@@ -1,0 +1,11 @@
+{
+    "id": "crm",
+    "name": "Customer History",
+    "description": "Customer relationship management module",
+    "keywords": ["crm", "customer"],
+    "version": "0.1.0",
+    "humhub": {
+        "minVersion": "1.15.0"
+    },
+    "namespace": "humhub\\modules\\crm"
+}
