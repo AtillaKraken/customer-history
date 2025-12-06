@@ -35,7 +35,13 @@ use yii\helpers\Html;
                         </div>
                     </div>
                     <div class="col-md-4 text-right">
-                        <?= Button::success('Schnellerfassung')->icon('fa-plus')->sm() ?>
+                    <?= Button::success('Schnellerfassung')
+                            ->icon('fa-plus')
+                            ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/create/'))
+                            ->right()
+                            ->sm()
+                            ->loader(false)
+                        ?>
                     </div>
                 </div>
             </div>
@@ -45,7 +51,7 @@ use yii\helpers\Html;
 
         <div class="crm-agenda-list">
             <?php foreach ($interactions as $interaction): ?>
-                <?= $this->render('_interaction_card', ['interaction' => $interaction]) ?>
+                <?= $this->render('../../widgets/views/interactionCard', ['interaction' => $interaction]) ?>
             <?php endforeach; ?>
         </div>
 
