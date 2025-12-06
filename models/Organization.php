@@ -2,6 +2,7 @@
 
 namespace app\modules\crm\models;
 
+use humhub\modules\user\models\User;
 use Yii;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\search\interfaces\Searchable; // required for  global search function
@@ -22,7 +23,7 @@ use humhub\modules\search\interfaces\Searchable; // required for  global search 
  * @property-read string $contentName
  * @property-read array $searchAttributes
  * @property-read string $icon
- * @property-read string $contentDescription
+ * @property-read string $description
  * @property-read mixed $responsibleUsers
  * @property Interaction[] $interactions
  */
@@ -42,6 +43,11 @@ class Organization extends ContentActiveRecord implements Searchable
         return 'crm_organization';
     }
 
+    /**
+     * @var array helper attribute for the form's UserPicker to save GUIDs.
+     */
+    public array $responsibleUserGuids = [];
+
     public function rules()
     {
         return [
@@ -51,6 +57,7 @@ class Organization extends ContentActiveRecord implements Searchable
             [['name'], 'string', 'max' => 255],
             [['category', 'industry', 'city'], 'string', 'max' => 100],
             [['size'], 'string', 'max' => 50],
+            [['responsibleUserGuids'], 'safe'],
         ];
     }
 
@@ -64,6 +71,7 @@ class Organization extends ContentActiveRecord implements Searchable
             'size' => 'Größe',
             'city' => 'Stadt',
             'notes' => 'Notizen',
+            'responsibleUserGuids' => 'Verantwortliche Nutzer',
         ];
     }
 
@@ -77,10 +85,10 @@ class Organization extends ContentActiveRecord implements Searchable
     }
 
     /**
-     * @inheritdoc
+     *
      * desc for search results
      */
-    public function getContentDescription()
+    public function getDescription()
     {
         return $this->name;
     }
@@ -102,6 +110,7 @@ class Organization extends ContentActiveRecord implements Searchable
     {
         return [
             'name' => $this->name,
+            'description' => $this->description,
             'city' => $this->city,
             'industry' => $this->industry,
             'notes' => $this->notes,
@@ -128,7 +137,42 @@ class Organization extends ContentActiveRecord implements Searchable
     // Relation to HumHub Users (ResponsibleUser)
     public function getResponsibleUsers()
     {
-        return $this->hasMany(\humhub\modules\user\models\User::class, ['id' => 'user_id'])
+        return $this->hasMany(User::class, ['id' => 'user_id'])
             ->viaTable('crm_organization_user', ['organization_id' => 'id']);
     }
+
+    /**
+     * load GUIDs after finding them in  responsibleUserGuids
+     */
+    public function afterFind()
+    {
+        parent::afterFind();
+        $this->responsibleUserGuids = array_map(function($user) {
+            return $user->guid;
+        }, $this->responsibleUsers);
+    }
+
+    /**
+     * save links after saving
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        // delete old links
+        $this->unlinkAll('responsibleUsers', true);
+
+        // set new links
+        if (!empty($this->responsibleUserGuids)) {
+            $guids = is_array($this->responsibleUserGuids) ? $this->responsibleUserGuids : explode(',', $this->responsibleUserGuids);
+
+            foreach ($guids as $guid) {
+                $user = User::findOne(['guid' => trim($guid)]);
+                if ($user) {
+                    $this->link('responsibleUsers', $user);
+                }
+            }
+        }
+    }
+
 }
