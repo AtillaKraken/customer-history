@@ -17,11 +17,13 @@ use humhub\widgets\Button;
     </div>
 
     <div class="panel-body">
-        <div class="clearfix">
+        <div class="clearfix" style="margin-bottom: 15px;">
             <?= Button::success('Neue Organisation')
                 ->icon('fa-plus')
+                ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/organization/create'))
                 ->right()
                 ->sm()
+                ->loader(false)
             ?>
         </div>
         <hr>
@@ -43,22 +45,28 @@ use humhub\widgets\Button;
                 <tbody>
                 <?php foreach ($organizations as $org): ?>
                     <tr>
-                        <td>
+                        <td style="vertical-align: middle;">
                             <strong><?= Html::encode($org->name) ?></strong>
                         </td>
-                        <td>
+                        <td style="vertical-align: middle;">
                             <span class="label label-default"><?= Html::encode($org->category) ?></span>
                         </td>
-                        <td>
+                        <td style="vertical-align: middle;">
                             <?= Html::encode($org->city) ?>
                         </td>
-                        <td>
-                            <?= Button::primary()->icon('fa-pencil')->xs() ?>
+                        <td class="text-right">
+                            <?= Button::primary()
+                                ->icon('fa-pencil')
+                                ->xs()
+                                ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/organization/edit', ['id' => $org->id]))
+                            //TODO: Edit-Dialog für Orgas
+                            ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
         <?php endif; ?>
+
     </div>
 </div>
