@@ -24,4 +24,24 @@ class OrganizationController extends ContentContainerController
             'space' => $this->contentContainer
         ]);
     }
+
+    public function actionCreate()
+    {
+        $model = new Organization();
+        $model->content->setContainer($this->contentContainer);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            // close Modal & reload stream
+            return $this->renderAjaxContent('
+                <script>
+                    humhub.modules.client.reload();
+                    humhub.modules.ui.modal.global.close();
+                </script>
+            ');
+        }
+
+        return $this->renderAjax('create', [
+            'model' => $model
+        ]);
+    }
 }

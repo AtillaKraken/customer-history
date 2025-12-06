@@ -1,19 +1,29 @@
 <?php
 
-use humhub\modules\space\widgets\Menu;
-use humhub\modules\crm\Module;
+use humhub\modules\content\widgets\WallCreateContentMenu; // NEUES ZIEL
+use humhub\modules\space\widgets\Menu; // FÜR SPACE SIDEBAR
+use humhub\modules\crm\Events;
 
 return [
     'id' => 'crm',
-    'class' => Module::class,
+    'class' => 'humhub\modules\crm\Module',
     'namespace' => 'humhub\modules\crm',
     'events' => [
-        // When Space menu is initialized (EVENT_INIT),
-        // call 'onSpaceMenuInit' in Module.php
+        // 1. Button im Stream (Jetzt korrekt am MENU, nicht am Formular)
+        [
+            'class' => WallCreateContentMenu::class,
+            'event' => WallCreateContentMenu::EVENT_INIT,
+            'callback' => [Events::class, 'onWallCreateContentMenuInit'],
+        ],
+
+        // 2. Link in der Space-Navigation (Damit das Modul links wieder auftaucht)
         [
             'class' => Menu::class,
             'event' => Menu::EVENT_INIT,
-            'callback' => [Module::class, 'onSpaceMenuInit'],
+            'callback' => [Events::class, 'onSpaceMenuInit'],
         ],
     ],
+    'urlManagerRules' => [
+        ['pattern' => 'contentcontainer/<containerId:\d+>/crm/<controller:\w+>/<action:\w*>', 'route' => 'crm/<controller>/<action>'],
+    ]
 ];
