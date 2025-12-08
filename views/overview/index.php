@@ -12,9 +12,9 @@ use yii\helpers\Html;
         <ul class="nav nav-pills">
             <li class="active"><a href="#">Übersicht</a></li>
             <li><a href="<?= $space->createUrl('/crm/organization/index') ?>">Organisationen</a></li>
-            <li><a href="#">Kontaktpersonen</a></li>
-            <li><a href="#">Interaktionen</a></li>
-            <li><a href="#">Veranstaltungen</a></li>
+            <li><a href="<?= $space->createUrl('/crm/contact/index') ?>">Kontaktpersonen</a></li>
+            <li><a href="<?= $space->createUrl('/crm/interaction/index') ?>">Interaktionen</a></li>
+            <li><a href="<?= $space->createUrl('/crm/event/index') ?>">Veranstaltungen</a></li>
         </ul>
     </div>
 </div>

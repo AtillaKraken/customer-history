@@ -12,8 +12,8 @@ use humhub\modules\ui\icon\widgets\Icon;
         <div class="row">
             <!-- Contact -->
             <div class="col-md-6">
-                <a href="<?= $contentContainer->createUrl('/crm/contact/create') ?>" data-target="#global-modal" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
-                    <div style="font-size: 40px; margin-bottom: 10px;">
+                <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $contentContainer->createUrl('/crm/contact/create') ?>" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
+                <div style="font-size: 40px; margin-bottom: 10px;">
                         <?= Icon::get('user') ?>
                     </div>
                     <h4 style="font-weight:bold;">Kontaktperson</h4>
@@ -25,7 +25,7 @@ use humhub\modules\ui\icon\widgets\Icon;
 
             <!-- Interaction -->
             <div class="col-md-6">
-                <a href="<?= $contentContainer->createUrl('/crm/interaction/create') ?>" data-target="#global-modal" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
+                <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $contentContainer->createUrl('/crm/interaction/create') ?>" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
                     <div style="font-size: 40px; margin-bottom: 10px;">
                         <?= Icon::get('comments-o') ?>
                     </div>
@@ -39,7 +39,7 @@ use humhub\modules\ui\icon\widgets\Icon;
         <div class="row" style="margin-top: 20px;">
             <!-- Organization -->
             <div class="col-md-6">
-                <a href="<?= $contentContainer->createUrl('/crm/organization/create') ?>" data-target="#global-modal" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
+                    <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $contentContainer->createUrl('/crm/organization/create') ?>" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
                     <div style="font-size: 40px; margin-bottom: 10px;">
                         <?= Icon::get('building') ?>
                     </div>
@@ -52,7 +52,7 @@ use humhub\modules\ui\icon\widgets\Icon;
 
             <!-- Event -->
             <div class="col-md-6">
-                <a href="<?= $contentContainer->createUrl('/crm/event/create') ?>" data-target="#global-modal" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
+                <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $contentContainer->createUrl('/crm/event/create') ?>" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
                     <div style="font-size: 40px; margin-bottom: 10px;">
                         <?= Icon::get('calendar') ?>
                     </div>
