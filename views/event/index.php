@@ -1,6 +1,7 @@
 <?php
 
 use app\modules\crm\models\Event;
+use app\modules\crm\widgets\CrmNavigation;
 use humhub\modules\space\models\Space;
 use yii\helpers\Html;
 use humhub\widgets\Button;
@@ -11,23 +12,19 @@ use humhub\widgets\Button;
  */
 ?>
 
+<?= CrmNavigation::widget([
+    'contentContainer' => $space,
+    'activeTab' => 'event',
+    'createButtonLabel' => 'Neue Veranstaltung',
+    'createUrl' => $space->createUrl('/crm/event/create')
+]) ?>
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <i class="fa fa-building"></i> <strong>Veranstaltungen</strong> im Space
     </div>
 
     <div class="panel-body">
-        <div class="clearfix" style="margin-bottom: 15px;">
-            <?= Button::success('Neue Veranstaltung')
-                ->icon('fa-plus')
-                ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/event/create'))
-                ->right()
-                ->sm()
-                ->loader(false)
-            ?>
-        </div>
-        <hr>
-
         <?php if (empty($events)): ?>
             <div class="alert alert-info">
                 Es liegen noch keine Veranstaltungen vor. Leg doch die erste an!
@@ -63,5 +60,15 @@ use humhub\widgets\Button;
             </table>
         <?php endif; ?>
 
+
+        <div class="clearfix" style="margin-bottom: 15px;">
+            <?= Button::success('Neue Veranstaltung')
+                ->icon('fa-plus')
+                ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/event/create'))
+                ->right()
+                ->sm()
+                ->loader(false)
+            ?>
+        </div>
     </div>
 </div>

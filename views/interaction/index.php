@@ -1,6 +1,7 @@
 <?php
 
 use app\modules\crm\models\Interaction;
+use app\modules\crm\widgets\CrmNavigation;
 use humhub\modules\space\models\Space;
 use yii\helpers\Html;
 use humhub\widgets\Button;
@@ -11,22 +12,20 @@ use humhub\widgets\Button;
  */
 ?>
 
+<?= CrmNavigation::widget([
+    'contentContainer' => $space,
+    'activeTab' => 'interaction',
+    'createButtonLabel' => 'Neue Interaktion',
+    'createUrl' => $space->createUrl('/crm/interaction/create')
+]) ?>
+
 <div class="panel panel-default">
     <div class="panel-heading">
         <i class="fa fa-building"></i> <strong>Interaktionen</strong> im Space
     </div>
 
     <div class="panel-body">
-        <div class="clearfix" style="margin-bottom: 15px;">
-            <?= Button::success('Neue Interaktion')
-                ->icon('fa-plus')
-                ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/interaction/create'))
-                ->right()
-                ->sm()
-                ->loader(false)
-            ?>
-        </div>
-        <hr>
+
 
         <?php if (empty($interactions)): ?>
             <div class="alert alert-info">
@@ -68,5 +67,15 @@ use humhub\widgets\Button;
             </table>
         <?php endif; ?>
 
+
+        <div class="clearfix" style="margin-bottom: 15px;">
+            <?= Button::success('Neue Interaktion')
+                ->icon('fa-plus')
+                ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/interaction/create'))
+                ->right()
+                ->sm()
+                ->loader(false)
+            ?>
+        </div>
     </div>
 </div>
