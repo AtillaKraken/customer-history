@@ -58,8 +58,6 @@ class Contact extends ContentActiveRecord
         ];
     }
 
-    // --- RELATIONEN ---
-
     public function getEvents()
     {
         return $this->hasMany(Event::class, ['id' => 'event_id'])
@@ -74,7 +72,6 @@ class Contact extends ContentActiveRecord
 
     public function getOrganization()
     {
-        // WICHTIG: Organization::class (nicht CrmOrganization)
         return $this->hasOne(Organization::class, ['id' => 'organization_id']);
     }
 }
