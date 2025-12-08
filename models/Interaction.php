@@ -2,8 +2,10 @@
 
 namespace app\modules\crm\models;
 
-use Yii;
+use humhub\modules\crm\models\traits\LinkableTrait;
+use humhub\modules\user\models\User;
 use humhub\modules\content\components\ContentActiveRecord;
+use humhub\modules\topic\models\Topic;
 
 /**
  * This is the model class for table "crm_interaction".
@@ -24,21 +26,31 @@ use humhub\modules\content\components\ContentActiveRecord;
  */
 class Interaction extends ContentActiveRecord
 {
+    use LinkableTrait;
+
     public static function tableName()
     {
         return 'crm_interaction';
     }
 
+    /**
+     * @var array helper attribute for the form's UserPicker to save GUIDs.
+     */
+    public array $responsibleUserGuids = []; // <--- DIES FEHLTE
+
+    public $topics = [];
+
     public function rules()
     {
         return [
+            [['title'], 'string', 'max' => 255],
             [['time', 'channel', 'description', 'result', 'links'], 'default', 'value' => null],
             [['status'], 'default', 'value' => 'PLANNED'],
             [['date', 'title'], 'required'],
             [['date', 'time'], 'safe'],
             [['description', 'result', 'links'], 'string'],
-            [['title'], 'string', 'max' => 255],
             [['channel', 'status'], 'string', 'max' => 50],
+            [['topics', 'responsibleUserGuids', 'newLinks', 'editLinks'], 'safe'],
         ];
     }
 
@@ -71,8 +83,36 @@ class Interaction extends ContentActiveRecord
 
     public function getResponsibleUsers()
     {
-        // HumHub User Model
-        return $this->hasMany(\humhub\modules\user\models\User::class, ['id' => 'user_id'])
+        return $this->hasMany(User::class, ['id' => 'user_id'])
             ->viaTable('crm_interaction_responsible_user', ['interaction_id' => 'id']);
+    }
+
+    public function afterFind()
+    {
+        parent::afterFind();
+        // Lade die GUIDs für das Formular
+        $this->responsibleUserGuids = array_map(function($user) {
+            return $user->guid;
+        }, $this->responsibleUsers);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        $this->saveLinks();
+        Topic::attach($this->content, $this->topics);
+
+        // Speichere Responsible Users
+        $this->unlinkAll('responsibleUsers', true);
+        if (!empty($this->responsibleUserGuids)) {
+            $guids = is_array($this->responsibleUserGuids) ? $this->responsibleUserGuids : explode(',', $this->responsibleUserGuids);
+            foreach ($guids as $guid) {
+                $user = User::findOne(['guid' => trim($guid)]);
+                if ($user) {
+                    $this->link('responsibleUsers', $user);
+                }
+            }
+        }
     }
 }
