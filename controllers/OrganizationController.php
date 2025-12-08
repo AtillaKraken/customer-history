@@ -28,20 +28,36 @@ class OrganizationController extends ContentContainerController
     public function actionCreate()
     {
         $model = new Organization();
-        $model->content->setContainer($this->contentContainer);
+        $model->content->container = $this->contentContainer;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            // close Modal & reload stream
-            return $this->renderAjaxContent('
-                <script>
-                    humhub.modules.client.reload();
-                    humhub.modules.ui.modal.global.close();
-                </script>
-            ');
+            return $this->asJson(['success' => true]); // or close modal
         }
 
-        return $this->renderAjax('create', [
-            'model' => $model
+
+        return $this->renderAjax('edit', [
+            'model' => $model,
+            'contentContainer' => $this->contentContainer
         ]);
     }
+
+    public function actionEdit($id)
+    {
+        $model = Organization::findOne(['id' => $id]);
+
+        // Security Check: Darf der User das sehen?
+        if (!$model || $model->content->contentcontainer_id !== $this->contentContainer->id) {
+            throw new \yii\web\HttpException(404);
+        }
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->asJson(['success' => true]);
+        }
+
+        return $this->renderAjax('edit', [
+            'model' => $model,
+            'contentContainer' => $this->contentContainer
+        ]);
+    }
+
 }

@@ -1,18 +1,15 @@
 <?php
 
-use app\modules\crm\models\Organization;
-use humhub\widgets\ModalDialog;
-use humhub\widgets\ModalButton;
-use humhub\modules\ui\form\widgets\ActiveForm;
 use humhub\modules\user\widgets\UserPickerField;
 use humhub\modules\content\widgets\richtext\RichTextField;
+use app\modules\crm\models\Organization;
 
+
+/* @var $form humhub\modules\ui\form\widgets\ActiveForm */
 /* @var $model Organization */
 ?>
 
-<?php ModalDialog::begin(['header' => 'Neue <strong>Organisation</strong>', 'size' => 'large']) ?>
-<?php $form = ActiveForm::begin(); ?>
-<div class="modal-body">
+<div style="padding-top: 15px;">
 
     <!-- Name -->
     <?= $form->field($model, 'name')->textInput(['placeholder' => 'Name der Organisation'])->hint(false) ?>
@@ -36,7 +33,6 @@ use humhub\modules\content\widgets\richtext\RichTextField;
     <?= $form->field($model, 'city')->textInput(['placeholder' => 'Ort']) ?>
 
     <!-- Notes (Rich Text) -->
-
     <?= $form->field($model, 'description')->widget(RichTextField::class) ?>
 
     <!-- Responsible Users -->
@@ -49,11 +45,5 @@ use humhub\modules\content\widgets\richtext\RichTextField;
     <div class="text-right">
         <a href="#" class="small"><i class="fa fa-check-circle"></i> Mich zuweisen</a>
     </div>
-
+    <!-- TODO: Mich Hinzufügen fixne-->
 </div>
-<div class="modal-footer">
-    <?= ModalButton::submitModal('Speichern', ['class' => 'btn btn-primary']) ?>
-    <?= ModalButton::cancel('Abbrechen') ?>
-</div>
-<?php ActiveForm::end(); ?>
-<?php ModalDialog::end() ?>
