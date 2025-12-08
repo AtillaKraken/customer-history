@@ -37,7 +37,37 @@ class OverviewController extends ContentContainerController
                     ['name' => 'Thomas van Maloche', 'org' => 'MalocherMannschaftHL'],
                 ],
                 'responsible' => ['Max Mustermann', 'Atilla']
-            ]
+            ],
+            [
+                'id' => 3,
+                'title' => 'Abgesagt...',
+                'date' => '2026-01-01 10:00:00',
+                'status' => 'CANCELLED', // PLANNED, COMPLETED, OVERDUE...
+                'channel' => 'Face-to-Face',
+                'description' => "Wir müssen Kooperationen anfragen bei folgenden Organisationen:\n- MalocherMannschaftHL\n- HAW Hamburg\nKommt was dazwischen dann bitte kommentieren!",
+                'creator' => 'Atilla',
+                'contacts' => [
+                    ['name' => 'L. Heldin', 'org' => 'HAW Hamburg'],
+                    ['name' => 'Kontaktperson ID:12', 'org' => 'Ministerium für Wirtschaft'],
+                ],
+                'responsible' => ['Atilla']
+            ],
+            [
+                'id' => 4,
+                'title' => 'Erledigtes Telefonat :-)',
+                'date' => '2026-01-01 10:00:00',
+                'status' => 'DONE', // PLANNED, COMPLETED, OVERDUE...
+                'channel' => 'Call',
+                'description' => "Wir müssen Kooperationen anfragen bei folgenden Organisationen:\n- MalocherMannschaftHL\n- HAW Hamburg\nKommt was dazwischen dann bitte kommentieren!",
+                'creator' => 'Atilla',
+                'contacts' => [
+                    ['name' => 'L. Heldin', 'org' => 'HAW Hamburg'],
+                    ['name' => 'T. Held', 'org' => 'THL'],
+                    ['name' => 'Christoph Testermann', 'org' => 'UHH'],
+                    ['name' => 'Kontaktperson ID:12', 'org' => 'Ministerium für Wirtschaft'],
+                ],
+                'responsible' => ['Atilla', 'Atilla2', 'Atilla3']
+            ],
         ];
 
         return $this->render('index', [
