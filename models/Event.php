@@ -2,6 +2,7 @@
 
 namespace app\modules\crm\models;
 
+use humhub\modules\crm\models\traits\LinkableTrait;
 use Yii;
 use humhub\modules\content\components\ContentActiveRecord;
 
@@ -24,10 +25,14 @@ use humhub\modules\content\components\ContentActiveRecord;
  */
 class Event extends ContentActiveRecord
 {
+    use LinkableTrait;
+
     public static function tableName()
     {
         return 'crm_event';
     }
+
+    public $topics = []; // helper array for the form/modal
 
     public function rules()
     {
@@ -39,6 +44,8 @@ class Event extends ContentActiveRecord
             [['calendar_entry_id'], 'integer'],
             [['title'], 'string', 'max' => 255],
             [['type'], 'string', 'max' => 100],
+            [['topics'], 'safe'],
+            [['newLinks', 'editLinks'], 'safe'],
         ];
     }
 
@@ -53,6 +60,7 @@ class Event extends ContentActiveRecord
             'description' => 'Description',
             'links' => 'Links',
             'calendar_entry_id' => 'Calendar Entry',
+            'topics' => 'Topics',
         ];
     }
 
@@ -66,5 +74,12 @@ class Event extends ContentActiveRecord
     {
         return $this->hasMany(Organization::class, ['id' => 'organization_id'])
             ->viaTable('crm_event_organization', ['event_id' => 'id']);
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+        $this->saveLinks(); // save links
+        \humhub\modules\topic\models\Topic::attach($this->content, $this->topics); // save topcis
     }
 }
