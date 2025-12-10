@@ -24,7 +24,7 @@ $header = $model->isNewRecord
     </div>
 
     <div class="modal-footer">
-        <?= ModalButton::submitModal('Speichern', ['class' => 'btn btn-primary']) ?>
+        <?= ModalButton::submitModal(null, 'Speichern') ?>
         <?= ModalButton::cancel('Abbrechen') ?>
     </div>
 <?php ActiveForm::end(); ?>
