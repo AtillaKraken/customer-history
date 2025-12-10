@@ -1,6 +1,11 @@
 <?php
 
 use app\modules\crm\widgets\CrmNavigation;
+use app\modules\crm\widgets\InteractionCard;
+use app\modules\crm\widgets\CrmStatistics;
+use app\modules\crm\widgets\MyInteractions;
+use app\modules\crm\widgets\MyOrganizations;
+use app\modules\crm\widgets\UpcomingEvents;
 
 /* @var $space humhub\modules\space\models\Space */
 /* @var $interactions array */
@@ -21,7 +26,8 @@ use app\modules\crm\widgets\CrmNavigation;
 
         <div class="crm-agenda-list">
             <?php foreach ($interactions as $interaction): ?>
-                <?= $this->render('../../widgets/views/interactionCard', ['interaction' => $interaction]) ?>
+                <!-- Nutzt das InteractionCard Widget für die große Darstellung -->
+                <?= InteractionCard::widget(['interaction' => $interaction]) ?>
             <?php endforeach; ?>
         </div>
 
@@ -34,10 +40,11 @@ use app\modules\crm\widgets\CrmNavigation;
     </div>
 
     <div class="col-md-4">
-        <!-- Sidebar Content (Statistik, Deine Interaktionen etc.) unverändert lassen -->
         <div class="panel panel-default">
-            <div class="panel-heading"><strong>Schnellzugriff & Statistik</strong></div>
-            <div class="panel-body">...</div>
+            <?php MyInteractions::widget(['contentContainer' => $space]) ?>
+            <?php MyOrganizations::widget(['contentContainer' => $space]) ?>
+            <?php UpcomingEvents::widget(['contentContainer' => $space]) ?>
+            <?php CrmStatistics::widget(['contentContainer' => $space]) ?>
         </div>
     </div>
 </div>
