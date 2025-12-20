@@ -3,6 +3,7 @@
 namespace app\modules\crm\widgets;
 
 use humhub\components\Widget;
+use app\modules\crm\models\forms\CrmFilter;
 use humhub\modules\content\components\ContentContainerActiveRecord;
 
 class CrmNavigation extends Widget
@@ -27,6 +28,12 @@ class CrmNavigation extends Widget
      */
     public $createUrl = null;
 
+    /**
+     * @var CrmFilter Filter Model has to be given by the controller,
+     * to maintain the status (z.B. Search entry).
+     */
+    public ?CrmFilter $filter = null;
+
     public function run()
     {
         // Default URL: quick capture
@@ -34,11 +41,17 @@ class CrmNavigation extends Widget
             $this->createUrl = $this->contentContainer->createUrl('/crm/create/index');
         }
 
+        // Fallback: empty filter
+        if ($this->filter === null) {
+            $this->filter = new CrmFilter();
+        }
+
         return $this->render('crmNavigation', [
             'contentContainer' => $this->contentContainer,
             'activeTab' => $this->activeTab,
             'createButtonLabel' => $this->createButtonLabel,
             'createUrl' => $this->createUrl,
+            'filter' => $this->filter, // An View weitergeben
         ]);
     }
 }
