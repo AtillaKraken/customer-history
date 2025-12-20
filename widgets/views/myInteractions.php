@@ -28,7 +28,7 @@ use humhub\widgets\PanelMenu;
                 <small class="text-muted">
                     <?= Yii::$app->formatter->asDate($int->date, 'php:d.m.y') ?> |
                     Betroffen:
-                    <?php // Beispiel für Org-Anzeige (erstes Element)
+                    <?php
                     $firstOrg = $int->getOrganizations()->one();
                     echo $firstOrg ? '<i class="fa fa-building-o"></i> ' . Html::encode($firstOrg->name) : '-';
                     ?>
