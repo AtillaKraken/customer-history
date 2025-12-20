@@ -22,11 +22,33 @@ use humhub\modules\topic\models\Topic;
  *
  * @property Contact[] $contacts
  * @property Organization[] $organizations
+ * @property-read mixed $event
+ * @property-read mixed $responsibleUsers
  * @property User[] $users
  */
 class Interaction extends ContentActiveRecord
 {
     use LinkableTrait;
+
+
+    // Statuses:
+    const STATUS_PLANNED = 'PLANNED';
+    const STATUS_OVERDUE = 'OVERDUE';
+    const STATUS_CANCELLED = 'CANCELLED';
+    const STATUS_DONE = 'DONE';
+
+    // Channels:
+    const CHANNEL_EMAIL = 'EMAIL';
+    const CHANNEL_PHONE = 'PHONE';
+    const CHANNEL_VIDEO = 'VIDEO_CONF';
+    const CHANNEL_IN_PERSON = 'IN_PERSON';
+    const CHANNEL_EVENT = 'EVENT';
+    const CHANNEL_SOCIAL = 'SOCIAL_MEDIA';
+    const CHANNEL_MESSENGER = 'MESSENGER';
+    const CHANNEL_LETTER = 'LETTER';
+    const CHANNEL_NEWSLETTER = 'NEWSLETTER';
+    const CHANNEL_OTHER = 'OTHER';
+
 
     public static function tableName()
     {
@@ -46,10 +68,12 @@ class Interaction extends ContentActiveRecord
             [['date', 'title'], 'required'],
             [['title'], 'string', 'max' => 255],
             [['time', 'channel', 'description', 'result', 'links'], 'default', 'value' => null],
-            [['status'], 'default', 'value' => 'PLANNED'],
+            ['status', 'in', 'range' => array_keys(self::getStatusOptions())], // only allow one of the statusses as model entries
+            ['status', 'default', 'value' => self::STATUS_PLANNED],
             [['date', 'time'], 'safe'],
             [['description', 'result', 'links'], 'string'],
             [['channel', 'status'], 'string', 'max' => 50],
+            ['channel', 'in', 'range' => array_keys(self::getChannelOptions())],
             [['topics', 'responsibleUserGuids', 'newLinks', 'editLinks'], 'safe'],
             [['event_id'], 'integer'],
         ];
@@ -59,15 +83,47 @@ class Interaction extends ContentActiveRecord
     {
         return [
             'id' => 'ID',
-            'date' => 'Date',
-            'time' => 'Time',
-            'title' => 'Title',
-            'channel' => 'Channel',
+            'date' => 'Datum',
+            'time' => 'Zeit',
+            'title' => 'Titel',
+            'channel' => 'Kanal',
             'status' => 'Status',
-            'description' => 'Description',
-            'result' => 'Result',
+            'description' => 'Beschreibung',
+            'result' => 'Ergebnis',
             'links' => 'Links',
             'event_id' => 'EventID',
+        ];
+    }
+
+    /**
+     * @return string[] array of applicable statuses
+     */
+    public static function getStatusOptions()
+    {
+        return [
+            self::STATUS_PLANNED => 'Geplant',
+            self::STATUS_OVERDUE => 'Überfällig',
+            self::STATUS_CANCELLED => 'Abgesagt',
+            self::STATUS_DONE => 'Erledigt',
+        ];
+    }
+
+    /**
+     * @return string[] array of applicable channels
+     */
+    public static function getChannelOptions()
+    {
+        return [
+            self::CHANNEL_EMAIL      => 'E-Mail',
+            self::CHANNEL_PHONE      => 'Telefon',
+            self::CHANNEL_VIDEO      => 'Videokonferenz',
+            self::CHANNEL_IN_PERSON  => 'Persönliches Treffen',
+            self::CHANNEL_EVENT      => 'Veranstaltung',
+            self::CHANNEL_SOCIAL     => 'Social Media',
+            self::CHANNEL_MESSENGER  => 'HumHub-Messenger',
+            self::CHANNEL_LETTER     => 'Brief',
+            self::CHANNEL_NEWSLETTER => 'Newsletter',
+            self::CHANNEL_OTHER      => 'Sonstiges',
         ];
     }
 
@@ -97,10 +153,13 @@ class Interaction extends ContentActiveRecord
     public function afterFind()
     {
         parent::afterFind();
-        // Lade die GUIDs für das Formular
+        // load GUIDs/responsibleUsers for the form
         $this->responsibleUserGuids = array_map(function ($user) {
             return $user->guid;
         }, $this->responsibleUsers);
+
+        // load topics
+        $this->topics = Topic::findByContent($this->content)->all();
     }
 
     public function afterSave($insert, $changedAttributes)
@@ -111,7 +170,6 @@ class Interaction extends ContentActiveRecord
         Topic::attach($this->content, $this->topics);
 
         // save contacts
-        // TODO: contactIds vom Formular übermitteln lassen
         if (is_array($this->contactIds)) {
             $this->unlinkAll('contacts', true);
             foreach ($this->contactIds as $cId) {
