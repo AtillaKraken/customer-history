@@ -4,8 +4,6 @@ use app\modules\crm\models\Organization;
 use humhub\widgets\ModalDialog;
 use humhub\widgets\ModalButton;
 use humhub\modules\ui\form\widgets\ActiveForm;
-use humhub\modules\user\widgets\UserPickerField;
-use humhub\modules\content\widgets\richtext\RichTextField;
 
 /* @var $model Organization */
 
@@ -17,7 +15,7 @@ $header = $model->isNewRecord
 $buttonText = $model->isNewRecord ? 'Erstellen' : 'Speichern';
 ?>
 
-<?php ModalDialog::begin(['header' => 'Neue <strong>Organisation</strong>', 'size' => 'large']) ?>
+<?php ModalDialog::begin(['header' => $header, 'size' => 'large']) ?>
 <?php $form = ActiveForm::begin(); ?>
 <div class="modal-body">
     <!-- embed content from edit-basic.php -->

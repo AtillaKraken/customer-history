@@ -16,7 +16,7 @@ $header = $model->isNewRecord
 $buttonText = $model->isNewRecord ? 'Erstellen' : 'Speichern';
 ?>
 
-<?php ModalDialog::begin(['header' => 'Neue <strong>Interaktion</strong>', 'size' => 'large']) ?>
+<?php ModalDialog::begin(['header' => $header, 'size' => 'large']) ?>
 <?php $form = ActiveForm::begin(['id' => 'interaction-form']); ?>
 
 <?= Tabs::widget([

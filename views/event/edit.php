@@ -16,8 +16,7 @@ $header = $model->isNewRecord
 $buttonText = $model->isNewRecord ? 'Erstellen' : 'Speichern';
 ?>
 
-<?php ModalDialog::begin(['header' => 'Neue <strong>Veranstaltung</strong>', 'size' => 'large']) ?>
-<?php $form = ActiveForm::begin(); ?>
+<?php ModalDialog::begin(['header' => $header, 'size' => 'large']) ?><?php $form = ActiveForm::begin(); ?>
 <?= Tabs::widget([
     'items' => [
         [
