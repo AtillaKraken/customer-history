@@ -20,7 +20,11 @@ use yii\jui\DatePicker;
         <div class="row">
             <div class="col-md-6">
                 <!-- Date -->
-                <?= $form->field($model, 'date')->widget(DatePicker::class, ['dateFormat' => Yii::$app->formatter->dateInputFormat, 'clientOptions' => [], 'options' => ['class' => 'form-control']]) ?>
+                <?= $form->field($model, 'date')->widget(DatePicker::class, [
+                    'dateFormat' => 'php:d.m.Y',
+                    'clientOptions' => [],
+                    'options' => ['class' => 'form-control', 'placeholder' => 'TT.MM.JJJJ']
+                ]) ?>
             </div>
             <div class="col-md-6">
                 <!-- Time -->

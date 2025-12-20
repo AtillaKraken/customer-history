@@ -114,16 +114,16 @@ class Interaction extends ContentActiveRecord
     public static function getChannelOptions()
     {
         return [
-            self::CHANNEL_EMAIL      => 'E-Mail',
-            self::CHANNEL_PHONE      => 'Telefon',
-            self::CHANNEL_VIDEO      => 'Videokonferenz',
-            self::CHANNEL_IN_PERSON  => 'Persönliches Treffen',
-            self::CHANNEL_EVENT      => 'Veranstaltung',
-            self::CHANNEL_SOCIAL     => 'Social Media',
-            self::CHANNEL_MESSENGER  => 'HumHub-Messenger',
-            self::CHANNEL_LETTER     => 'Brief',
+            self::CHANNEL_EMAIL => 'E-Mail',
+            self::CHANNEL_PHONE => 'Telefon',
+            self::CHANNEL_VIDEO => 'Videokonferenz',
+            self::CHANNEL_IN_PERSON => 'Persönliches Treffen',
+            self::CHANNEL_EVENT => 'Veranstaltung',
+            self::CHANNEL_SOCIAL => 'Social Media',
+            self::CHANNEL_MESSENGER => 'HumHub-Messenger',
+            self::CHANNEL_LETTER => 'Brief',
             self::CHANNEL_NEWSLETTER => 'Newsletter',
-            self::CHANNEL_OTHER      => 'Sonstiges',
+            self::CHANNEL_OTHER => 'Sonstiges',
         ];
     }
 
@@ -160,6 +160,25 @@ class Interaction extends ContentActiveRecord
 
         // load topics
         $this->topics = Topic::findByContent($this->content)->all();
+
+        // format date (for readability)
+        if ($this->date) {
+            $this->date = \Yii::$app->formatter->asDate($this->date, 'php:d.m.Y');
+        }
+    }
+
+    public function beforeSave($insert)
+    {
+        if (!parent::beforeSave($insert)) return false;
+
+        // format date for database (dd.mm.YYYY -> YYYY-mm-dd)
+        if ($this->date) {
+            $dt = \DateTime::createFromFormat('d.m.Y', $this->date);
+            if ($dt) {
+                $this->date = $dt->format('Y-m-d');
+            }
+        }
+        return true;
     }
 
     public function afterSave($insert, $changedAttributes)

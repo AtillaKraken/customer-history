@@ -3,6 +3,7 @@
 namespace app\modules\crm\models;
 
 use humhub\modules\crm\models\traits\LinkableTrait;
+use humhub\modules\topic\models\Topic;
 use Yii;
 use humhub\modules\content\components\ContentActiveRecord;
 
@@ -53,14 +54,14 @@ class Event extends ContentActiveRecord
     {
         return [
             'id' => 'ID',
-            'title' => 'Title',
-            'date' => 'Date',
-            'time' => 'Time',
-            'type' => 'Type',
-            'description' => 'Description',
+            'title' => 'Titel',
+            'date' => 'Datum',
+            'time' => 'Zeit',
+            'type' => 'Format',
+            'description' => 'Beschreibung',
             'links' => 'Links',
-            'calendar_entry_id' => 'Calendar Entry',
-            'topics' => 'Topics',
+            'calendar_entry_id' => 'Zug. Kalender-Eintrag',
+            'topics' => 'Themen',
         ];
     }
 
@@ -74,6 +75,32 @@ class Event extends ContentActiveRecord
     {
         return $this->hasMany(Organization::class, ['id' => 'organization_id'])
             ->viaTable('crm_event_organization', ['event_id' => 'id']);
+    }
+
+    public function afterFind()
+    {
+        parent::afterFind();
+        // load topics
+        $this->topics = Topic::findByContent($this->content)->all();
+
+        // format date (for readability)
+        if ($this->date) {
+            $this->date = \Yii::$app->formatter->asDate($this->date, 'php:d.m.Y');
+        }
+    }
+
+    public function beforeSave($insert)
+    {
+        if (!parent::beforeSave($insert)) return false;
+
+        // format date for database (dd.mm.YYYY -> YYYY-mm-dd)
+        if ($this->date) {
+            $dt = \DateTime::createFromFormat('d.m.Y', $this->date);
+            if ($dt) {
+                $this->date = $dt->format('Y-m-d');
+            }
+        }
+        return true;
     }
 
     public function afterSave($insert, $changedAttributes)
