@@ -40,11 +40,14 @@ use app\modules\crm\widgets\UpcomingEvents;
     </div>
 
     <div class="col-md-4">
-        <div class="panel panel-default">
-            <?php MyInteractions::widget(['contentContainer' => $space]) ?>
-            <?php MyOrganizations::widget(['contentContainer' => $space]) ?>
-            <?php UpcomingEvents::widget(['contentContainer' => $space]) ?>
-            <?php CrmStatistics::widget(['contentContainer' => $space]) ?>
+        <div >
+            <?php try {
+                echo MyInteractions::widget(['contentContainer' => $space]);
+                echo MyOrganizations::widget(['contentContainer' => $space]);
+                echo UpcomingEvents::widget(['contentContainer' => $space]);
+                echo CrmStatistics::widget(['contentContainer' => $space]);
+            } catch (Exception $e) {
+            } ?>
         </div>
     </div>
 </div>
