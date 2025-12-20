@@ -21,47 +21,12 @@ use humhub\widgets\Button;
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-building"></i> <strong>Veranstaltungen</strong> im Space
+        <i class="fa fa-calendar"></i> <strong>Veranstaltungen</strong>
     </div>
+    <div class="panel-body" id="crm-list-content">
+        <?= $this->render('_list', ['events' => $events]) ?>
 
-    <div class="panel-body">
-        <?php if (empty($events)): ?>
-            <div class="alert alert-info">
-                Es liegen noch keine Veranstaltungen vor. Leg doch die erste an!
-            </div>
-        <?php else: ?>
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>Titel</th>
-                    <th>Format</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php foreach ($events as $evt): ?>
-                    <tr>
-                        <td style="vertical-align: middle;">
-                            <strong><?= Html::encode($evt->name) ?></strong>
-                        </td>
-                        <td style="vertical-align: middle;">
-                            <span class="label label-default"><?= Html::encode($evt->type) ?></span>
-                        </td>
-                        <td class="text-right">
-                            <?= Button::primary()
-                                ->icon('fa-pencil')
-                                ->xs()
-                                ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/event/edit', ['id' => $evt->id]))
-                            //TODO: Edit-Dialog für Events
-                            ?>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
-
-
-        <div class="clearfix" style="margin-bottom: 15px;">
+        <div class="clearfix" style="margin-bottom: 15px; margin-top: 15px">
             <?= Button::success('Neue Veranstaltung')
                 ->icon('fa-plus')
                 ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/event/create'))
@@ -71,4 +36,5 @@ use humhub\widgets\Button;
             ?>
         </div>
     </div>
+
 </div>
