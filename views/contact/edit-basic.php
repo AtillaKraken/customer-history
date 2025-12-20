@@ -1,6 +1,7 @@
 <?php
 
 use humhub\modules\content\widgets\richtext\RichTextField;
+use humhub\modules\ui\form\widgets\MultiSelect;
 use app\modules\crm\models\Contact;
 
 /* @var $form humhub\modules\ui\form\widgets\ActiveForm */
@@ -21,19 +22,21 @@ use app\modules\crm\models\Contact;
                 'male' => 'Männlich',
                 'female' => 'Weiblich',
                 'diverse' => 'Divers',
-                'other' => 'Anderes',
-                'n/a' => 'Keine Angabe'
-            ], ['prompt' => 'Geschlecht...']) ?>
+            ], ['prompt' => 'Keine Angabe']) ?>
         </div>
     </div>
 
     <!-- Link to Organization -->
     <?= $form->field($model, 'organization_id')->dropDownList($organizations, ['prompt' => 'Organisation auswählen...'])
-        ->label('Gehört zu Organisation') ?>
+        ->label('Zugehörigkeit') ?>
 
-    <!-- Roles / Positions -->
-    <?= $form->field($model, 'roles')->textInput(['placeholder' => 'z.B. Geschäftsführer, Einkäufer']) ?>
-    <!-- TODO: Entsprechendes Widget entwikeln für Multiselect zum anlegen einer String-liste -->
+    <!-- Roles -->
+    <?= $form->field($model, 'roleList')->widget(MultiSelect::class, [
+        'items' => Contact::getRoleOptions(),
+        'options' => [
+            'multiple' => true, // allow multiselection
+        ],
+    ])->label('Rollen / Funktionen') ?>
 
     <hr>
 
