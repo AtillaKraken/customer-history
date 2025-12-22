@@ -5,7 +5,9 @@ namespace app\modules\crm\models;
 use humhub\modules\user\models\User;
 use Yii;
 use humhub\modules\content\components\ContentActiveRecord;
-use humhub\modules\search\interfaces\Searchable; // required for  global search function
+use humhub\modules\search\interfaces\Searchable;
+
+// required for  global search function
 
 /**
  * This is the model class for table "crm_organization".
@@ -29,7 +31,83 @@ use humhub\modules\search\interfaces\Searchable; // required for  global search 
  */
 class Organization extends ContentActiveRecord implements Searchable
 {
-    public $moduleId = 'crm';
+    // Category:
+    const CATEGORY_COMPANY = 'Unternehmen';
+    const CATEGORY_ASSOCIATION = 'Verband';
+    const CATEGORY_SCHOOL = 'Schule';
+    const CATEGORY_COLLEGE = 'Hochschule';
+    const CATEGORY_AUTHORITY = 'Behörde';
+    const CATEGORY_PROJECT = 'Projekt';
+    const CATEGORY_RESEARCH_PROJECT = 'Forschungsprojekt';
+    private const CATEGORIES = [
+        self::CATEGORY_COMPANY,
+        self::CATEGORY_ASSOCIATION,
+        self::CATEGORY_SCHOOL,
+        self::CATEGORY_COLLEGE,
+        self::CATEGORY_AUTHORITY,
+        self::CATEGORY_PROJECT,
+        self::CATEGORY_RESEARCH_PROJECT,
+    ];
+
+
+    // Industry:
+    const INDUSTRY_IT_AND_SOFTWARE_DEVELOPMENT = 'IT & Softwareentwicklung';
+    const INDUSTRY_MECHANICAL_ENGINEERING_AND_INDUSTRY = 'Maschinenbau & Industrie';
+    const INDUSTRY_AUTOMOTIVE_AND_MOBILITY = 'Automobil & Mobilität';
+    const INDUSTRY_ENERGY_AND_ENVIRONMENT = 'Energie & Umwelt';
+    const INDUSTRY_CONSTRUCTION_AND_ARCHITECTURE = 'Bau & Architektur';
+    const INDUSTRY_CRAFTS = 'Handwerk';
+    const INDUSTRY_HEALTH_AND_CARE = 'Gesundheit & Pflege';
+    const INDUSTRY_EDUCATION_AND_RESEARCH = 'Bildung & Forschung';
+    const INDUSTRY_PUBLIC_SERVICE_AND_ADMINISTRATION = 'Öffentlicher Dienst & Verwaltung';
+    const INDUSTRY_FINANCE_AND_INSURANCE = 'Finanzen & Versicherung';
+    const INDUSTRY_RETAIL_AND_ECOMMERCE = 'Handel & E-Commerce';
+    const INDUSTRY_LOGISTICS_AND_TRANSPORT = 'Logistik & Transport';
+    const INDUSTRY_MARKETING_MEDIA_AND_COMMUNICATION = 'Marketing, Medien & Kommunikation';
+    const INDUSTRY_CONSULTING_AND_SERVICES = 'Beratung & Dienstleistungen';
+    const INDUSTRY_TOURISM_AND_GASTRONOMY = 'Tourismus & Gastronomie';
+    const INDUSTRY_AGRICULTURE_AND_FOOD = 'Landwirtschaft & Ernährung';
+    const INDUSTRY_CULTURE_AND_CREATIVE_INDUSTRIES = 'Kultur & Kreativwirtschaft';
+    const INDUSTRY_NON_PROFIT_AND_ASSOCIATIONS = 'Non-Profit & Vereine';
+    private const INDUSTRIES = [
+        self::INDUSTRY_IT_AND_SOFTWARE_DEVELOPMENT,
+        self::INDUSTRY_MECHANICAL_ENGINEERING_AND_INDUSTRY,
+        self::INDUSTRY_AUTOMOTIVE_AND_MOBILITY,
+        self::INDUSTRY_ENERGY_AND_ENVIRONMENT,
+        self::INDUSTRY_CONSTRUCTION_AND_ARCHITECTURE,
+        self::INDUSTRY_CRAFTS,
+        self::INDUSTRY_HEALTH_AND_CARE,
+        self::INDUSTRY_EDUCATION_AND_RESEARCH,
+        self::INDUSTRY_PUBLIC_SERVICE_AND_ADMINISTRATION,
+        self::INDUSTRY_FINANCE_AND_INSURANCE,
+        self::INDUSTRY_RETAIL_AND_ECOMMERCE,
+        self::INDUSTRY_LOGISTICS_AND_TRANSPORT,
+        self::INDUSTRY_MARKETING_MEDIA_AND_COMMUNICATION,
+        self::INDUSTRY_CONSULTING_AND_SERVICES,
+        self::INDUSTRY_TOURISM_AND_GASTRONOMY,
+        self::INDUSTRY_AGRICULTURE_AND_FOOD,
+        self::INDUSTRY_CULTURE_AND_CREATIVE_INDUSTRIES,
+        self::INDUSTRY_NON_PROFIT_AND_ASSOCIATIONS,
+    ];
+
+
+    // Size:
+    const SIZE_XS = '1 - 5';
+    const SIZE_S = '6 - 20';
+    const SIZE_M = '21 - 50';
+    const SIZE_L = '51 - 100';
+    const SIZE_XL = '101 - 250';
+    const SIZE_XXL = '251 - 1000';
+    const SIZE_3XL = '+1000';
+    private const SIZES = [
+        self::SIZE_XS,
+        self::SIZE_S,
+        self::SIZE_M,
+        self::SIZE_L,
+        self::SIZE_XL,
+        self::SIZE_XXL,
+        self::SIZE_3XL,
+    ];
 
     /**
      * @inheritdoc
@@ -65,10 +143,10 @@ class Organization extends ContentActiveRecord implements Searchable
     {
         return [
             'id' => 'ID',
-            'name' => 'Firmenname',
+            'name' => 'Name',
             'category' => 'Kategorie',
             'industry' => 'Branche',
-            'size' => 'Größe',
+            'size' => 'Mitarbeitenden-Anzahl',
             'city' => 'Stadt',
             'notes' => 'Notizen',
             'responsibleUserGuids' => 'Verantwortliche Nutzer',
@@ -147,7 +225,7 @@ class Organization extends ContentActiveRecord implements Searchable
     public function afterFind()
     {
         parent::afterFind();
-        $this->responsibleUserGuids = array_map(function($user) {
+        $this->responsibleUserGuids = array_map(function ($user) {
             return $user->guid;
         }, $this->responsibleUsers);
     }
@@ -174,5 +252,21 @@ class Organization extends ContentActiveRecord implements Searchable
             }
         }
     }
+
+    public static function getCategoryOptions()
+    {
+        return array_combine(self::CATEGORIES, self::CATEGORIES);
+    }
+
+    public static function getIndustryOptions()
+    {
+        return array_combine(self::INDUSTRIES, self::INDUSTRIES);
+    }
+
+    public static function getSizeOptions()
+    {
+        return array_combine(self::SIZES, self::SIZES);
+    }
+
 
 }
