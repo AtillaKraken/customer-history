@@ -2,7 +2,10 @@
 
 use app\modules\crm\models\Interaction;
 use yii\helpers\Html;
-use Yii;
+use humhub\modules\like\widgets\LikeLink;
+use humhub\modules\comment\widgets\CommentLink;
+use humhub\modules\comment\widgets\Comments;
+use humhub\modules\comment\models\Comment;
 
 /* @var $interaction app\modules\crm\models\Interaction */
 
@@ -29,8 +32,19 @@ switch ($interaction->status) {
 }
 
 // generate unique ID for collapse
-$collapseId = 'interaction-collapse-' . ($interaction['id'] ?? uniqid());
+$collapseId = 'interaction-collapse-' . $interaction->id;
+$commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
 ?>
+
+<style>
+    /* rotate arrow animation when card is opened */
+    .panel-heading[aria-expanded="true"] .interaction-toggle-icon {
+        transform: rotate(180deg);
+    }
+    .interaction-toggle-icon {
+        transition: transform 0.3s ease;
+    }
+</style>
 
 <div class="panel panel-default" style="<?= $borderClass ?> margin-bottom: 10px;">
     <!-- Header -->
@@ -43,15 +57,23 @@ $collapseId = 'interaction-collapse-' . ($interaction['id'] ?? uniqid());
             <div class="media-body">
                 <h4 class="media-heading" style="font-size: 16px; font-weight: 600;">
                     <?= Html::encode($interaction->title) ?>
-                    <i class="fa fa-angle-down pull-right text-muted"></i>
+                    <i class="fa fa-angle-down pull-right text-muted interaction-toggle-icon"></i>
                 </h4>
                 <div class="text-muted" style="font-size: 12px;">
-                    <?= Html::encode($interaction->content->createdBy->displayName ?? 'System') ?> •
+
+                    <strong class="text-dark" style="margin-right: 5px;">
+                        <i class="fa fa-calendar"></i> <?= Yii::$app->formatter->asDate($interaction->date, 'php:d.m.Y') ?>
+                    </strong> •
+
+                    <a href="<?= $interaction->content->createdBy->getUrl() ?>" class="text-muted">
+                        <?= Html::encode($interaction->content->createdBy->displayName ?? 'System') ?>
+                    </a> •
 
                     <?= Yii::$app->formatter->asRelativeTime($interaction->content->created_at) ?> •
 
-                    <i class="fa fa-users"></i> <?= count($interaction->contacts) ?> •
-                    <i class="fa fa-user"></i> <?= count($interaction->responsibleUsers) ?>
+                    <i class="fa fa-users" title="Kontaktpersonen"></i> <?= count($interaction->contacts) ?> •
+                    <i class="fa fa-user" title="Verantwortliche"></i> <?= count($interaction->responsibleUsers) ?> •
+                    <i class="fa fa-comment-o" title="Kommentare"></i> <?= $commentCount ?>
                 </div>
             </div>
         </div>
@@ -69,8 +91,9 @@ $collapseId = 'interaction-collapse-' . ($interaction['id'] ?? uniqid());
                 </div>
                 <div class="col-sm-4">
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Zeitpunkt</small><br>
-                    <strong><?= Yii::$app->formatter->asDate($interaction->date, 'php:d.m.y') ?></strong>
-                    <?php if ($interaction->time): ?>
+                    <!-- TODO: if status==DONE => Result ebenfalls einblenden | Ebenfalls mit obigen RichText sobald gefixt -->
+                    <strong><?= Yii::$app->formatter->asDate($interaction->date, 'php:d.m.Y') ?></strong>
+                    <?php if($interaction->time): ?>
                         <small>(<?= Html::encode($interaction->time) ?>)</small>
                     <?php endif; ?>
                 </div>
@@ -84,21 +107,28 @@ $collapseId = 'interaction-collapse-' . ($interaction['id'] ?? uniqid());
             <div style="margin-bottom: 15px;">
                 <strong>Beschreibung</strong>
                 <div class="well well-sm" style="background: #fff; border: 1px solid #ddd; margin-top: 5px;">
-                    <?= nl2br(Html::encode($interaction->description)) ?>
-                    <!-- TODO: RichText Styling anwenden / Aktuell bloßer Text mit Shortcodes vorhanden -->
-                    <!-- TODO: => Ebenfalls sicherstellen, dass der Text auf/zuklappbar ist -->
+                    <div class="crm-richtext-container" id="desc-container-<?= $interaction->id ?>">
+                        <?= \humhub\modules\content\widgets\richtext\RichText::output($interaction->description) ?>
+                    </div>
                 </div>
             </div>
 
-            <!-- TODO: if status==DONE => Result ebenfalls einblenden | Ebenfalls mit obigen RichText sobald gefixt -->
-
+            <?php if ($interaction->status === Interaction::STATUS_DONE && !empty($interaction->result)): ?>
+                <div style="margin-bottom: 15px;">
+                    <strong>Ergebnis</strong>
+                    <div class="well well-sm" style="background: #eaffea; border: 1px solid #c3e6cb; margin-top: 5px;">
+                        <div class="crm-richtext-container" id="res-container-<?= $interaction->id ?>">
+                            <?= \humhub\modules\content\widgets\richtext\RichText::output($interaction->result) ?>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <?php if (!empty($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->count())): ?>
                 <div style="margin-bottom: 15px;">
                     <i class="fa fa-tags text-muted"></i>
                     <?php foreach ($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->all() as $topic): ?>
-                        <span class="label label-default"
-                              style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
+                        <span class="label label-default" style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -140,9 +170,10 @@ $collapseId = 'interaction-collapse-' . ($interaction['id'] ?? uniqid());
                     <ul class="list-unstyled" style="margin-top: 5px;">
                         <?php foreach ($interaction->responsibleUsers as $user): ?>
                             <li>
-                                <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded"
-                                     style="width: 16px; height: 16px;"/>
-                                <?= Html::encode($user->displayName) ?>
+                                <a href="<?= $user->getUrl() ?>">
+                                    <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded" style="width: 16px; height: 16px; margin-right: 5px;"/>
+                                    <?= Html::encode($user->displayName) ?>
+                                </a>
                             </li>
                         <?php endforeach; ?>
                     </ul>
@@ -151,12 +182,21 @@ $collapseId = 'interaction-collapse-' . ($interaction['id'] ?? uniqid());
 
             <!-- Footer Buttons -->
             <div class="text-right" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
+                <span style="margin-right: 15px;">
+                    <?= LikeLink::widget(['object' => $interaction]) ?>
+                     &middot;
+                    <?= CommentLink::widget(['object' => $interaction]) ?>
+                </span>
                 <?= \humhub\widgets\Button::defaultType('Bearbeiten')
                     ->icon('fa-pencil')
                     ->xs()
                     ->action('ui.modal.load', \humhub\modules\content\helpers\ContentContainerHelper::getCurrent()->createUrl('/crm/interaction/edit', ['id' => $interaction->id]))
                 ?>
-                <!-- TODO: Kommentierbarkeit adden-->
+                <!-- TODO: URL/Benachrichtigung/Stream Fixen-->
+            </div>
+
+            <div class="wall-entry-comments" style="margin-top: 15px; background-color: #f9f9f9; padding: 10px; border-radius: 4px;">
+                <?= Comments::widget(['object' => $interaction]) ?>
             </div>
 
         </div>
