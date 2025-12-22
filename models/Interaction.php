@@ -68,13 +68,13 @@ class Interaction extends ContentActiveRecord
             [['date', 'title'], 'required'],
             [['title'], 'string', 'max' => 255],
             [['time', 'channel', 'description', 'result', 'links'], 'default', 'value' => null],
-            ['status', 'in', 'range' => array_keys(self::getStatusOptions())], // only allow one of the statusses as model entries
+            ['status', 'in', 'range' => array_keys(self::getStatusOptions())],
             ['status', 'default', 'value' => self::STATUS_PLANNED],
             [['date', 'time'], 'safe'],
             [['description', 'result', 'links'], 'string'],
             [['channel', 'status'], 'string', 'max' => 50],
             ['channel', 'in', 'range' => array_keys(self::getChannelOptions())],
-            [['topics', 'responsibleUserGuids', 'newLinks', 'editLinks'], 'safe'],
+            [['topics', 'responsibleUserGuids', 'contactIds', 'newLinks', 'editLinks'], 'safe'],
             [['event_id'], 'integer'],
         ];
     }
@@ -158,6 +158,11 @@ class Interaction extends ContentActiveRecord
             return $user->guid;
         }, $this->responsibleUsers);
 
+        // load contacts
+        $this->contactIds = array_map(function ($contact) {
+            return $contact->id;
+        }, $this->contacts);
+
         // load topics
         $this->topics = Topic::findByContent($this->content)->all();
 
@@ -198,6 +203,7 @@ class Interaction extends ContentActiveRecord
                 }
             }
         }
+        // TODO: Kontaktzuweisung fixen!
 
         // save organizations of applied contacts in interaction
         $this->unlinkAll('organizations', true);
