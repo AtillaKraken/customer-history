@@ -3,6 +3,7 @@
 use humhub\modules\user\widgets\UserPickerField;
 use humhub\modules\content\widgets\richtext\RichTextField;
 use app\modules\crm\models\Organization;
+use humhub\widgets\Link;
 
 
 /* @var $form humhub\modules\ui\form\widgets\ActiveForm */
@@ -17,33 +18,44 @@ use app\modules\crm\models\Organization;
     <div class="row">
         <div class="col-md-6">
             <!-- Category -->
-            <?= $form->field($model, 'category')->dropDownList([
-                'partner' => 'Partner', 'customer' => 'Kunde', 'lead' => 'Interessent'
-            ], ['prompt' => 'Bitte auswählen...']) ?>
+            <?= $form->field($model, 'category')->dropDownList(Organization::getCategoryOptions(), [
+                'prompt' => 'Bitte auswählen...'
+            ]) ?>
         </div>
         <div class="col-md-6">
             <!-- Industry -->
-            <?= $form->field($model, 'industry')->dropDownList([
-                'it' => 'IT & Software', 'retail' => 'Handel'
-            ], ['prompt' => 'Bitte auswählen...']) ?>
+            <?= $form->field($model, 'industry')->dropDownList(Organization::getIndustryOptions(), [
+                'prompt' => 'Bitte auswählen...'
+            ]) ?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Size -->
+            <?= $form->field($model, 'size')->dropDownList(Organization::getSizeOptions(), [
+                'prompt' => 'Bitte auswählen...'
+            ]) ?>
+        </div>
+        <div class="col-md-6">
+            <!-- City -->
+            <?= $form->field($model, 'city')->textInput(['placeholder' => 'Ort']) ?>
         </div>
     </div>
 
-    <!-- City -->
-    <?= $form->field($model, 'city')->textInput(['placeholder' => 'Ort']) ?>
-
     <!-- Notes (Rich Text) -->
-    <?= $form->field($model, 'description')->widget(RichTextField::class) ?>
+    <?= $form->field($model, 'notes')->widget(RichTextField::class) ?>
 
     <!-- Responsible Users -->
     <?= $form->field($model, 'responsibleUserGuids')->widget(UserPickerField::class, [
+        'id' => 'crm-responsible-user-picker',
         'selection' => $model->responsibleUsers,
         'placeholder' => 'Benutzer zuweisen...'
     ]) ?>
 
-    <!-- "Mich zuweisen" Link -->
+    <!-- "Assign me" Button -->
     <div class="text-right">
-        <a href="#" class="small"><i class="fa fa-check-circle"></i> Mich zuweisen</a>
+        <?= Link::userPickerSelfSelect('#crm-responsible-user-picker', 'Mich zuweisen')
+            ->icon('fa-check-circle')
+            ->options(['class' => 'small']) ?>
     </div>
-    <!-- TODO: Mich Hinzufügen fixne-->
 </div>
