@@ -2,9 +2,14 @@
 
 namespace humhub\modules\crm\controllers;
 
+use app\modules\crm\models\forms\CrmFilter;
 use app\modules\crm\models\Organization;
+use HttpException;
 use humhub\modules\content\components\ContentContainerController;
+use humhub\modules\content\permissions\CreatePrivateContent;
+use humhub\widgets\ModalClose;
 use Yii;
+use yii\db\Exception;
 
 class OrganizationController extends ContentContainerController
 {
@@ -13,27 +18,52 @@ class OrganizationController extends ContentContainerController
      */
     public function actionIndex()
     {
-        // Build Query: find all organization models which belong to this space
-        $organizations = Organization::find()
-            ->contentContainer($this->contentContainer)
-            ->all();
+        // load filter
+        $filter = new CrmFilter();
+        $filter->load(Yii::$app->request->get());
 
-        // render the view
+        // build query
+        $query = Organization::find()
+            ->contentContainer($this->contentContainer);
+
+        // join for "mine" (regarding responsibility)
+        if (in_array('mine', $filter->filters)) {
+            $query->joinWith('responsibleUsers');
+        }
+
+        // apply filter
+        $filter->apply($query, 'organization');
+
+        $organizations = $query->all();
+
+        // use ajax to update list view
+        if (Yii::$app->request->isAjax && !Yii::$app->request->isPjax) {
+            return $this->renderAjax('_list', ['organizations' => $organizations]);
+        }
+
+        // usual/normal index-call / "show all"
         return $this->render('index', [
             'organizations' => $organizations,
-            'space' => $this->contentContainer
+            'space' => $this->contentContainer,
+            'filter' => $filter
         ]);
     }
 
     public function actionCreate()
     {
+        if (!$this->contentContainer->permissionManager->can(new CreatePrivateContent())) {
+            throw new HttpException(401, 'Zugriff verweigert.');
+        }
+
         $model = new Organization();
         $model->content->container = $this->contentContainer;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->asJson(['success' => true]); // or close modal
+            return ModalClose::widget([
+                'saved' => true,
+                'script' => 'humhub.modules.client.reload();'
+            ]);
         }
-
 
         return $this->renderAjax('edit', [
             'model' => $model,
@@ -41,19 +71,37 @@ class OrganizationController extends ContentContainerController
         ]);
     }
 
+    /**
+     * @throws HttpException
+     * @throws Exception
+     * @throws \yii\base\Exception
+     */
     public function actionEdit($id)
     {
-        $model = Organization::findOne(['id' => $id]);
+        $model = Organization::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['crm_organization.id' => $id])
+            ->one();
 
-        // Security Check: Darf der User das sehen?
-        if (!$model || $model->content->contentcontainer_id !== $this->contentContainer->id) {
-            throw new \yii\web\HttpException(404);
+        // check existence
+        if (!$model) {
+            throw new HttpException(404, 'Organisation nicht gefunden.');
         }
 
+        // check permissions
+        if (!$model->content->canEdit()) {
+            throw new HttpException(401, 'Zugriff verweigert.');
+        }
+
+        // save
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->asJson(['success' => true]);
+            return ModalClose::widget([
+                'saved' => true,
+                'script' => 'humhub.modules.client.reload();'
+            ]);
         }
 
+        // render view
         return $this->renderAjax('edit', [
             'model' => $model,
             'contentContainer' => $this->contentContainer
