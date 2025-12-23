@@ -33,7 +33,20 @@ class Event extends ContentActiveRecord
         return 'crm_event';
     }
 
+    // Type Constants
+    const TYPE_NETWORKING = 'networking';
+    const TYPE_WORKSHOP = 'workshop';
+    const TYPE_PRESENTATION = 'presentation';
+    const TYPE_CAREER = 'career';
+    const TYPE_CAMPUSTOUR = 'campustour';
+    const TYPE_PROJECT = 'project';
+    const TYPE_CONFERENCE = 'conference';
+    const TYPE_MEDIA = 'media';
+    const TYPE_MARKETING = 'marketing';
+    const TYPE_OTHER = 'other';
+
     public $topics = []; // helper array for the form/modal
+    public array $contactIds = []; // helper for contact assignment
 
     public function rules()
     {
@@ -45,8 +58,8 @@ class Event extends ContentActiveRecord
             [['calendar_entry_id'], 'integer'],
             [['title'], 'string', 'max' => 255],
             [['type'], 'string', 'max' => 100],
-            [['topics'], 'safe'],
-            [['newLinks', 'editLinks'], 'safe'],
+            ['type', 'in', 'range' => array_keys(self::getTypeOptions())],
+            [['topics', 'contactIds', 'newLinks', 'editLinks'], 'safe'],
         ];
     }
 
@@ -62,6 +75,25 @@ class Event extends ContentActiveRecord
             'links' => 'Links',
             'calendar_entry_id' => 'Zug. Kalender-Eintrag',
             'topics' => 'Themen',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getTypeOptions()
+    {
+        return [
+            self::TYPE_NETWORKING => 'Netzwerktreffen',
+            self::TYPE_WORKSHOP => 'Workshop',
+            self::TYPE_PRESENTATION => 'Präsentation',
+            self::TYPE_CAREER => 'Karriere-Event',
+            self::TYPE_CAMPUSTOUR => 'Campustour',
+            self::TYPE_PROJECT => 'Projektmeeting',
+            self::TYPE_CONFERENCE => 'Fachtagung/Messe',
+            self::TYPE_MEDIA => 'Presse- & Medienformat',
+            self::TYPE_MARKETING => 'Marketing-/PR-Aktion',
+            self::TYPE_OTHER => 'Sonstige',
         ];
     }
 
@@ -82,6 +114,11 @@ class Event extends ContentActiveRecord
         parent::afterFind();
         // load topics
         $this->topics = Topic::findByContent($this->content)->all();
+
+        // load contact IDs
+        $this->contactIds = array_map(function ($contact) {
+            return $contact->id;
+        }, $this->contacts);
 
         // format date (for readability)
         if ($this->date) {
@@ -108,5 +145,29 @@ class Event extends ContentActiveRecord
         parent::afterSave($insert, $changedAttributes);
         $this->saveLinks(); // save links
         \humhub\modules\topic\models\Topic::attach($this->content, $this->topics); // save topcis
+
+        // save contacts
+        if (is_array($this->contactIds)) {
+            $this->unlinkAll('contacts', true);
+            foreach ($this->contactIds as $cId) {
+                $contact = Contact::findOne($cId);
+                if ($contact) {
+                    $this->link('contacts', $contact);
+                }
+            }
+        }
+
+        // save organizations (determined by selected contacts)
+        // => ensures orga links persist even if contact is deleted later from the DB (due to e.g. DSGVO)
+        $this->unlinkAll('organizations', true);
+        foreach ($this->contacts as $contact) {
+            if ($contact->organization) {
+                // avoid duplicates
+                $exists = $this->getOrganizations()->where(['id' => $contact->organization->id])->exists();
+                if (!$exists) {
+                    $this->link('organizations', $contact->organization);
+                }
+            }
+        }
     }
 }
