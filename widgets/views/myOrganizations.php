@@ -17,7 +17,7 @@ use yii\helpers\Html;
             <div style="padding: 10px; border-bottom: 1px solid #eee;">
                 <strong><?= Html::encode($org->name) ?></strong><br>
                 <small class="text-muted">
-                    <?= Html::encode($org->category) ?> | <?= Html::encode($org->city) ?>
+                    <?= Html::encode($org->category) ?> | <?= Html::encode($org->industry) ?> | <?= Html::encode($org->city) ?>
                 </small>
             </div>
         <?php endforeach; ?>
