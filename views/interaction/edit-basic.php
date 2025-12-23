@@ -68,10 +68,10 @@ if ($model->content->container) {
         </div>
 
         <!-- Contact-MultiselectDropdown -->
-            <?= $form->field($model, 'contactIds')->widget(ContactMultiselectDropdown::class, [
-                'contentContainer' => $model->content->container,
-                'options' => ['id' => 'interaction-contact-picker']
-            ])->label('Kontaktpersonen') ?>
+        <?= $form->field($model, 'contactIds')->widget(ContactMultiselectDropdown::class, [
+            'contentContainer' => $model->content->container,
+            'options' => ['id' => 'interaction-contact-picker']
+        ])->label('Kontaktpersonen') ?>
 
         <!-- (thus) affected organizations -->
         <div class="form-group">
@@ -85,10 +85,10 @@ if ($model->content->container) {
         <!-- Description (Rich Text) -->
         <?= $form->field($model, 'description')->widget(RichTextField::class) ?>
 
-        <!-- TODO: Toggle Logic einbauen | Wenn Status === DONE zeige result an, else description-->
-
         <!-- Result (Rich Text) -->
-        <?= $form->field($model, 'result')->widget(RichTextField::class) ?>
+        <div id="interaction-result-wrapper" style="display:none;">
+            <?= $form->field($model, 'result')->widget(RichTextField::class) ?>
+        </div>
 
         <!-- Responsible Users -->
         <?= $form->field($model, 'responsibleUserGuids')->widget(UserPickerField::class, [
@@ -108,7 +108,7 @@ if ($model->content->container) {
 </div>
 
 <?php
-// js logic for the reactive organizaton-display
+// js logic for the reactive organizaton-display & status toggle
 // sidenote: injected javascript via php instead of <script> to be CSP safe
 $contactOrgMapJson = Json::encode($contactOrgMap);
 
@@ -119,7 +119,7 @@ $script = <<<JS
     var displayId = '#affected-organizations-display';
     var lastValue = '';
 
-    // update the organization display field
+    // ORG LOGIC:
     var updateOrgs = function() {
         var val = $(pickerId).val();
 
@@ -156,9 +156,26 @@ $script = <<<JS
         $(displayId).val(orgs.join(', '));
     };
 
+    // RESULT TOGGLE LOGIC:
+    var toggleResult = function() {
+        var status = $('#interaction-status').val();
+        var resultWrapper = $('#interaction-result-wrapper');
+
+        if (status === 'DONE') {
+            resultWrapper.slideDown();
+        } else {
+            resultWrapper.slideUp();
+        }
+    };
+
+    // --- INIT ---
     // check every 800ms
     var orgPollTimer = setInterval(updateOrgs, 800);
     updateOrgs();
+
+    // status-selection listener
+    $('#interaction-status').on('change', toggleResult);
+    toggleResult(); // run once on load (for edit mode)
 
     // cleanup when modal closes
     $(document).on('hidden.bs.modal', function (e) {
