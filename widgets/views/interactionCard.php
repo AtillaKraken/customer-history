@@ -8,6 +8,7 @@ use humhub\modules\comment\widgets\Comments;
 use humhub\modules\comment\models\Comment;
 
 /* @var $interaction app\modules\crm\models\Interaction */
+/* @var $isStream bool "is this Card inside the global/space Stream or inside the Module/Interaction Dashboard?" */
 
 $statusClass = 'label-default';
 $borderClass = 'border-left: 4px solid #ccc;';
@@ -41,6 +42,7 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
     .panel-heading[aria-expanded="true"] .interaction-toggle-icon {
         transform: rotate(180deg);
     }
+
     .interaction-toggle-icon {
         transition: transform 0.3s ease;
     }
@@ -65,15 +67,20 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
                         <i class="fa fa-calendar"></i> <?= Yii::$app->formatter->asDate($interaction->date, 'php:d.m.Y') ?>
                     </strong> •
 
-                    <a href="<?= $interaction->content->createdBy->getUrl() ?>" class="text-muted">
-                        <?= Html::encode($interaction->content->createdBy->displayName ?? 'System') ?>
-                    </a> •
+                    <?php if (!$isStream): ?>
+                        <a href="<?= $interaction->content->createdBy->getUrl() ?>" class="text-muted">
+                            <?= Html::encode($interaction->content->createdBy->displayName ?? 'System') ?>
+                        </a> •
 
-                    <?= Yii::$app->formatter->asRelativeTime($interaction->content->created_at) ?> •
+                        <?= Yii::$app->formatter->asRelativeTime($interaction->content->created_at) ?> •
+                    <?php endif; ?>
 
                     <i class="fa fa-users" title="Kontaktpersonen"></i> <?= count($interaction->contacts) ?> •
-                    <i class="fa fa-user" title="Verantwortliche"></i> <?= count($interaction->responsibleUsers) ?> •
-                    <i class="fa fa-comment-o" title="Kommentare"></i> <?= $commentCount ?>
+                    <i class="fa fa-user" title="Verantwortliche"></i> <?= count($interaction->responsibleUsers) ?>
+
+                    <?php if (!$isStream): ?>
+                        • <i class="fa fa-comment-o" title="Kommentare"></i> <?= $commentCount ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
@@ -93,7 +100,7 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Zeitpunkt</small><br>
                     <!-- TODO: if status==DONE => Result ebenfalls einblenden | Ebenfalls mit obigen RichText sobald gefixt -->
                     <strong><?= Yii::$app->formatter->asDate($interaction->date, 'php:d.m.Y') ?></strong>
-                    <?php if($interaction->time): ?>
+                    <?php if ($interaction->time): ?>
                         <small>(<?= Html::encode($interaction->time) ?>)</small>
                     <?php endif; ?>
                 </div>
@@ -124,11 +131,12 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
                 </div>
             <?php endif; ?>
 
-            <?php if (!empty($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->count())): ?>
+            <?php if (!$isStream && !empty($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->count())): ?>
                 <div style="margin-bottom: 15px;">
                     <i class="fa fa-tags text-muted"></i>
                     <?php foreach ($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->all() as $topic): ?>
-                        <span class="label label-default" style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
+                        <span class="label label-default"
+                              style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -171,7 +179,8 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
                         <?php foreach ($interaction->responsibleUsers as $user): ?>
                             <li>
                                 <a href="<?= $user->getUrl() ?>">
-                                    <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded" style="width: 16px; height: 16px; margin-right: 5px;"/>
+                                    <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded"
+                                         style="width: 16px; height: 16px; margin-right: 5px;"/>
                                     <?= Html::encode($user->displayName) ?>
                                 </a>
                             </li>
@@ -182,23 +191,31 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
 
             <!-- Footer Buttons -->
             <div class="text-right" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
-                <span style="margin-right: 15px;">
-                    <?= LikeLink::widget(['object' => $interaction]) ?>
-                     &middot;
-                    <?= CommentLink::widget(['object' => $interaction]) ?>
-                </span>
+
+                <?php if (!$isStream): ?>
+                    <span style="margin-right: 15px;">
+                        <?= LikeLink::widget(['object' => $interaction]) ?>
+                         &middot;
+                        <?= CommentLink::widget(['object' => $interaction]) ?>
+                    </span>
+                <?php endif; ?>
 
                 <?php
                 echo \humhub\widgets\Button::defaultType('Bearbeiten')
                     ->icon('fa-pencil')
                     ->xs()
-                    ->action('ui.modal.load', $interaction->content->container->createUrl('/crm/interaction/edit', ['id' => $interaction->id]));
+                    ->action('ui.modal.load', $interaction->content->container->createUrl('/crm/interaction/edit', ['id' => $interaction->id]))
                 ?>
-                <!-- TODO: URL/Benachrichtigung/Stream Fixen-->
             </div>
 
-                <?= Comments::widget(['object' => $interaction]) ?>
+            <?php if (!$isStream): ?>
+                <div class="wall-entry-comments"
+                     style="margin-top: 15px; background-color: #f9f9f9; padding: 10px; border-radius: 4px;">
+                    <?= Comments::widget(['object' => $interaction]) ?>
+                </div>
+            <?php endif; ?>
 
         </div>
     </div>
 </div>
+

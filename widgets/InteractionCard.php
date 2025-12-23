@@ -2,6 +2,7 @@
 
 namespace app\modules\crm\widgets;
 
+use app\modules\crm\models\Interaction;
 use humhub\components\Widget;
 
 /**
@@ -12,9 +13,14 @@ use humhub\components\Widget;
 class InteractionCard extends Widget
 {
     /**
-     * @var array Array for the data (currenlty just Mockdata)
+     * @var Interaction
      */
     public $interaction;
+
+    /**
+     * @var bool true: card is rendered in "Stream Mode" (slim display w/o duplicate header/footer)
+     */
+    public bool $isStream = false;
 
     /**
      * @inheritdoc
@@ -23,7 +29,8 @@ class InteractionCard extends Widget
     {
         // operations such as date formatting includable in here
         return $this->render('interactionCard', [
-            'interaction' => $this->interaction
+            'interaction' => $this->interaction,
+            'isStream' => $this->isStream
         ]);
     }
 }
