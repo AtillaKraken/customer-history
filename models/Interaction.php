@@ -2,6 +2,7 @@
 
 namespace app\modules\crm\models;
 
+use HttpException;
 use humhub\modules\crm\models\traits\LinkableTrait;
 use humhub\modules\user\models\User;
 use humhub\modules\content\components\ContentActiveRecord;
@@ -30,6 +31,14 @@ class Interaction extends ContentActiveRecord
 {
     use LinkableTrait;
 
+    // define Widget for Stream
+    public $wallEntryClass = 'app\modules\crm\widgets\WallEntry';
+
+    // define target of Notification-Links
+    public function getUrl()
+    {
+        return $this->content->container->createUrl('/crm/interaction/view', ['id' => $this->id]);
+    }
 
     // Statuses:
     const STATUS_PLANNED = 'PLANNED';
@@ -148,6 +157,24 @@ class Interaction extends ContentActiveRecord
     public function getEvent()
     {
         return $this->hasOne(Event::class, ['id' => 'event_id']);
+    }
+
+    public function actionView($id)
+    {
+        $model = Interaction::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['crm_interaction.id' => $id])
+            ->one();
+
+        if (!$model) {
+            throw new HttpException(404);
+        }
+
+        if (!$model->content->canView()) {
+            throw new HttpException(403);
+        }
+
+        return $this->render('view', ['model' => $model]);
     }
 
     public function afterFind()

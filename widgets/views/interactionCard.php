@@ -187,17 +187,17 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
                      &middot;
                     <?= CommentLink::widget(['object' => $interaction]) ?>
                 </span>
-                <?= \humhub\widgets\Button::defaultType('Bearbeiten')
+
+                <?php
+                echo \humhub\widgets\Button::defaultType('Bearbeiten')
                     ->icon('fa-pencil')
                     ->xs()
-                    ->action('ui.modal.load', \humhub\modules\content\helpers\ContentContainerHelper::getCurrent()->createUrl('/crm/interaction/edit', ['id' => $interaction->id]))
+                    ->action('ui.modal.load', $interaction->content->container->createUrl('/crm/interaction/edit', ['id' => $interaction->id]));
                 ?>
                 <!-- TODO: URL/Benachrichtigung/Stream Fixen-->
             </div>
 
-            <div class="wall-entry-comments" style="margin-top: 15px; background-color: #f9f9f9; padding: 10px; border-radius: 4px;">
                 <?= Comments::widget(['object' => $interaction]) ?>
-            </div>
 
         </div>
     </div>
