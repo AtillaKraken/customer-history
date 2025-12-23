@@ -54,7 +54,8 @@ class CrmFilter extends Model
                     break;
                 case 'event':
                     $query->andWhere(['like', 'crm_event.title', $this->term])
-                        ->orWhere(['like', 'crm_event.description', $this->term]);
+                        ->orWhere(['like', 'crm_event.description', $this->term])
+                        ->orWhere(['like', 'crm_event.type', $this->term]);
                     break;
             }
         }
