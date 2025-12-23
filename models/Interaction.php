@@ -219,6 +219,13 @@ class Interaction extends ContentActiveRecord
             $dt = \DateTime::createFromFormat('d.m.Y', $this->date);
             if ($dt) {
                 $this->date = $dt->format('Y-m-d');
+
+                // auto-overdue logic: if date is in the past AND status is currently PLANNED, set it to overdue
+                // => to prevent interactions labeled as "planned" even though there are set in the past
+                $today = new \DateTime('today');
+                if ($dt < $today && $this->status === self::STATUS_PLANNED) {
+                    $this->status = self::STATUS_OVERDUE;
+                }
             }
         }
 
