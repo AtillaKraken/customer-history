@@ -136,6 +136,17 @@ class Interaction extends ContentActiveRecord
         ];
     }
 
+    // necessary to display correct texts in streams and activity widgets
+    public function getContentName()
+    {
+        return 'Interaktion';
+    }
+    // necessary to display correct name of an entry in streams and activity widgets
+    public function getContentDescription()
+    {
+        return $this->title;
+    }
+
     public function getContacts()
     {
         return $this->hasMany(Contact::class, ['id' => 'contact_id'])
@@ -210,6 +221,9 @@ class Interaction extends ContentActiveRecord
                 $this->date = $dt->format('Y-m-d');
             }
         }
+
+        // force private-visibility (=> only space-members allowed!)
+        $this->content->visibility = \humhub\modules\content\models\Content::VISIBILITY_PRIVATE;
         return true;
     }
 
