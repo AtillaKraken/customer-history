@@ -9,6 +9,7 @@ use humhub\modules\comment\models\Comment;
 
 /* @var $interaction app\modules\crm\models\Interaction */
 /* @var $isStream bool "is this Card inside the global/space Stream or inside the Module/Interaction Dashboard?" */
+/* @var $startCollapsed bool "is this Card initially collapsed when opened rendered?" */
 
 $statusClass = 'label-default';
 $borderClass = 'border-left: 4px solid #ccc;';
@@ -35,6 +36,10 @@ switch ($interaction->status) {
 // generate unique ID for collapse
 $collapseId = 'interaction-collapse-' . $interaction->id;
 $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
+
+// logic for inititial collapse state
+$collapseClass = $startCollapsed ? 'collapse' : 'collapse in';
+$ariaExpanded = $startCollapsed ? 'false' : 'true';
 ?>
 
 <style>
@@ -50,7 +55,8 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
 
 <div class="panel panel-default" style="<?= $borderClass ?> margin-bottom: 10px;">
     <!-- Header -->
-    <div class="panel-heading" role="button" data-toggle="collapse" href="#<?= $collapseId ?>" aria-expanded="false"
+    <div class="panel-heading" role="button" data-toggle="collapse" href="#<?= $collapseId ?>"
+         aria-expanded="<?= $ariaExpanded ?>"
          style="background-color: #fff; cursor: pointer;">
         <div class="media">
             <div class="media-left">
@@ -87,7 +93,7 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
     </div>
 
     <!-- body -->
-    <div id="<?= $collapseId ?>" class="panel-collapse collapse">
+    <div id="<?= $collapseId ?>" class="panel-collapse <?= $collapseClass ?>">
         <div class="panel-body" style="border-top: 1px solid #eee;">
 
             <!-- info row -->
@@ -98,7 +104,6 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
                 </div>
                 <div class="col-sm-4">
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Zeitpunkt</small><br>
-                    <!-- TODO: if status==DONE => Result ebenfalls einblenden | Ebenfalls mit obigen RichText sobald gefixt -->
                     <strong><?= Yii::$app->formatter->asDate($interaction->date, 'php:d.m.Y') ?></strong>
                     <?php if ($interaction->time): ?>
                         <small>(<?= Html::encode($interaction->time) ?>)</small>

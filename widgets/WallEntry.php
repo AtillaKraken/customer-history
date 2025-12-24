@@ -16,7 +16,8 @@ class WallEntry extends WallStreamEntryWidget
     {
         return InteractionCard::widget([
             'interaction' => $this->model,
-            'isStream' => true
+            'isStream' => true,
+            'startCollapsed' => false // in global/space stream: have it collapsed for better usability (overview)
         ]);
     }
 

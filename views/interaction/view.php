@@ -31,8 +31,7 @@ $isAjax = Yii::$app->request->isAjax;
                             <i class="fa fa-arrow-left"></i> Zurück zur Übersicht
                         </a>
 
-                        <?= InteractionCard::widget(['interaction' => $model]) ?>
-                    </div>
+                        <?= InteractionCard::widget(['interaction' => $model, 'startCollapsed' => false]) ?>                    </div>
                 </div>
             </div>
         </div>
