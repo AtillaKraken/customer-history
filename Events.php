@@ -2,6 +2,7 @@
 
 namespace humhub\modules\crm;
 
+use app\modules\crm\models\Interaction;
 use humhub\modules\content\widgets\stream\WallStreamEntryWidget;
 use humhub\modules\content\widgets\WallCreateContentMenu;
 use humhub\modules\space\models\Space;
@@ -14,27 +15,28 @@ use Yii;
 class Events
 {
     /**
-     * Fügt den "CRM Eintrag" Tab über dem Stream hinzu.
-     * Behebt das Problem, dass Standard-Buttons verschwinden.
+     * Adds the "CRM-Eintrag" tab above the stream.
+     * Fixes the issue where standard buttons disappear.
      */
     public static function onWallCreateContentMenuInit(Event $event)
     {
         /** @var WallCreateContentMenu $menu */
         $menu = $event->sender;
 
-        // Sicherheitscheck: Nur in Spaces
+        // check: only in spaces | enabling each profile to have this would be overkill
+        // => emphasis on collaboration therefore space-onky
         if (!($menu->contentContainer instanceof Space)) {
             return;
         }
 
-        // 1. STANDARD-BUTTONS WIEDERHERSTELLEN
-        // Da wir hier eingreifen, lädt HumHub die Standard-Buttons nicht mehr selbst.
-        // Wir müssen das manuell tun, indem wir durch alle Module loopen.
+        // RESTORE STANDARD BUTTONS
+        // Since we intervene/change behaviour here, HumHub no longer loads the standard buttons itself
+        // therefore we have to do this manually by looping through all modules
         foreach ($menu->contentContainer->moduleManager->getContentClasses() as $content) {
-            // Holt das Widget für den Inhaltstyp (z.B. Poll, Task)
+            // Gets the widget for the content type (e.g. Poll, Task)
             $wallEntryWidget = WallStreamEntryWidget::getByContent($content);
 
-            // Überspringen, wenn es keinen Creator gibt
+            // skip if there is no creator
             if (!$wallEntryWidget || !$wallEntryWidget->createRoute) {
                 continue;
             }
@@ -42,7 +44,7 @@ class Events
             $url = $menu->contentContainer->createUrl($wallEntryWidget->createRoute);
             $label = ucfirst($content->getContentName());
 
-            // Optionen bauen (Logik aus HumHub Core übernommen)
+            // build options (logic from HumHubs core)
             $menuOptions = [
                 'label' => $label,
                 'icon' => $content->getIcon(),
@@ -50,7 +52,7 @@ class Events
                 'sortOrder' => $wallEntryWidget->createFormSortOrder ?? 900,
             ];
 
-            // Klick-Verhalten je nach Modus (Inline Formular vs Modal)
+            // click behavior depending on mode (Inline Form vs Modal)
             if ($wallEntryWidget->createMode === WallStreamEntryWidget::EDIT_MODE_INLINE) {
                 $menuOptions['htmlOptions'] = [
                     'data-action-click' => $wallEntryWidget->createFormMenuAction ?? 'loadForm',
@@ -65,14 +67,11 @@ class Events
                 $menuOptions['url'] = $url;
             }
 
-            // Standard-Eintrag hinzufügen
+            // add standard entry
             $menu->addEntry(new MenuLink($menuOptions));
         }
 
-        // 2. UNSEREN CRM BUTTON HINZUFÜGEN
-        // Jetzt können wir unseren Button sicher hinzufügen.
-
-        // Modul-Check
+        // add CRM button in space index
         if (!$menu->contentContainer->isModuleEnabled('crm')) {
             return;
         }
@@ -83,16 +82,16 @@ class Events
             'label' => 'CRM Eintrag',
             'url' => $crmUrl,
             'icon' => Icon::get('address-card'),
-            'sortOrder' => 350, // Positioniert zwischen Beitrag und Aufgaben
+            'sortOrder' => 350, // positioned between Post and Tasks
             'htmlOptions' => [
-                'data-action-click' => 'ui.modal.load', // Öffnet das Modal
+                'data-action-click' => 'ui.modal.load', // opens the modal
                 'data-action-url' => $crmUrl
             ]
         ]));
     }
 
     /**
-     * Fügt das Modul zur Space-Navigation (links) hinzu.
+     * Add the module to the space navigation bar
      */
     public static function onSpaceMenuInit(Event $event)
     {
@@ -114,5 +113,16 @@ class Events
             'isActive' => (Yii::$app->controller->module && Yii::$app->controller->module->id == 'crm'),
             'sortOrder' => 400,
         ]));
+    }
+
+    /**
+     * Callback for daily cron job event.
+     * Automatically update overdue interactions.
+     *
+     * @param Event $event
+     */
+    public static function onDailyCron($event)
+    {
+        Interaction::updateOverdueStatuses();
     }
 }

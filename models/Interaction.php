@@ -7,6 +7,7 @@ use humhub\modules\crm\models\traits\LinkableTrait;
 use humhub\modules\user\models\User;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\topic\models\Topic;
+use yii\db\Exception;
 
 /**
  * This is the model class for table "crm_interaction".
@@ -257,5 +258,31 @@ class Interaction extends ContentActiveRecord
                 if ($user) $this->link('responsibleUsers', $user);
             }
         }
+    }
+
+    /**
+     * @return int amount of affected rows / interactions updated
+     */
+    public static function updateOverdueStatuses()
+    {
+        $count = 0;
+        $today = new \DateTime('today');
+        $todayStr = $today->format('Y-m-d');
+
+        // find all planned, yet past interactions
+        $overdueInteractions = self::find()
+            ->where(['status' => self::STATUS_PLANNED])
+            ->andWhere(['<', 'date', $todayStr])
+            ->all();
+
+
+        foreach ($overdueInteractions as $interaction) {
+            $interaction->status = self::STATUS_OVERDUE;
+            if ($interaction->save(false, ['status'])) {
+                $count++;
+            }
+        }
+
+        return $count;
     }
 }
