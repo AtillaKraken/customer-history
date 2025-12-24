@@ -3,9 +3,11 @@
 use humhub\widgets\Button;
 use yii\helpers\Html;
 use humhub\widgets\Label;
-use \app\modules\crm\models\Interaction;
+use app\modules\crm\models\Interaction;
+use humhub\widgets\LinkPager;
 
 /* @var $interactions app\modules\crm\models\Interaction[] */
+/* @var $pagination yii\data\Pagination */
 ?>
 
 <?php if (empty($interactions)): ?>
@@ -63,4 +65,8 @@ use \app\modules\crm\models\Interaction;
         <?php endforeach; ?>
         </tbody>
     </table>
+
+    <div class="text-center">
+        <?= LinkPager::widget(['pagination' => $pagination]) ?>
+    </div>
 <?php endif; ?>

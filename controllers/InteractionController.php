@@ -9,6 +9,7 @@ use humhub\widgets\ModalClose;
 use HttpException;
 use humhub\modules\content\components\ContentContainerController;
 use Yii;
+use yii\data\Pagination;
 
 class InteractionController extends ContentContainerController
 {
@@ -29,18 +30,38 @@ class InteractionController extends ContentContainerController
 
         $filter->apply($query, 'interaction');
 
-        $interactions = $query->all();
+        // pagination taken from yii framework
+        $countQuery = clone $query;
+        // 15 items for _list, 8 for cards (_accordionList)
+        $pageSize = ($view === 'cards') ? 12 : 15;
+
+        $pages = new Pagination([
+            'totalCount' => $countQuery->count(),
+            'pageSize' => $pageSize,
+            // save 'view' parameter in pagination links
+            'params' => array_merge(Yii::$app->request->get(), ['view' => $view])
+        ]);
+
+        $interactions = $query->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
 
         // AJAX vs PJAX
         if (Yii::$app->request->isAjax && !Yii::$app->request->isPjax) {
-            return $this->renderAjax('_list', ['interactions' => $interactions]);
+            // render view based on current mode
+            $viewFile = ($view === 'cards') ? '_accordionList' : '_list';
+            return $this->renderAjax($viewFile, [
+                'interactions' => $interactions,
+                'pagination' => $pages
+            ]);
         }
 
         return $this->render('index', [
             'interactions' => $interactions,
             'space' => $this->contentContainer,
             'filter' => $filter,
-            'viewMode' => $view // pass view mode to view
+            'viewMode' => $view,
+            'pagination' => $pages
         ]);
     }
 

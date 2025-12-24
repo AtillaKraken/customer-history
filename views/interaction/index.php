@@ -11,6 +11,7 @@ use yii\helpers\Url;
  * @var $interactions Interaction[]
  * @var $space Space
  * @var $viewMode string
+ * @var $pagination yii\data\Pagination
  */
 ?>
 
@@ -42,9 +43,9 @@ use yii\helpers\Url;
     <div class="panel-body" id="crm-list-content">
 
         <?php if ($viewMode === 'cards'): ?>
-            <?= $this->render('_accordionList', ['interactions' => $interactions]) ?>
+            <?= $this->render('_accordionList', ['interactions' => $interactions, 'pagination' => $pagination]) ?>
         <?php else: ?>
-            <?= $this->render('_list', ['interactions' => $interactions]) ?>
+            <?= $this->render('_list', ['interactions' => $interactions, 'pagination' => $pagination]) ?>
         <?php endif; ?>
 
         <div class="clearfix" style="margin-bottom: 15px; margin-top: 15px">
