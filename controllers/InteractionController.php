@@ -43,6 +43,24 @@ class InteractionController extends ContentContainerController
         ]);
     }
 
+    public function actionView($id)
+    {
+        $model = Interaction::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['crm_interaction.id' => $id])
+            ->one();
+
+        if (!$model) {
+            throw new HttpException(404);
+        }
+
+        if (!$model->content->canView()) {
+            throw new HttpException(403);
+        }
+
+        return $this->render('view', ['model' => $model]);
+    }
+
     public function actionCreate()
     {
         // permission check

@@ -170,24 +170,6 @@ class Interaction extends ContentActiveRecord
         return $this->hasOne(Event::class, ['id' => 'event_id']);
     }
 
-    public function actionView($id)
-    {
-        $model = Interaction::find()
-            ->contentContainer($this->contentContainer)
-            ->where(['crm_interaction.id' => $id])
-            ->one();
-
-        if (!$model) {
-            throw new HttpException(404);
-        }
-
-        if (!$model->content->canView()) {
-            throw new HttpException(403);
-        }
-
-        return $this->render('view', ['model' => $model]);
-    }
-
     public function afterFind()
     {
         parent::afterFind();
