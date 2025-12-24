@@ -2,14 +2,15 @@
 
 use app\modules\crm\models\Interaction;
 use app\modules\crm\widgets\CrmNavigation;
-use app\modules\crm\widgets\InteractionCard;
 use humhub\modules\space\models\Space;
 use yii\helpers\Html;
 use humhub\widgets\Button;
+use yii\helpers\Url;
 
 /**
  * @var $interactions Interaction[]
  * @var $space Space
+ * @var $viewMode string
  */
 ?>
 
@@ -23,9 +24,29 @@ use humhub\widgets\Button;
 <div class="panel panel-default">
     <div class="panel-heading">
         <i class="fa fa-comments-o"></i> <strong>Interaktionen</strong>
+
+        <div class="pull-right" style="margin-left: 10px;">
+            <div class="btn-group btn-group-xs">
+                <a href="<?= Url::current(['view' => 'list']) ?>"
+                   class="btn btn-default <?= ($viewMode === 'list') ? 'active' : '' ?>" title="Liste">
+                    <i class="fa fa-list"></i>
+                </a>
+                <a href="<?= Url::current(['view' => 'cards']) ?>"
+                   class="btn btn-default <?= ($viewMode === 'cards') ? 'active' : '' ?>" title="Details">
+                    <i class="fa fa-th-list"></i>
+                </a>
+            </div>
+        </div>
     </div>
+
     <div class="panel-body" id="crm-list-content">
-        <?= $this->render('_list', ['interactions' => $interactions]) ?>
+
+        <?php if ($viewMode === 'cards'): ?>
+            <?= $this->render('_accordionList', ['interactions' => $interactions]) ?>
+        <?php else: ?>
+            <?= $this->render('_list', ['interactions' => $interactions]) ?>
+        <?php endif; ?>
+
         <div class="clearfix" style="margin-bottom: 15px; margin-top: 15px">
 
             <?= Button::success('Neue Interaktion')

@@ -14,7 +14,7 @@ class InteractionController extends ContentContainerController
 {
     // URL: /index.php?r=crm/interaction/index&cguid=<space-guid>
 
-    public function actionIndex()
+    public function actionIndex($view = 'list')
     {
         $filter = new CrmFilter();
         $filter->load(Yii::$app->request->get());
@@ -39,7 +39,8 @@ class InteractionController extends ContentContainerController
         return $this->render('index', [
             'interactions' => $interactions,
             'space' => $this->contentContainer,
-            'filter' => $filter
+            'filter' => $filter,
+            'viewMode' => $view // pass view mode to view
         ]);
     }
 
@@ -50,12 +51,12 @@ class InteractionController extends ContentContainerController
             ->where(['crm_interaction.id' => $id])
             ->one();
 
-        if (!$model) {
-            throw new HttpException(404);
-        }
+        if (!$model) throw new HttpException(404);
+        if (!$model->content->canView()) throw new HttpException(403);
 
-        if (!$model->content->canView()) {
-            throw new HttpException(403);
+        // check if ajax to render plain/modal friendly
+        if (Yii::$app->request->isAjax) {
+            return $this->renderAjax('view', ['model' => $model]);
         }
 
         return $this->render('view', ['model' => $model]);

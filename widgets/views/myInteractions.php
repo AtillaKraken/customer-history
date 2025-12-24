@@ -22,8 +22,9 @@ use humhub\widgets\PanelMenu;
             ?>
             <div style="padding: 10px; border-bottom: 1px solid #eee;">
                 <div style="margin-bottom: 2px;">
-                    <strong><a href="#" style="color:#333;"><?= Html::encode($int->title) ?></a></strong>
-                    <?= $statusLabel ?>
+                    <strong><a href="#" data-action-click="ui.modal.load"
+                               data-action-url="<?= $int->content->container->createUrl('/crm/interaction/view', ['id' => $int->id]) ?>" style="color:#333;"><?= Html::encode($int->title) ?></a></strong>
+                                        <?= $statusLabel ?>
                 </div>
                 <small class="text-muted">
                     <?= Yii::$app->formatter->asDate($int->date, 'php:d.m.y') ?> |

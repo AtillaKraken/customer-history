@@ -1,21 +1,40 @@
 <?php
+
 use app\modules\crm\widgets\InteractionCard;
+use humhub\widgets\ModalDialog;
+use humhub\widgets\ModalButton;
 
 /* @var $model app\modules\crm\models\Interaction */
+
+// Check if loaded via AJAX (=> causing a modal to open)
+$isAjax = Yii::$app->request->isAjax;
 ?>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="panel panel-default">
-                <div class="panel-body">
-                    <a href="<?= $model->content->container->createUrl('/crm/interaction/index') ?>" class="btn btn-default btn-sm" style="margin-bottom: 15px;">
-                        <i class="fa fa-arrow-left"></i> Zurück zur Übersicht
-                    </a>
+<?php if ($isAjax): ?>
+    <?php ModalDialog::begin(['header' => 'Details: ' . \yii\helpers\Html::encode($model->title), 'size' => 'large']) ?>
+    <div class="modal-body" style="padding-bottom: 0;">
+        <?= InteractionCard::widget(['interaction' => $model]) ?>
+    </div>
+    <div class="modal-footer">
+        <?= ModalButton::cancel('Schließen') ?>
+    </div>
+    <?php ModalDialog::end() ?>
 
-                    <?= InteractionCard::widget(['interaction' => $model]) ?>
+<?php else: ?>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <a href="<?= $model->content->container->createUrl('/crm/interaction/index') ?>"
+                           class="btn btn-default btn-sm" style="margin-bottom: 15px;">
+                            <i class="fa fa-arrow-left"></i> Zurück zur Übersicht
+                        </a>
+
+                        <?= InteractionCard::widget(['interaction' => $model]) ?>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+<?php endif; ?>

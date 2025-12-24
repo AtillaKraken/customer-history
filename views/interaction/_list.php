@@ -24,22 +24,27 @@ use \app\modules\crm\models\Interaction;
         <tbody>
         <?php foreach ($interactions as $interaction): ?>
             <tr>
-                <td><strong><?= Html::encode($interaction->title) ?></strong></td>
+                <td>
+                    <a href="#" data-action-click="ui.modal.load"
+                       data-action-url="<?= $interaction->content->container->createUrl('/crm/interaction/view', ['id' => $interaction->id]) ?>">
+                        <strong><?= Html::encode($interaction->title) ?></strong>
+                    </a>
+                </td>
                 <td><?= Yii::$app->formatter->asDate($interaction->date) ?></td>
                 <td>
                     <?php
                     switch ($interaction->status) {
                         case Interaction::STATUS_DONE:
-                            echo Label::success(Html::encode($interaction->status)) -> icon('fa fa-flag');
+                            echo Label::success(Html::encode($interaction->status))->icon('fa fa-flag');
                             break;
                         case Interaction::STATUS_PLANNED:
-                            echo Label::info(Html::encode($interaction->status)) -> icon('fa fa-flag');
+                            echo Label::info(Html::encode($interaction->status))->icon('fa fa-flag');
                             break;
                         case Interaction::STATUS_OVERDUE:
-                            echo Label::danger(Html::encode($interaction->status)) -> icon('fa fa-flag');
+                            echo Label::danger(Html::encode($interaction->status))->icon('fa fa-flag');
                             break;
                         case Interaction::STATUS_CANCELLED:
-                            echo Label::warning(Html::encode($interaction->status)) -> icon('fa fa-flag');
+                            echo Label::warning(Html::encode($interaction->status))->icon('fa fa-flag');
                     }
                     ?>
                 </td>
