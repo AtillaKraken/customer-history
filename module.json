@@ -1,11 +1,19 @@
 {
     "id": "crm",
-    "name": "Customer History",
-    "description": "Customer relationship management module",
-    "keywords": ["crm", "customer"],
-    "version": "0.1.0",
+    "name": "Kundenhistorie",
+    "description": "Verwalten von Interaktionen, Kontakten, Organisationen und Veranstaltungen innerhalb von Spaces.",
+    "keywords": ["crm", "customer", "contacts", "interaction", "event"],
+    "version": "0.2.0",
     "humhub": {
         "minVersion": "1.15.0"
     },
-    "namespace": "humhub\\modules\\crm"
+    "namespace": "humhub\\modules\\crm",
+    "authors": [
+        {
+            "name": "Atilla Turan"
+        }
+    ],
+    "resources": {
+        "icons": "assets/icon.png"
+    }
 }

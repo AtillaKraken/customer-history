@@ -20,10 +20,6 @@ class Module extends ContentContainerModule
         return [];
     }
 
-    /**
-     * HIER IST DER NEUE CODE:
-     * Fügt den Link ins Space-Menü ein.
-     */
     public static function onSpaceMenuInit($event)
     {
         // Which space are we in?
@@ -36,7 +32,7 @@ class Module extends ContentContainerModule
             $event->sender->addItem([
                 'label' => 'Kundenhistorie',
                 'url' => $space->createUrl('/crm/overview/index'), // URL to the crm space-overview
-                'icon' => '<i class="fa fa-building"></i>', // TODO: suchen nach dem UI Kit wie in Figma
+                'icon' => '<i class="fa fa-building"></i>',
                 'isActive' => (Yii::$app->controller->module && Yii::$app->controller->module->id == 'crm'),
                 'sortOrder' => 400,
             ]);
