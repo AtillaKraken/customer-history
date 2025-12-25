@@ -7,7 +7,11 @@ use humhub\modules\content\widgets\stream\WallStreamEntryWidget;
 use humhub\modules\content\widgets\EditLink;
 use humhub\modules\content\widgets\VisibilityLink;
 
-class WallEntry extends WallStreamEntryWidget
+/**
+ *
+ * @property-read mixed $controlsMenuEntries
+ */
+class InteractionWallEntry extends WallStreamEntryWidget
 {
     /**
      * renderContent displays main content of the entry

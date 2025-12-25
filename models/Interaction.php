@@ -33,7 +33,7 @@ class Interaction extends ContentActiveRecord
     use LinkableTrait;
 
     // define Widget for Stream
-    public $wallEntryClass = 'app\modules\crm\widgets\WallEntry';
+    public $wallEntryClass = 'app\modules\crm\widgets\InteractionWallEntry';
 
     // define target of Notification-Links
     public function getUrl()

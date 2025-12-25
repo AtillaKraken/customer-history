@@ -20,10 +20,41 @@ use humhub\modules\content\components\ContentActiveRecord;
  * @property InteractionContact[] $crmInteractionContacts
  * @property Event[] $events
  * @property Interaction[] $interactions
+ * @property-read string $contentName
+ * @property-read mixed $url
+ * @property-read null|string $contentDescription
  * @property Organization $organization
  */
 class Contact extends ContentActiveRecord
 {
+
+    public $wallEntryClass = 'app\modules\crm\widgets\ContactWallEntry';
+
+    public function getUrl()
+    {
+        return $this->content->container->createUrl('/crm/contact/view', ['id' => $this->id]);
+    }
+
+    /**
+     * @return string|null Name to display - usually the name from the db, but in case of an empty field (e.g. DSGVO reasons), display the ID instead
+     */
+    public function getDisplayName()
+    {
+        return !empty($this->name)
+            ? $this->name
+            : 'ID: ' . $this->id;
+    }
+
+    public function getContentName()
+    {
+        return 'Kontaktperson';
+    }
+
+    public function getContentDescription()
+    {
+        return $this->getDisplayName();
+    }
+
     public static function tableName()
     {
         return 'crm_contact';

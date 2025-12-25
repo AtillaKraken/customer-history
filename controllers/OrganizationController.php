@@ -2,21 +2,21 @@
 
 namespace humhub\modules\crm\controllers;
 
-use app\modules\crm\models\forms\CrmFilter;
 use app\modules\crm\models\Organization;
+use app\modules\crm\models\forms\CrmFilter;
 use HttpException;
-use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\content\permissions\CreatePrivateContent;
 use humhub\widgets\ModalClose;
+use humhub\modules\content\components\ContentContainerController;
 use Yii;
-use yii\db\Exception;
+use yii\data\Pagination;
 
 class OrganizationController extends ContentContainerController
 {
     /**
      * Show List of all Organizations
      */
-    public function actionIndex()
+    public function actionIndex($view = 'list')
     {
         // load filter
         $filter = new CrmFilter();
@@ -34,18 +34,36 @@ class OrganizationController extends ContentContainerController
         // apply filter
         $filter->apply($query, 'organization');
 
-        $organizations = $query->all();
+        // Pagination
+        $countQuery = clone $query;
+        $pageSize = ($view === 'cards') ? 8 : 10;
 
-        // use ajax to update list view
+        $pages = new Pagination([
+            'totalCount' => $countQuery->count(),
+            'pageSize' => $pageSize,
+            'params' => array_merge(Yii::$app->request->get(), ['view' => $view])
+        ]);
+
+        $organizations = $query->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
+
+        // AJAX
         if (Yii::$app->request->isAjax && !Yii::$app->request->isPjax) {
-            return $this->renderAjax('_list', ['organizations' => $organizations]);
+            $viewFile = ($view === 'cards') ? '_accordionList' : '_list';
+            return $this->renderAjax($viewFile, [
+                'organizations' => $organizations,
+                'pagination' => $pages
+            ]);
         }
 
         // usual/normal index-call / "show all"
         return $this->render('index', [
             'organizations' => $organizations,
             'space' => $this->contentContainer,
-            'filter' => $filter
+            'filter' => $filter,
+            'viewMode' => $view,
+            'pagination' => $pages
         ]);
     }
 
@@ -71,11 +89,6 @@ class OrganizationController extends ContentContainerController
         ]);
     }
 
-    /**
-     * @throws HttpException
-     * @throws Exception
-     * @throws \yii\base\Exception
-     */
     public function actionEdit($id)
     {
         $model = Organization::find()
@@ -106,6 +119,23 @@ class OrganizationController extends ContentContainerController
             'model' => $model,
             'contentContainer' => $this->contentContainer
         ]);
+    }
+
+    public function actionView($id)
+    {
+        $model = Organization::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['crm_organization.id' => $id])
+            ->one();
+
+        if (!$model) throw new HttpException(404);
+        if (!$model->content->canView()) throw new HttpException(403);
+
+        if (Yii::$app->request->isAjax) {
+            return $this->renderAjax('view', ['model' => $model]);
+        }
+
+        return $this->render('view', ['model' => $model]);
     }
 
 }

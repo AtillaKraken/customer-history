@@ -12,32 +12,50 @@ use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 
+/**
+ *
+ * @property-read mixed $organizationList
+ */
 class ContactController extends ContentContainerController
 {
     /**
      * Show List of all Contacts
      */
-    public function actionIndex()
+    public function actionIndex($view = 'list')
     {
         $filter = new CrmFilter();
         $filter->load(Yii::$app->request->get());
-
-        $query = Contact::find()
-            ->contentContainer($this->contentContainer);
-
+        $query = Contact::find()->contentContainer($this->contentContainer);
         $filter->apply($query, 'contact');
 
-        $contacts = $query->all();
+        $countQuery = clone $query;
+        $pageSize = ($view === 'cards') ? 8 : 10;
+        $pages = new \yii\data\Pagination(['totalCount' => $countQuery->count(), 'pageSize' => $pageSize, 'params' => array_merge(Yii::$app->request->get(), ['view' => $view])]);
+
+        $contacts = $query->offset($pages->offset)->limit($pages->limit)->all();
 
         if (Yii::$app->request->isAjax && !Yii::$app->request->isPjax) {
-            return $this->renderAjax('_list', ['contacts' => $contacts]);
+            $viewFile = ($view === 'cards') ? '_accordionList' : '_list';
+            return $this->renderAjax($viewFile, ['contacts' => $contacts, 'pagination' => $pages]);
         }
 
-        return $this->render('index', [
-            'contacts' => $contacts,
-            'space' => $this->contentContainer,
-            'filter' => $filter
-        ]);
+        return $this->render('index', ['contacts' => $contacts, 'space' => $this->contentContainer, 'filter' => $filter, 'viewMode' => $view, 'pagination' => $pages]);
+    }
+
+    public function actionView($id)
+    {
+        $model = Contact::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['crm_contact.id' => $id])
+            ->one();
+
+        if (!$model) throw new HttpException(404, 'Kontaktperson nicht gefunden.');
+        if (!$model->content->canView()) throw new HttpException(403, 'Zugriff verweigert.');
+
+        if (Yii::$app->request->isAjax) {
+            return $this->renderAjax('view', ['model' => $model]);
+        }
+        return $this->render('view', ['model' => $model]);
     }
 
     public function actionCreate()
