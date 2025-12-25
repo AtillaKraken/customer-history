@@ -2,9 +2,9 @@
 
 namespace app\modules\crm\models;
 
-use humhub\modules\user\models\User;
-use Yii;
+use humhub\modules\crm\models\traits\LinkableTrait;
 use humhub\modules\content\components\ContentActiveRecord;
+use humhub\modules\user\models\User;
 use humhub\modules\search\interfaces\Searchable;
 
 // required for  global search function
@@ -27,10 +27,20 @@ use humhub\modules\search\interfaces\Searchable;
  * @property-read string $icon
  * @property-read string $description
  * @property-read mixed $responsibleUsers
+ * @property-read mixed $url
+ * @property-read string $contentDescription
+ * @property-read mixed $participations
  * @property Interaction[] $interactions
  */
 class Organization extends ContentActiveRecord implements Searchable
 {
+
+    use LinkableTrait;
+
+    // define Widget for Stream
+    public $wallEntryClass = 'app\modules\crm\widgets\OrganizationWallEntry';
+
+
     // Category:
     const CATEGORY_COMPANY = 'Unternehmen';
     const CATEGORY_ASSOCIATION = 'Verband';
@@ -109,12 +119,6 @@ class Organization extends ContentActiveRecord implements Searchable
         self::SIZE_3XL,
     ];
 
-    /**
-     * @inheritdoc
-     * TODO: Hier definieren wir später, wie der Eintrag auf der Wall (Stream) aussieht.
-     * Aktuell nutzen wir den Standard, später bauen wir ein eigenes Widget.
-     */
-    // public $wallEntryClass = 'humhub\modules\crm\widgets\WallEntry';
 
     public static function tableName()
     {
@@ -139,18 +143,10 @@ class Organization extends ContentActiveRecord implements Searchable
         ];
     }
 
-    public function attributeLabels()
+    // Define target of Notification-Links
+    public function getUrl()
     {
-        return [
-            'id' => 'ID',
-            'name' => 'Name',
-            'category' => 'Kategorie',
-            'industry' => 'Branche',
-            'size' => 'Mitarbeitenden-Anzahl',
-            'city' => 'Stadt',
-            'notes' => 'Notizen',
-            'responsibleUserGuids' => 'Verantwortliche Nutzer',
-        ];
+        return $this->content->container->createUrl('/crm/organization/view', ['id' => $this->id]);
     }
 
     /**
@@ -162,11 +158,8 @@ class Organization extends ContentActiveRecord implements Searchable
         return 'Organisation';
     }
 
-    /**
-     *
-     * desc for search results
-     */
-    public function getDescription()
+    // Necessary for Stream activity text
+    public function getContentDescription()
     {
         return $this->name;
     }
@@ -203,7 +196,16 @@ class Organization extends ContentActiveRecord implements Searchable
     public function getInteractions()
     {
         return $this->hasMany(Interaction::class, ['id' => 'interaction_id'])
-            ->viaTable('crm_interaction_organization', ['organization_id' => 'id']);
+            ->viaTable('crm_interaction_organization', ['organization_id' => 'id'])
+            ->orderBy(['date' => SORT_DESC]);
+    }
+
+    /// return Events where a certain Organization participated in
+    public function getParticipations()
+    {
+        return $this->hasMany(Event::class, ['id' => 'event_id'])
+            ->viaTable('crm_event_organization', ['organization_id' => 'id'])
+            ->orderBy(['date' => SORT_DESC]);
     }
 
     public function getEvents()
@@ -251,6 +253,14 @@ class Organization extends ContentActiveRecord implements Searchable
                 }
             }
         }
+    }
+
+    // Force private visibility
+    public function beforeSave($insert)
+    {
+        if (!parent::beforeSave($insert)) return false;
+        $this->content->visibility = \humhub\modules\content\models\Content::VISIBILITY_PRIVATE;
+        return true;
     }
 
     public static function getCategoryOptions()

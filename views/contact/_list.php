@@ -1,4 +1,5 @@
 <?php
+
 use yii\helpers\Html;
 use humhub\widgets\Button;
 
@@ -24,11 +25,23 @@ use humhub\widgets\Button;
         <?php foreach ($contacts as $cnt): ?>
             <tr>
                 <td style="vertical-align: middle;">
-                    <strong><?= Html::encode($cnt->name) ?></strong><br>
+                    <a href="#" data-action-click="ui.modal.load"
+                       data-action-url="<?= $cnt->content->container->createUrl('/crm/contact/view', ['id' => $cnt->id]) ?>">
+
+                        <?php if (empty($cnt->name)): ?>
+                            <strong class="text-danger">
+                                <?= Html::encode($cnt->getDisplayName()) ?>
+                            </strong>
+                        <?php else: ?>
+                            <strong>
+                                <?= Html::encode($cnt->getDisplayName()) ?>
+                            </strong>
+                        <?php endif; ?>
+                        <br>
                     <small class="text-muted"><?= Html::encode($cnt->gender) ?></small>
                 </td>
                 <td style="vertical-align: middle;">
-                    <?php if($cnt->organization): ?>
+                    <?php if ($cnt->organization): ?>
                         <i class="fa fa-building-o"></i> <?= Html::encode($cnt->organization->name) ?>
                     <?php else: ?>
                         <span class="text-muted">-</span>
@@ -38,10 +51,12 @@ use humhub\widgets\Button;
                     <?= Html::encode($cnt->roles) ?>
                 </td>
                 <td style="vertical-align: middle;">
-                    <?php if($cnt->email): ?>
-                        <div><i class="fa fa-envelope-o"></i> <a href="mailto:<?= Html::encode($cnt->email) ?>"><?= Html::encode($cnt->email) ?></a></div>
+                    <?php if ($cnt->email): ?>
+                        <div><i class="fa fa-envelope-o"></i> <a
+                                href="mailto:<?= Html::encode($cnt->email) ?>"><?= Html::encode($cnt->email) ?></a>
+                        </div>
                     <?php endif; ?>
-                    <?php if($cnt->phone_number): ?>
+                    <?php if ($cnt->phone_number): ?>
                         <div><i class="fa fa-phone"></i> <?= Html::encode($cnt->phone_number) ?></div>
                     <?php endif; ?>
                 </td>

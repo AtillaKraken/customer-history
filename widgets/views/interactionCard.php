@@ -179,7 +179,7 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                     </ul>
                 </div>
                 <div class="col-sm-6">
-                    <strong style="color: #17a2b8;"><i class="fa fa-user-circle"></i> Verantwortliche</strong>
+                    <strong style="color: #17a2b8;"><i class="fa fa-user-circle"></i> Verantwortliche Nutzer</strong>
                     <ul class="list-unstyled" style="margin-top: 5px;">
                         <?php foreach ($interaction->responsibleUsers as $user): ?>
                             <li>

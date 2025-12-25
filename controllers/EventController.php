@@ -9,13 +9,14 @@ use humhub\modules\content\permissions\CreatePrivateContent;
 use humhub\widgets\ModalClose;
 use humhub\modules\content\components\ContentContainerController;
 use Yii;
+use yii\data\Pagination;
 
 class EventController extends ContentContainerController
 {
     /**
      * Show List of all Events
      */
-    public function actionIndex()
+    public function actionIndex($view = 'list')
     {
         $filter = new CrmFilter();
         $filter->load(Yii::$app->request->get());
@@ -25,17 +26,35 @@ class EventController extends ContentContainerController
 
         $filter->apply($query, 'event');
 
-        $events = $query->all();
+        // pagination
+        $countQuery = clone $query;
+        $pageSize = ($view === 'cards') ? 8 : 10;
+
+        $pages = new Pagination([
+            'totalCount' => $countQuery->count(),
+            'pageSize' => $pageSize,
+            'params' => array_merge(Yii::$app->request->get(), ['view' => $view])
+        ]);
+
+        $events = $query->offset($pages->offset)
+            ->limit($pages->limit)
+            ->all();
 
         // AJAX vs PJAX
         if (Yii::$app->request->isAjax && !Yii::$app->request->isPjax) {
-            return $this->renderAjax('_list', ['events' => $events]);
+            $viewFile = ($view === 'cards') ? '_accordionList' : '_list';
+            return $this->renderAjax($viewFile, [
+                'events' => $events,
+                'pagination' => $pages
+            ]);
         }
 
         return $this->render('index', [
             'events' => $events,
             'space' => $this->contentContainer,
-            'filter' => $filter
+            'filter' => $filter,
+            'viewMode' => $view,
+            'pagination' => $pages
         ]);
     }
 
@@ -92,4 +111,20 @@ class EventController extends ContentContainerController
         ]);
     }
 
+    public function actionView($id)
+    {
+        $model = Event::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['crm_event.id' => $id])
+            ->one();
+
+        if (!$model) throw new HttpException(404, 'Veranstaltung nicht gefunden.');
+        if (!$model->content->canView()) throw new HttpException(403, 'Zugriff verweigert.');
+
+        if (Yii::$app->request->isAjax) {
+            return $this->renderAjax('view', ['model' => $model]);
+        }
+
+        return $this->render('view', ['model' => $model]);
+    }
 }

@@ -2,48 +2,52 @@
 
 use app\modules\crm\models\Organization;
 use app\modules\crm\widgets\CrmNavigation;
-use humhub\modules\space\models\Space;
 use humhub\widgets\Button;
+use yii\helpers\Url;
 
 /**
  * @var $organizations Organization[]
- * @var $space Space
+ * @var $space humhub\modules\space\models\Space
+ * @var $viewMode string
+ * @var $pagination yii\data\Pagination
  */
 ?>
 
-<!-- WICHTIG: Alles in einem Wrapper, damit PJAX nicht das Layout zerreißt -->
-<div class="crm-module-container">
+<?= CrmNavigation::widget([
+    'contentContainer' => $space,
+    'activeTab' => 'organization',
+    'createButtonLabel' => 'Neue Organisation',
+    'createUrl' => $space->createUrl('/crm/organization/create')
+]) ?>
 
-    <!-- Navigation Widget -->
-    <?= CrmNavigation::widget([
-        'contentContainer' => $space,
-        'activeTab' => 'organization',
-        'createButtonLabel' => 'Neue Organisation',
-        'createUrl' => $space->createUrl('/crm/organization/create'),
-    ]) ?>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <i class="fa fa-building"></i> <strong>Organisationen</strong>
 
-    <!-- Content Panel -->
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <i class="fa fa-building"></i> <strong>Organisationen</strong> im Space
-        </div>
-
-        <div class="panel-body">
-            <!-- AJAX Target für Listen-Updates -->
-            <div id="crm-list-content">
-                <?= $this->render('_list', ['organizations' => $organizations]) ?>
-            </div>
-            <div class="clearfix" style="margin-bottom: 15px; margin-top: 15px">
-                <?= Button::success('Neue Organisation')
-                    ->icon('fa-plus')
-                    ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/organization/create'))
-                    ->right()
-                    ->sm()
-                    ->loader(false)
-                ?>
+        <div class="pull-right" style="margin-left: 10px;">
+            <div class="btn-group btn-group-xs">
+                <a href="<?= Url::current(['view' => 'list']) ?>" class="btn btn-default <?= ($viewMode === 'list') ? 'active' : '' ?>" title="Liste">
+                    <i class="fa fa-list"></i>
+                </a>
+                <a href="<?= Url::current(['view' => 'cards']) ?>" class="btn btn-default <?= ($viewMode === 'cards') ? 'active' : '' ?>" title="Details">
+                    <i class="fa fa-th-list"></i>
+                </a>
             </div>
         </div>
-
     </div>
 
+    <div class="panel-body" id="crm-list-content">
+        <?php if ($viewMode === 'cards'): ?>
+            <?= $this->render('_accordionList', ['organizations' => $organizations, 'pagination' => $pagination]) ?>
+        <?php else: ?>
+            <?= $this->render('_list', ['organizations' => $organizations, 'pagination' => $pagination]) ?>
+        <?php endif; ?>
+
+        <div class="clearfix" style="margin-bottom: 15px; margin-top: 15px">
+            <?= Button::success('Neue Organisation')
+                ->icon('fa-plus')
+                ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/organization/create'))
+                ->right()->sm()->loader(false) ?>
+        </div>
+    </div>
 </div>

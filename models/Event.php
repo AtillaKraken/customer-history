@@ -22,11 +22,23 @@ use humhub\modules\content\components\ContentActiveRecord;
  * @property Contact[] $contacts
  * @property EventContact[] $crmEventContacts
  * @property EventOrganization[] $crmEventOrganizations
+ * @property-read string $contentName
+ * @property-read mixed $url
+ * @property-read string $contentDescription
  * @property Organization[] $organizations
  */
 class Event extends ContentActiveRecord
 {
     use LinkableTrait;
+
+    // define Widget for Stream
+    public $wallEntryClass = 'app\modules\crm\widgets\EventWallEntry';
+
+    // define target of Notification-Links
+    public function getUrl()
+    {
+        return $this->content->container->createUrl('/crm/event/view', ['id' => $this->id]);
+    }
 
     public static function tableName()
     {
@@ -61,6 +73,17 @@ class Event extends ContentActiveRecord
             ['type', 'in', 'range' => array_keys(self::getTypeOptions())],
             [['topics', 'contactIds', 'newLinks', 'editLinks'], 'safe'],
         ];
+    }
+
+    // necessary to display correct texts in streams and activity widgets
+    public function getContentName()
+    {
+        return 'Veranstaltung';
+    }
+    // necessary to display correct name of an entry in streams and activity widgets
+    public function getContentDescription()
+    {
+        return 'Veranstaltung';
     }
 
     public function attributeLabels()
@@ -137,6 +160,10 @@ class Event extends ContentActiveRecord
                 $this->date = $dt->format('Y-m-d');
             }
         }
+
+        // force private-visibility
+        $this->content->visibility = \humhub\modules\content\models\Content::VISIBILITY_PRIVATE;
+
         return true;
     }
 
