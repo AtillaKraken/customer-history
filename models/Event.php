@@ -78,13 +78,23 @@ class Event extends ContentActiveRecord
     // necessary to display correct texts in streams and activity widgets
     public function getContentName()
     {
-        return 'Veranstaltung';
+        return 'CRM-Veranstaltung';
     }
     // necessary to display correct name of an entry in streams and activity widgets
     public function getContentDescription()
     {
-        return 'Veranstaltung';
+        return $this->title;
     }
+
+    /**
+     * @inheritdoc
+     * icon next to the Event
+     */
+    public function getIcon()
+    {
+        return 'fa-calendar-o';
+    }
+    // TODO: Icon-Konsistenz prüfne/durchsetzen
 
     public function attributeLabels()
     {

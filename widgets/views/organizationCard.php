@@ -154,17 +154,29 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
             <div class="row">
                 <div class="col-sm-3">
                     <strong style="color: #008fa1"><i class="fa fa-user-circle"></i> Verantwortliche Nutzer</strong>
-                    <ul class="list-unstyled" style="margin-top: 5px;">
-                        <?php foreach ($organization->responsibleUsers as $user): ?>
-                            <li>
-                                <a href="<?= $user->getUrl() ?>">
-                                    <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded"
-                                         style="width: 16px; height: 16px; margin-right: 5px;"/>
-                                    <?= Html::encode($user->displayName) ?>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
+                    <?php if (empty($organization->responsibleUsers)): ?>
+                        <div class="text-muted small" style="margin-top:5px;">-</div>
+                    <?php else: ?>
+                        <ul class="list-unstyled" style="margin-top: 10px; font-size: 12px;">
+                            <?php foreach ($organization->responsibleUsers as $user): ?>
+                                <li style="margin-bottom: 8px; display: flex; align-items: center;">
+                                    <a href="<?= $user->getUrl() ?>">
+                                        <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded"
+                                             style="width: 24px; height: 24px; margin-right: 8px;"
+                                             alt="<?= Html::encode($user->displayName) ?>"/>
+                                    </a>
+                                    <div style="line-height: 1.2;">
+                                        <a href="<?= $user->getUrl() ?>" style="color: inherit;">
+                                            <strong><?= Html::encode($user->displayName) ?></strong>
+                                        </a><br>
+                                        <span class="text-muted" style="font-size: 10px;">
+                                            <?= Html::encode($user->profile->title ?? 'Mitglied') ?>
+                                        </span>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
                 </div>
 
                 <div class="col-sm-3">
@@ -177,10 +189,16 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                                     <strong>
                                         <a href="#" data-action-click="ui.modal.load"
                                            data-action-url="<?= $contact->content->container->createUrl('/crm/contact/view', ['id' => $contact->id]) ?>">
-                                            <?= Html::encode($contact->name) ?>
+                                            <?php if (empty($contact->name)): ?>
+                                                <span class="text-danger">
+                                                    <?= Html::encode($contact->getDisplayName()) ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <?= Html::encode($contact->getDisplayName()) ?>
+                                            <?php endif; ?>
                                         </a>
                                     </strong>
-                                    <small><?= $contact->hasAttribute('roles') ? Html::encode($contact->roles): 'Keine Rollen hinterlegt'; ?></small>
+                                    <small><?= $contact->hasAttribute('roles') ? Html::encode($contact->roles) : 'Keine Rollen hinterlegt'; ?></small>
                                 </div>
                             </li>
                         <?php endforeach; ?>

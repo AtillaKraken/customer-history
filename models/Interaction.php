@@ -148,6 +148,15 @@ class Interaction extends ContentActiveRecord
         return $this->title;
     }
 
+    /**
+     * @inheritdoc
+     * icon next to the Interaction
+     */
+    public function getIcon()
+    {
+        return 'fa-comments-o';
+    }
+
     public function getContacts()
     {
         return $this->hasMany(Contact::class, ['id' => 'contact_id'])

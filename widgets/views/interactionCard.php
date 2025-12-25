@@ -51,6 +51,48 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
     .interaction-toggle-icon {
         transition: transform 0.3s ease;
     }
+
+    .crm-related-list {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
+    .crm-related-list li {
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px dashed #eee;
+        font-size: 12px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .crm-related-list li:last-child {
+        border-bottom: none;
+    }
+
+    .crm-related-list .icon-col {
+        width: 20px;
+        text-align: center;
+        margin-right: 8px;
+        color: #17a2b8; /* Interaction Blue */
+        font-size: 14px;
+        margin-top: 2px;
+    }
+
+    .crm-related-list .content-col {
+        flex: 1;
+    }
+
+    .crm-related-list strong {
+        display: block;
+        color: #333;
+        font-size: 13px;
+    }
+
+    .crm-related-list small {
+        color: #999;
+    }
 </style>
 
 <div class="panel panel-default" style="<?= $borderClass ?> margin-bottom: 10px;">
@@ -82,7 +124,8 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                     <?php endif; ?>
 
                     <i class="fa fa-users" title="Kontaktpersonen"></i> <?= count($interaction->contacts) ?> •
-                    <i class="fa fa-user" title="Verantwortliche"></i> <?= count($interaction->responsibleUsers) ?>
+                    <i class="fa fa-user"
+                       title="Verantwortliche Nutzer"></i> <?= count($interaction->responsibleUsers) ?>
 
                     <?php if (!$isStream): ?>
                         • <i class="fa fa-comment-o" title="Kommentare"></i> <?= $commentCount ?>
@@ -161,41 +204,86 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 </div>
             <?php endif; ?>
 
-            <!-- People (Contacts & resp. Users) -->
-            <div class="row">
-                <div class="col-sm-6">
-                    <strong style="color: #17a2b8;"><i class="fa fa-users"></i> Kontaktpersonen</strong>
-                    <ul class="list-unstyled" style="margin-top: 5px; font-size: 13px;">
-                        <?php foreach ($interaction->contacts as $contact): ?>
-                            <li style="margin-bottom: 4px;">
-                                <i class="fa fa-user"></i> <strong><?= Html::encode($contact->name) ?></strong><br>
-                                <?php if ($contact->organization): ?>
-                                    <span class="text-muted" style="margin-left: 16px; font-size: 11px;">
-                                        <i class="fa fa-building-o"></i> <?= Html::encode($contact->organization->name) ?>
-                                    </span>
-                                <?php endif; ?>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-                <div class="col-sm-6">
+            <!-- TODO: <a>/Hover-Bereiche vereinheitlichen -->
+
+            <div class="row" style="margin-top: 20px; border-top: 1px dashed #eee; padding-top: 15px;">
+
+                <div class="col-sm-4">
                     <strong style="color: #17a2b8;"><i class="fa fa-user-circle"></i> Verantwortliche Nutzer</strong>
-                    <ul class="list-unstyled" style="margin-top: 5px;">
-                        <?php foreach ($interaction->responsibleUsers as $user): ?>
-                            <li>
-                                <a href="<?= $user->getUrl() ?>">
+                    <?php if (empty($interaction->responsibleUsers)): ?>
+                        <div class="text-muted small" style="margin-top:5px;">-</div>
+                    <?php else: ?>
+                        <ul class="list-unstyled" style="margin-top: 10px; font-size: 12px;">
+                            <?php foreach ($interaction->responsibleUsers as $user): ?>
+                            <a href="<?= $user->getUrl() ?>">
+                                <li style="margin-bottom: 8px; display: flex; align-items: center;">
                                     <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded"
-                                         style="width: 16px; height: 16px; margin-right: 5px;"/>
-                                    <?= Html::encode($user->displayName) ?>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
+                                         style="width: 24px; height: 24px; margin-right: 8px;"
+                                         alt="<?= Html::encode($user->displayName) ?>"/>
+                                    <div style="line-height: 1.2;">
+                                        <strong><?= Html::encode($user->displayName) ?></strong>
+                                        <br>
+                                        <span class="text-muted" style="font-size: 10px;">
+                                            <?= Html::encode($user->profile->title ?? 'Mitglied') ?>
+                                        </span>
+                                    </div>
+                                </li>
+                                <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
                 </div>
+
+                <div class="col-sm-4">
+                    <strong style="color: #17a2b8;"><i class="fa fa-users"></i> Kontaktpersonen</strong>
+                    <?php if (empty($interaction->contacts)): ?>
+                        <div class="text-muted small" style="margin-top:5px;">-</div>
+                    <?php else: ?>
+                        <ul class="crm-related-list" style="margin-top: 10px;">
+                            <?php foreach ($interaction->contacts as $contact): ?>
+                                <li>
+                                    <div class="icon-col"><i class="fa fa-user"></i></div>
+                                    <div class="content-col">
+                                        <strong>
+                                            <a href="#" data-action-click="ui.modal.load"
+                                               data-action-url="<?= $contact->content->container->createUrl('/crm/contact/view', ['id' => $contact->id]) ?>">
+                                                <?= Html::encode($contact->name) ?>
+                                            </a>
+                                        </strong>
+                                        <small><?= $contact->organization ? Html::encode($contact->organization->name) : '-' ?></small>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+
+                <div class="col-sm-4">
+                    <strong style="color: #17a2b8;"><i class="fa fa-building-o"></i> Betroffene Organisationen</strong>
+                    <?php if (empty($interaction->organizations)): ?>
+                        <div class="text-muted small" style="margin-top:5px;">-</div>
+                    <?php else: ?>
+                        <ul class="crm-related-list" style="margin-top: 10px;">
+                            <?php foreach ($interaction->organizations as $org): ?>
+                                <li>
+                                    <div class="icon-col"><i class="fa fa-building-o"></i></div>
+                                    <div class="content-col">
+                                        <strong>
+                                            <a href="#" data-action-click="ui.modal.load"
+                                               data-action-url="<?= $org->content->container->createUrl('/crm/organization/view', ['id' => $org->id]) ?>">
+                                                <?= Html::encode($org->name) ?>
+                                            </a>
+                                        </strong>
+                                        <small><?= $org->hasAttribute('city') ? Html::encode($org->city) : '' ?></small>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+
             </div>
 
-            <!-- Footer Buttons -->
-            <div class="text-right" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
+            <div class="text-right" style="margin-top: 20px; padding-top: 10px; border-top: 1px dashed #eee;">
 
                 <?php if (!$isStream): ?>
                     <span style="margin-right: 15px;">

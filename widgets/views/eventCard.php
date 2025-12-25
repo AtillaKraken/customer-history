@@ -32,6 +32,48 @@ $typeLabel = $types[$event->type] ?? '-';
     .event-toggle-icon {
         transition: transform 0.3s ease;
     }
+
+    .crm-related-list {
+        list-style: none;
+        padding-left: 0;
+        margin-bottom: 0;
+    }
+
+    .crm-related-list li {
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px dashed #eee;
+        font-size: 12px;
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .crm-related-list li:last-child {
+        border-bottom: none;
+    }
+
+    .crm-related-list .icon-col {
+        width: 20px;
+        text-align: center;
+        margin-right: 8px;
+        color: #17a2b8; /* Event/Info Blue */
+        font-size: 14px;
+        margin-top: 2px;
+    }
+
+    .crm-related-list .content-col {
+        flex: 1;
+    }
+
+    .crm-related-list strong {
+        display: block;
+        color: #333;
+        font-size: 13px;
+    }
+
+    .crm-related-list small {
+        color: #999;
+    }
 </style>
 
 <div class="panel panel-default" style="<?= $borderClass ?> margin-bottom: 10px;">
@@ -87,7 +129,14 @@ $typeLabel = $types[$event->type] ?? '-';
                         <?php endif; ?>
                     </strong>
                 </div>
+
                 <div class="col-sm-4">
+                    <?php if (!$isStream && !empty($event->content->getTags(humhub\modules\topic\models\Topic::class)->count())): ?>
+                        <small class="text-muted text-uppercase" style="font-size: 10px;">Themen</small><br>
+                        <?php foreach ($event->content->getTags(humhub\modules\topic\models\Topic::class)->all() as $topic): ?>
+                            <span class="label label-default" style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -100,46 +149,77 @@ $typeLabel = $types[$event->type] ?? '-';
                 </div>
             <?php endif; ?>
 
-            <?php if (!$isStream && !empty($event->content->getTags(humhub\modules\topic\models\Topic::class)->count())): ?>
-                <div style="margin-bottom: 15px;">
-                    <i class="fa fa-tags text-muted"></i>
-                    <?php foreach ($event->content->getTags(humhub\modules\topic\models\Topic::class)->all() as $topic): ?>
-                        <span class="label label-default" style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
+            <div class="row" style="margin-top: 20px; border-top: 1px dashed #eee; padding-top: 15px;">
 
-            <?php if (!empty($event->externalLinks)): ?>
-                <div style="margin-bottom: 15px;">
-                    <strong><i class="fa fa-link"></i> Verknüpfte Links</strong>
-                    <ul class="list-unstyled" style="margin-top: 5px; padding-left: 10px; border-left: 2px solid #eee;">
-                        <?php foreach ($event->externalLinks as $link): ?>
-                            <li style="margin-bottom: 3px;">
-                                <a href="<?= Html::encode($link->url) ?>" target="_blank" rel="noopener noreferrer">
-                                    <i class="fa fa-external-link-square"></i> <?= Html::encode($link->url) ?>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
-
-            <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-4">
                     <strong style="color: #17a2b8;"><i class="fa fa-users"></i> Teilnehmende Kontakte</strong>
-                    <ul class="list-unstyled" style="margin-top: 5px; font-size: 13px;">
-                        <?php foreach ($event->contacts as $contact): ?>
-                            <li style="margin-bottom: 4px;">
-                                <i class="fa fa-user"></i> <strong><?= Html::encode($contact->name) ?></strong>
-                                <?php if ($contact->organization): ?>
-                                    <span class="text-muted" style="margin-left: 5px; font-size: 11px;">
-                                        (<i class="fa fa-building-o"></i> <?= Html::encode($contact->organization->name) ?>)
-                                    </span>
-                                <?php endif; ?>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
+                    <?php if (empty($event->contacts)): ?>
+                        <div class="text-muted small" style="margin-top:5px;">-</div>
+                    <?php else: ?>
+                        <ul class="crm-related-list" style="margin-top: 10px;">
+                            <?php foreach ($event->contacts as $contact): ?>
+                                <li>
+                                    <div class="icon-col"><i class="fa fa-user"></i></div>
+                                    <div class="content-col">
+                                        <strong>
+                                            <a href="#" data-action-click="ui.modal.load"
+                                               data-action-url="<?= $contact->content->container->createUrl('/crm/contact/view', ['id' => $contact->id]) ?>">
+                                                <?= Html::encode($contact->name) ?>
+                                            </a>
+                                        </strong>
+                                        <small><?= $contact->organization ? Html::encode($contact->organization->name) : '-' ?></small>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
                 </div>
+
+                <div class="col-sm-4">
+                    <strong style="color: #17a2b8;"><i class="fa fa-building-o"></i> Betroffene Organisationen</strong>
+                    <?php if (empty($event->organizations)): ?>
+                        <div class="text-muted small" style="margin-top:5px;">-</div>
+                    <?php else: ?>
+                        <ul class="crm-related-list" style="margin-top: 10px;">
+                            <?php foreach ($event->organizations as $org): ?>
+                                <li>
+                                    <div class="icon-col"><i class="fa fa-building-o"></i></div>
+                                    <div class="content-col">
+                                        <strong>
+                                            <a href="#" data-action-click="ui.modal.load"
+                                               data-action-url="<?= $org->content->container->createUrl('/crm/organization/view', ['id' => $org->id]) ?>">
+                                                <?= Html::encode($org->name) ?>
+                                            </a>
+                                        </strong>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+
+                <div class="col-sm-4">
+                    <strong style="color: #17a2b8;"><i class="fa fa-link"></i> Links</strong>
+                    <?php if (empty($event->externalLinks)): ?>
+                        <div class="text-muted small" style="margin-top:5px;">-</div>
+                    <?php else: ?>
+                        <ul class="crm-related-list" style="margin-top: 10px;">
+                            <?php foreach ($event->externalLinks as $link): ?>
+                                <li>
+                                    <div class="icon-col"><i class="fa fa-external-link-square"></i></div>
+                                    <div class="content-col">
+                                        <strong class="text-link">
+                                            <a href="<?= Html::encode($link->url) ?>" target="_blank" rel="noopener noreferrer">
+                                                <?= Html::encode($link->url) ?>
+                                            </a>
+                                        </strong>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+
             </div>
 
             <div class="text-right" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">

@@ -55,6 +55,15 @@ class Contact extends ContentActiveRecord
         return $this->getDisplayName();
     }
 
+    /**
+     * @inheritdoc
+     * icon next to the Contact
+     */
+    public function getIcon()
+    {
+        return 'fa-user';
+    }
+
     public static function tableName()
     {
         return 'crm_contact';
@@ -164,5 +173,15 @@ class Contact extends ContentActiveRecord
         }
 
         return true;
+    }
+
+    /**
+     * return Events where a certain Contact participated in
+     * */
+    public function getParticipations()
+    {
+        return $this->hasMany(Event::class, ['id' => 'event_id'])
+            ->viaTable('crm_event_contact', ['contact_id' => 'id'])
+            ->orderBy(['date' => SORT_DESC]);
     }
 }
