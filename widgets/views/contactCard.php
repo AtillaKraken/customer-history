@@ -132,7 +132,7 @@ foreach ($interactions as $interaction) {
                     <small class="text-muted text-uppercase">Persönliche Daten</small><br>
                     <?php if (empty($contact->name)): ?>
                         <i class="fa fa-warning"></i> <strong>Name fehlt </strong>
-                        <strong class="text-danger"><i class="fa fa-arrow-right"></i>
+                        <strong class="text-danger"><i class="fa fa-long-arrow-right"></i>
                             ID: <?= Html::encode($contact->id) ?></strong>
                     <?php endif ?>
                     <strong><?= Html::encode($contact->name) ?></strong><br>
@@ -161,7 +161,11 @@ foreach ($interactions as $interaction) {
                 </div>
                 <div class="col-sm-3">
                     <small class="text-muted text-uppercase">Rollen / Funktionen</small><br>
-                    <?= Html::encode($contact->roles ?? '-') ?>
+                    <?php foreach ($contact->roleList as $role): ?>
+                        <span class="label label-default">
+                        <?= Html::encode($role) ?>
+                    </span>
+                    <?php endforeach; ?>
                 </div>
                 <div class="col-sm-3">
                     <small class="text-muted text-uppercase">Kommunikation</small><br>
@@ -223,12 +227,14 @@ foreach ($interactions as $interaction) {
                             <span class="text-muted small">-</span>
                         <?php else: ?>
                             <ul class="list-unstyled" style="font-size: 12px;">
-                                <?php foreach ($responsibleUsers as $user): ?>
-                                    <a href="<?= $user->getUrl() ?>">
+                                <?php foreach ($responsibleUsers
+
+                                as $user): ?>
+                                <a href="<?= $user->getUrl() ?>">
                                     <li style="margin-bottom: 8px; display: flex; align-items: center;">
-                                            <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded"
-                                                 style="width: 24px; height: 24px; margin-right: 8px;"
-                                                 alt="<?= Html::encode($user->displayName) ?>"/>
+                                        <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded"
+                                             style="width: 24px; height: 24px; margin-right: 8px;"
+                                             alt="<?= Html::encode($user->displayName) ?>"/>
                                         <div>
                                             <a href="<?= $user->getUrl() ?>">
                                                 <strong><?= Html::encode($user->displayName) ?></strong><br>
@@ -237,7 +243,7 @@ foreach ($interactions as $interaction) {
                                             </a>
                                         </div>
                                     </li>
-                                <?php endforeach; ?>
+                                    <?php endforeach; ?>
                             </ul>
                         <?php endif; ?>
                     </div>
@@ -262,7 +268,8 @@ foreach ($interactions as $interaction) {
                                 </li>
                             <?php endforeach; ?>
                             <?php if ($countEvents == 0): ?>
-                                <li class="text-muted">Keine erfassten Teilnahmen an Veranstaltungen</li> <?php endif; ?>
+                                <li class="text-muted">Keine erfassten Teilnahmen an Veranstaltungen
+                                </li> <?php endif; ?>
                         </ul>
                     </div>
 

@@ -1,4 +1,5 @@
 <?php
+
 use humhub\widgets\Button;
 use yii\helpers\Html;
 use humhub\widgets\LinkPager;
@@ -14,20 +15,47 @@ use humhub\widgets\LinkPager;
         <thead>
         <tr>
             <th>Name</th>
-            <th>Website</th>
-            <th>Kontakte</th>
+            <th>Stadt</th>
+            <th>Größe</th>
+            <th class="text-center" title="Anzahl Kontakte"><i class="fa fa-users"></i></th>
+            <th class="text-center" title="Anzahl Interaktionen"><i class="fa fa-comments-o"></i></th>
+            <th class="text-center" title="Anzahl Veranstaltungen"><i class="fa fa-calendar"></i></th>
+            <th class="text-right">Bearbeiten</th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($organizations as $org): ?>
             <tr>
-                <td>
-                    <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $org->content->container->createUrl('/crm/organization/view', ['id' => $org->id]) ?>">
+                <td style="vertical-align: middle;">
+                    <a href="#" data-action-click="ui.modal.load"
+                       data-action-url="<?= $org->content->container->createUrl('/crm/organization/view', ['id' => $org->id]) ?>">
                         <strong><?= Html::encode($org->name) ?></strong>
                     </a>
                 </td>
-                <td><span class="badge"><?= count($org->contacts) ?></span></td>
-                <td class="text-right">
+                <td style="vertical-align: middle;">
+                    <?= $org->hasAttribute('city') ? Html::encode($org->city) : '-' ?>
+                </td>
+                <td style="vertical-align: middle;">
+                    <?= $org->hasAttribute('size') ? Html::encode($org->size) : '-' ?>
+                </td>
+
+                <td style="vertical-align: middle;" class="text-center">
+                    <span class="label label-default">
+                        <?= $org->getContacts()->count() ?>
+                    </span>
+                </td>
+                <td style="vertical-align: middle;" class="text-center">
+                    <span class="label label-default">
+                        <?= $org->getInteractions()->count() ?>
+                    </span>
+                </td>
+                <td style="vertical-align: middle;" class="text-center">
+                    <span class="label label-default">
+                        <?= $org->getParticipations()->count() ?>
+                    </span>
+                </td>
+
+                <td class="text-right" style="vertical-align: middle;">
                     <?= Button::primary()->icon('fa-pencil')->xs()
                         ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/organization/edit', ['id' => $org->id])) ?>
                 </td>

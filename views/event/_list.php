@@ -16,32 +16,43 @@ use humhub\widgets\LinkPager;
         <tr>
             <th>Titel</th>
             <th>Datum</th>
-            <th>Typ</th>
-            <th>Links</th>
+            <th>Format</th>
+            <th>Teilnahmen:</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($events as $event): ?>
             <tr>
-                <td>
+                <td style="vertical-align: middle;">
                     <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $event->content->container->createUrl('/crm/event/view', ['id' => $event->id]) ?>">
                         <strong><?= Html::encode($event->title) ?></strong>
                     </a>
                 </td>
-                <td>
+                <td style="vertical-align: middle;">
                     <?= Yii::$app->formatter->asDate($event->date) ?>
                     <?php if($event->time): ?>
                         <small class="text-muted"><?= Html::encode($event->time) ?> Uhr</small>
                     <?php endif; ?>
                 </td>
-                <td>
+                <td style="vertical-align: middle;">
                     <?php
                     $types = \app\modules\crm\models\Event::getTypeOptions();
-                    echo Html::encode($types[$event->type] ?? $event->type);
+                    $label = $types[$event->type] ?? $event->type;
                     ?>
+                    <span class="label label-default"><?= Html::encode($label) ?></span>
                 </td>
-                <td><?= Html::encode($event->links) ?></td>
-                <td class="text-right">
+
+                <td style="vertical-align: middle;" class="text-left">
+                        <i class="fa fa-users text-muted"></i> <?= count($event->contacts) ?> <i class="fa fa-long-arrow-right"></i>
+                        <i class="fa fa-building text-muted"></i> <?= count($event->organizations) ?>
+                </td>
+
+                <td style="vertical-align: middle; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <?= Html::encode($event->links) ?>
+                </td>
+
+                <td class="text-right" style="vertical-align: middle;">
                     <?= Button::primary()
                         ->icon('fa-pencil')
                         ->xs()

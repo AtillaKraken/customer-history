@@ -5,6 +5,7 @@ use yii\helpers\Html;
 use humhub\widgets\Label;
 use app\modules\crm\models\Interaction;
 use humhub\widgets\LinkPager;
+use humhub\modules\user\widgets\Image as UserImage;
 
 /* @var $interactions app\modules\crm\models\Interaction[] */
 /* @var $pagination yii\data\Pagination */
@@ -20,20 +21,24 @@ use humhub\widgets\LinkPager;
             <th>Datum</th>
             <th>Status</th>
             <th>Kanal</th>
+            <th class="text-left">Betroffen:</th>
             <th>Verantwortlich</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($interactions as $interaction): ?>
             <tr>
-                <td>
+                <td style="vertical-align: middle;">
                     <a href="#" data-action-click="ui.modal.load"
                        data-action-url="<?= $interaction->content->container->createUrl('/crm/interaction/view', ['id' => $interaction->id]) ?>">
                         <strong><?= Html::encode($interaction->title) ?></strong>
                     </a>
                 </td>
-                <td><?= Yii::$app->formatter->asDate($interaction->date) ?></td>
-                <td>
+                <td style="vertical-align: middle;">
+                    <?= Yii::$app->formatter->asDate($interaction->date) ?>
+                </td>
+                <td style="vertical-align: middle;">
                     <?php
                     switch ($interaction->status) {
                         case Interaction::STATUS_DONE:
@@ -50,11 +55,30 @@ use humhub\widgets\LinkPager;
                     }
                     ?>
                 </td>
-                <td><?= Html::encode($interaction->channel) ?></td>
-                <td>
-                    <span class="badge"><?= count($interaction->responsibleUsers) ?></span>
+                <td style="vertical-align: middle;">
+                    <?php if (empty($interaction->channel)): ?>
+
+                    <?php else: ?>
+                        <span class="label label-default">
+                            <?= Html::encode($interaction->channel) ?>
+                    </span>
+
+                    <?php endif ?>
                 </td>
-                <td class="text-right">
+
+                <td style="vertical-align: middle;" class="text-left">
+                    <i class="fa fa-users text-muted"></i> <?= count($interaction->contacts) ?> <i
+                        class="fa fa-long-arrow-right"></i>
+                    <i class="fa fa-building text-muted"></i> <?= count($interaction->organizations) ?>
+                </td>
+
+                <td style="vertical-align: middle;">
+                    <?php foreach ($interaction->responsibleUsers as $user): ?>
+                        <?= UserImage::widget(['user' => $user, 'width' => 24, 'showTooltip' => true]) ?>
+                    <?php endforeach; ?>
+                </td>
+
+                <td class="text-right" style="vertical-align: middle;">
                     <?= Button::primary()
                         ->icon('fa-pencil')
                         ->xs()
