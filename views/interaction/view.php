@@ -13,7 +13,7 @@ $isAjax = Yii::$app->request->isAjax;
 <?php if ($isAjax): ?>
     <?php ModalDialog::begin(['header' => 'Details: ' . \yii\helpers\Html::encode($model->title), 'size' => 'large']) ?>
     <div class="modal-body" style="padding-bottom: 0;">
-        <?= InteractionCard::widget(['interaction' => $model]) ?>
+        <?= InteractionCard::widget(['interaction' => $model, 'startCollapsed' => false]) ?>
     </div>
     <div class="modal-footer">
         <?= ModalButton::cancel('Schließen') ?>
