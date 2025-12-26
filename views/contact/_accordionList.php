@@ -14,5 +14,7 @@ if (empty($contacts)): ?>
             <?= ContactCard::widget(['contact' => $contact]) ?>
         <?php endforeach; ?>
     </div>
-    <div class="text-center"><?= LinkPager::widget(['pagination' => $pagination]) ?></div>
+    <?php if (isset($pagination)): ?>
+        <div class="text-center"><?= LinkPager::widget(['pagination' => $pagination]) ?></div>
+    <?php endif; ?>
 <?php endif; ?>

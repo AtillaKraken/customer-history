@@ -22,8 +22,13 @@ class MyOrganizations extends Widget
             ->where(['user.id' => $user->id])
             ->orderBy(['crm_organization.name' => SORT_ASC]);
 
+        $totalCount = $query->count();
+
         return $this->render('myOrganizations', [
-            'organizations' => $query->limit($this->limit)->all()
+            'organizations' => $query->limit($this->limit)->all(),
+            'totalCount' => $totalCount,
+            'limit' => $this->limit,
+            'contentContainer' => $this->contentContainer
         ]);
     }
 }

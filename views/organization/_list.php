@@ -20,7 +20,7 @@ use humhub\widgets\LinkPager;
             <th class="text-center" title="Anzahl Kontakte"><i class="fa fa-users"></i></th>
             <th class="text-center" title="Anzahl Interaktionen"><i class="fa fa-comments-o"></i></th>
             <th class="text-center" title="Anzahl Veranstaltungen"><i class="fa fa-calendar"></i></th>
-            <th class="text-right">Bearbeiten</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>

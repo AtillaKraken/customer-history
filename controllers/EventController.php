@@ -127,4 +127,19 @@ class EventController extends ContentContainerController
 
         return $this->render('view', ['model' => $model]);
     }
+
+    public function actionLoadUpcoming()
+    {
+        $query = Event::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['>=', 'date', new \yii\db\Expression('CURDATE()')])
+            ->orderBy(['date' => SORT_ASC]);
+
+        $events = $query->all();
+
+        return $this->renderAjax('_modal_list', [
+            'events' => $events,
+            'title' => 'Anstehende Veranstaltungen'
+        ]);
+    }
 }

@@ -23,7 +23,7 @@ use app\modules\crm\models\Interaction;
             <th>Kontakt</th>
             <th class="text-center" title="Anzahl Interaktionen"><i class="fa fa-comments-o"></i></th>
             <th class="text-center" title="Anzahl Veranstaltungen"><i class="fa fa-calendar"></i></th>
-            <th class="text-right">Aktionen</th>
+            <th class="text-right"></th>
         </tr>
         </thead>
         <tbody>

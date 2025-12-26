@@ -20,8 +20,13 @@ class UpcomingEvents extends Widget
             ->where(['>=', 'date', new Expression('CURDATE()')])
             ->orderBy(['date' => SORT_ASC]);
 
+        $totalCount = $query->count();
+
         return $this->render('upcomingEvents', [
-            'events' => $query->limit($this->limit)->all()
+            'events' => $query->limit($this->limit)->all(),
+            'totalCount' => $totalCount,
+            'limit' => $this->limit,
+            'contentContainer' => $this->contentContainer
         ]);
     }
 }

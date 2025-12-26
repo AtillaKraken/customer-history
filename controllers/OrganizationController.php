@@ -138,4 +138,22 @@ class OrganizationController extends ContentContainerController
         return $this->render('view', ['model' => $model]);
     }
 
+    public function actionLoadMyOrganizations()
+    {
+        $user = Yii::$app->user->getIdentity();
+
+        $query = \app\modules\crm\models\Organization::find()
+            ->contentContainer($this->contentContainer)
+            ->joinWith('responsibleUsers')
+            ->where(['user.id' => $user->id])
+            ->orderBy(['crm_organization.name' => SORT_ASC]);
+
+        $organizations = $query->all();
+
+        return $this->renderAjax('_modal_list', [
+            'organizations' => $organizations,
+            'title' => 'Meine Organisationen'
+        ]);
+    }
+
 }

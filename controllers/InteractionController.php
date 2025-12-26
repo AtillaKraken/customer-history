@@ -138,4 +138,26 @@ class InteractionController extends ContentContainerController
         ]);
     }
 
+    /**
+     * get all interactions of the loggedin user for the "show all" modal
+     */
+    public function actionLoadMyInteractions()
+    {
+        $user = Yii::$app->user->getIdentity();
+
+        $query = Interaction::find()
+            ->contentContainer($this->contentContainer)
+            ->joinWith('responsibleUsers')
+            ->where(['user.id' => $user->id])
+            ->andWhere(['NOT IN', 'crm_interaction.status', ['DONE', 'CANCELLED']])
+            ->orderBy(['date' => SORT_ASC]);
+
+        $interactions = $query->all();
+
+        return $this->renderAjax('_modal_list', [
+            'interactions' => $interactions,
+            'title' => 'Meine offenen Interaktionen'
+        ]);
+    }
+
 }

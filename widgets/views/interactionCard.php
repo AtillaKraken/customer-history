@@ -143,7 +143,7 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
             <div class="row" style="margin-bottom: 15px;">
                 <div class="col-sm-4">
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Status</small><br>
-                    <span class="label <?= $statusClass ?>"><?= $interaction->status ?></span>
+                    <span class="label <?= $statusClass ?>"><i class="fa fa-flag"></i> <?= $interaction->status ?></span>
                 </div>
                 <div class="col-sm-4">
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Zeitpunkt</small><br>

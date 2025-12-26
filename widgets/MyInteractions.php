@@ -22,9 +22,13 @@ class MyInteractions extends Widget
             ->where(['user.id' => $user->id])
             ->andWhere(['NOT IN', 'crm_interaction.status', ['DONE', 'CANCELLED']]) // hide where no action's needed to be taken
             ->orderBy(['date' => SORT_ASC]); // => show overdue/pending ones first
+        $totalCount = $query->count();
 
         return $this->render('myInteractions', [
-            'interactions' => $query->limit($this->limit)->all()
+            'interactions' => $query->limit($this->limit)->all(),
+            'totalCount' => $totalCount,
+            'limit' => $this->limit,
+            'contentContainer' => $this->contentContainer
         ]);
     }
 }
