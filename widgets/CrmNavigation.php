@@ -4,7 +4,8 @@ namespace app\modules\crm\widgets;
 
 use humhub\components\Widget;
 use app\modules\crm\models\forms\CrmFilter;
-use humhub\modules\content\components\ContentContainerActiveRecord;
+use app\modules\crm\models\Organization;
+use humhub\modules\space\modules\manage\models\MembershipSearch;
 
 class CrmNavigation extends Widget
 {
@@ -46,12 +47,32 @@ class CrmNavigation extends Widget
             $this->filter = new CrmFilter();
         }
 
+        // Load information for the dorpdowns:
+
+        // get all of this space's orgs
+        $orgQuery = Organization::find()->contentContainer($this->contentContainer)->orderBy('name');
+        $orgOptions = \yii\helpers\ArrayHelper::map($orgQuery->all(), 'id', 'name');
+
+        // get all of this space's Users
+        $userQuery = MembershipSearch::find()
+            ->joinWith('user')
+            ->where(['space_id' => $this->contentContainer->id]);
+
+        $userOptions = [];
+        foreach($userQuery->all() as $member) {
+            if($member->user) {
+                $userOptions[$member->user->id] = $member->user->displayName;
+            }
+        }
+
         return $this->render('crmNavigation', [
             'contentContainer' => $this->contentContainer,
             'activeTab' => $this->activeTab,
             'createButtonLabel' => $this->createButtonLabel,
             'createUrl' => $this->createUrl,
-            'filter' => $this->filter, // An View weitergeben
+            'filter' => $this->filter,
+            'orgOptions' => $orgOptions,
+            'userOptions' => $userOptions
         ]);
     }
 }

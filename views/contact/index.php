@@ -12,6 +12,7 @@ use humhub\widgets\Button;
  * @var $space humhub\modules\space\models\Space
  * @var $viewMode string
  * @var $pagination yii\data\Pagination
+ * @var $filter
  */
 ?>
 

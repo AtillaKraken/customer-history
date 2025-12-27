@@ -3,7 +3,6 @@
 use app\modules\crm\models\Event;
 use app\modules\crm\widgets\CrmNavigation;
 use humhub\modules\space\models\Space;
-use yii\helpers\Html;
 use humhub\widgets\Button;
 use yii\helpers\Url;
 
@@ -12,6 +11,7 @@ use yii\helpers\Url;
  * @var $space Space
  * @var $viewMode string
  * @var $pagination yii\data\Pagination
+ * @var $filter
  */
 ?>
 
@@ -19,7 +19,8 @@ use yii\helpers\Url;
     'contentContainer' => $space,
     'activeTab' => 'event',
     'createButtonLabel' => 'Neue Veranstaltung',
-    'createUrl' => $space->createUrl('/crm/event/create')
+    'createUrl' => $space->createUrl('/crm/event/create'),
+    'filter' => $filter
 ]) ?>
 
 <div class="panel panel-default">

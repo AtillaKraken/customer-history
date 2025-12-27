@@ -10,6 +10,7 @@ use yii\helpers\Url;
  * @var $space humhub\modules\space\models\Space
  * @var $viewMode string
  * @var $pagination yii\data\Pagination
+ * @var $filter
  */
 ?>
 
@@ -17,7 +18,8 @@ use yii\helpers\Url;
     'contentContainer' => $space,
     'activeTab' => 'organization',
     'createButtonLabel' => 'Neue Organisation',
-    'createUrl' => $space->createUrl('/crm/organization/create')
+    'createUrl' => $space->createUrl('/crm/organization/create'),
+    'filter' => $filter
 ]) ?>
 
 <div class="panel panel-default">

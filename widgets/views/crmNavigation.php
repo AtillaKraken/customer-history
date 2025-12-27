@@ -3,12 +3,20 @@
 use humhub\widgets\Button;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use humhub\modules\ui\form\widgets\MultiSelect;
+use yii\jui\DatePicker;
+use app\modules\crm\models\Organization;
+use app\modules\crm\models\Interaction;
+use app\modules\crm\models\Contact;
+use app\modules\crm\models\Event;
 
 /* @var $contentContainer humhub\modules\content\components\ContentContainerActiveRecord */
 /* @var $activeTab string */
 /* @var $createButtonLabel string */
 /* @var $createUrl string */
 /* @var $filter app\modules\crm\models\forms\CrmFilter */
+/* @var $orgOptions array */
+/* @var $userOptions array */
 
 // helper function to check active state
 $isActive = function ($tab) use ($activeTab) {
@@ -18,11 +26,25 @@ $isActive = function ($tab) use ($activeTab) {
 // unique ID for Filter-Collapse
 $filterId = 'crm-filter-settings-' . $activeTab;
 
-// helper to check if a value is part of the filter array
-$isChecked = function ($value) use ($filter) {
-    return in_array($value, $filter->filters);
-};
+// collapse filter dropdown if filters're applied
+$hasActiveFilters = !empty($filter->filters) || !empty($filter->orgCategories) || !empty($filter->interactionStatus) || !empty($filter->contactOrg);
+
+// examine whether or not we are i nthe module's overview/dashboard (overview/index.php)
+$isOverview = ($activeTab === 'overview');
+
+
 ?>
+
+<style>
+    /* rotate animation to un-/collapse the filter dropdown*/
+    #crm-filter-toggle-btn .caret {
+        transition: transform 0.3s ease;
+    }
+
+    #crm-filter-toggle-btn[aria-expanded="true"] .caret {
+        transform: rotate(180deg);
+    }
+</style>
 
 <!-- Navigation Tabs -->
 <div class="panel panel-default">
@@ -38,149 +60,199 @@ $isChecked = function ($value) use ($filter) {
                     href="<?= $contentContainer->createUrl('/crm/interaction/index') ?>">Interaktionen</a></li>
             <li class="<?= $isActive('event') ?>"><a href="<?= $contentContainer->createUrl('/crm/event/index') ?>">Veranstaltungen</a>
             </li>
+            <?php if ($isOverview): ?>
+                <li class="pull-right">
+                    <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $createUrl ?>"
+                       class="backgroundSuccess" style="color: #fff;  font-weight: bold;">
+                        <i class="fa fa-plus"></i> <?= $createButtonLabel ?>
+                    </a>
+                </li>
+            <?php endif; ?>
+
         </ul>
     </div>
 </div>
 
 <!-- filter and action Panel -->
-<div class="panel panel-default">
-    <div class="panel-body">
-
-        <?= Html::beginForm(Url::current(), 'GET', ['id' => 'crm-filter-form', 'data-target' => '#crm-list-content']) ?>
-
-        <div class="row">
-            <div class="col-md-2" style="padding-top: 6px;">
-                <a href="#<?= $filterId ?>" data-toggle="collapse" aria-expanded="false"
-                   style="color: #333; text-decoration: none;" id="crm-filter-toggle-btn">
-                    <strong><i class="fa fa-filter"></i> Filter</strong> <span class="caret"></span>
-                </a>
-            </div>
-
-            <div class="col-md-6">
-                <div class="input-group">
-                    <?= Html::textInput('CrmFilter[term]', $filter->term, [
-                        'class' => 'form-control',
-                        'placeholder' => 'Suchen...',
-                        'id' => 'crm-search-input'
-                    ]) ?>
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" type="submit"><i class="fa fa-search"></i></button>
-                    </span>
-                </div>
-            </div>
-
-            <div class="col-md-4 text-right">
-                <?= Button::success($createButtonLabel)
-                    ->icon('fa-plus')
-                    ->action('ui.modal.load', $createUrl)
-                    ->right()
-                    ->sm()
-                    ->loader(false)
-                ?>
-            </div>
-        </div>
-
-        <div id="<?= $filterId ?>" class="collapse <?= !empty($filter->filters) ? 'in' : '' ?>"
-             style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+<?php if (!$isOverview): ?>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <?= Html::beginForm(Url::current(), 'GET', ['id' => 'crm-filter-form', 'data-target' => '#crm-list-content']) ?>
 
             <div class="row">
-                <div class="col-md-3">
-                    <label>
-                        <?= Html::checkbox('CrmFilter[filters][]', $isChecked('mine'), ['value' => 'mine', 'class' => 'crm-filter-input']) ?>
-                        Nur meine Einträge
-                    </label>
+                <div class="col-md-2" style="padding-top: 6px;">
+                    <a href="#<?= $filterId ?>" data-toggle="collapse"
+                       aria-expanded="<?= $hasActiveFilters ? 'true' : 'false' ?>"
+                       style="color: #333; text-decoration: none;" id="crm-filter-toggle-btn">
+                        <strong><i class="fa fa-filter"></i> Filter</strong> <span class="caret"></span>
+                    </a>
                 </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <?= Html::activeTextInput($filter, 'term', ['class' => 'form-control', 'placeholder' => 'Suchen...', 'id' => 'crm-search-input']) ?>
+                        <span class="input-group-btn"><button class="btn btn-default" type="submit"><i
+                                    class="fa fa-search"></i></button></span>
+                    </div>
+                </div>
+                <div class="col-md-4 text-right">
+                    <?= Button::success($createButtonLabel)->icon('fa-plus')->action('ui.modal.load', $createUrl)->right()->sm()->loader(false) ?>
+                </div>
+            </div>
+
+            <div id="<?= $filterId ?>" class="collapse <?= $hasActiveFilters ? 'in' : '' ?>"
+                 style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+
+                <?php if ($activeTab === 'organization'): ?>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Kategorie</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'orgCategories', 'items' => Organization::getCategoryOptions(), 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Branche</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'orgIndustries', 'items' => Organization::getIndustryOptions(), 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Größe</label>
+                            <?= Html::activeDropDownList($filter, 'orgSize', Organization::getSizeOptions(), ['class' => 'form-control crm-filter-input', 'prompt' => 'Alle']) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Verantwortlich</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'orgRespUsers', 'items' => $userOptions, 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($activeTab === 'contact'): ?>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Geschlecht</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'contactGender', 'items' => Contact::getGenderOptions(), 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Organisation</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'contactOrg', 'items' => $orgOptions, 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Rolle</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'contactRoles', 'items' => Contact::getRoleOptions(), 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
+                        <div class="col-md-3" style="padding-top: 25px;">
+                            <label>
+                                <?= Html::activeCheckbox($filter, 'contactOwnOrg', ['label' => 'Von mir betreute Organisationen', 'class' => 'crm-filter-input']) ?>
+                            </label>
+                        </div>
+                    </div>
+                <?php endif; ?>
 
                 <?php if ($activeTab === 'interaction'): ?>
-                    <div class="col-md-3">
-                        <label>
-                            <?= Html::checkbox('CrmFilter[filters][]', $isChecked('open'), ['value' => 'open', 'class' => 'crm-filter-input']) ?>
-                            Nur offene
-                        </label>
-                    </div>
-                    <div class="col-md-3">
-                        <label>
-                            <?= Html::checkbox('CrmFilter[filters][]', $isChecked('overdue'), ['value' => 'overdue', 'class' => 'crm-filter-input']) ?>
-                            <span class="text-danger">Überfällig</span>
-                        </label>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Datum</label>
+                            <?= DatePicker::widget(['model' => $filter, 'attribute' => 'interactionDate', 'dateFormat' => 'yyyy-MM-dd', 'options' => ['class' => 'form-control crm-filter-input', 'placeholder' => 'Datum']]) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Status</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'interactionStatus', 'items' => Interaction::getStatusOptions(), 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Kanal</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'interactionChannel', 'items' => Interaction::getChannelOptions(), 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Verantwortlich</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'interactionRespUsers', 'items' => $userOptions, 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
                     </div>
                 <?php endif; ?>
 
                 <?php if ($activeTab === 'event'): ?>
-                    <div class="col-md-3">
-                        <label>
-                            <?= Html::checkbox('CrmFilter[filters][]', $isChecked('upcoming'), ['value' => 'upcoming', 'class' => 'crm-filter-input']) ?>
-                            Nur Zukünftige
-                        </label>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Datum</label>
+                            <?= DatePicker::widget(['model' => $filter, 'attribute' => 'eventDate', 'dateFormat' => 'yyyy-MM-dd', 'options' => ['class' => 'form-control crm-filter-input', 'placeholder' => 'Datum']]) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Typ</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'eventType', 'items' => Event::getTypeOptions(), 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Organisation</label>
+                            <?= MultiSelect::widget(['model' => $filter, 'attribute' => 'eventOrg', 'items' => $orgOptions, 'options' => ['class' => 'crm-filter-input']]) ?>
+                        </div>
+                        <div class="col-md-3" style="padding-top: 25px;">
+                            <label><?= Html::activeCheckbox($filter, 'eventOwnOrg', ['label' => 'Von mir betreute Organisationen', 'class' => 'crm-filter-input']) ?></label>
+                        </div>
                     </div>
                 <?php endif; ?>
 
-                <?php if ($activeTab === 'organization'): ?>
-                    <div class="col-md-3">
-                        <label>
-                            <?= Html::checkbox('CrmFilter[filters][]', $isChecked('category_customer'), ['value' => 'category_customer', 'class' => 'crm-filter-input']) ?>
-                            Kunden
-                        </label>
+                <div class="row" style="margin-top: 15px; border-top: 1px dashed #ddd; padding-top: 10px;">
+                    <div class="col-md-12 text-right">
+                        <a href="#" id="crm-filter-reset" class="btn btn-default btn-sm"><i class="fa fa-times"></i>
+                            Filter
+                            zurücksetzen</a>
                     </div>
-                <?php endif; ?>
-
-                <div class="col-md-12 text-right" style="margin-top: 10px;">
-                    <a href="#" id="crm-filter-reset" class="btn btn-default btn-xs">
-                        <i class="fa fa-times"></i> Filter zurücksetzen
-                    </a>
                 </div>
             </div>
+            <?= Html::endForm() ?>
         </div>
-
-        <?= Html::endForm() ?>
     </div>
-</div>
+<?php endif; ?>
 
-<script>
-    $(document).ready(function () {
+<?php
+$script = <<<JS
+(function() {
+    var formSelector = '#crm-filter-form';
 
-        // load
-        function reloadCrmList() {
-            var form = $('#crm-filter-form');
-            var url = form.attr('action');
-            var target = form.data('target');
+    // load
+    function reloadCrmList() {
+        var \$form = $(formSelector);
+        var url = \$form.attr('action');
+        var data = \$form.serialize();
+        var target = \$form.data('target');
+        var \$target = $(target);
 
-            // get all inputs (Text + checked Checkboxes)
-            var data = form.serialize();
+        \$target.css('opacity', 0.5);
 
-            $(target).css('opacity', 0.5);
-
-            $.get(url, data, function (response) {
-                $(target).html(response).css('opacity', 1);
-            }).fail(function() {
-                $(target).css('opacity', 1);
-                console.error("Fehler beim Laden der CRM Liste");
-            });
-        }
-
-        // reactivity: when checkbox changes -> reload
-        $('.crm-filter-input').on('change', function () {
-            reloadCrmList();
+        $.get(url, data, function (response) {
+            \$target.html(response).css('opacity', 1);
+        }).fail(function() {
+            \$target.css('opacity', 1);
         });
-        // TODO: actually fix reset button (currently not really reactive)
+    }
 
-
-        // searchbar: prevents normal submit (=> reload entire side), use Ajax instead
-        $('#crm-filter-form').on('submit', function (e) {
-            e.preventDefault();
-            reloadCrmList();
-        });
-
-        $('#crm-filter-reset').on('click', function(e) {
-            e.preventDefault();
-
-            // empty searhbar
-            $('#crm-search-input').val('');
-
-            // uncheck all boxes
-            $('#crm-filter-form').find('input[type=checkbox]').prop('checked', false);
-
-            reloadCrmList();
-        });
+    // listen to .crm-filter-input's information [checkboxes, selections]
+    $(document).off('change.crm', '.crm-filter-input').on('change.crm', '.crm-filter-input', function () {
+        reloadCrmList();
     });
-</script>
+    // reactivity: when searched -> reload
+    $(document).off('submit.crm', formSelector).on('submit.crm', formSelector, function (e) {
+        e.preventDefault();
+        reloadCrmList();
+    });
+
+    // reactivity: when reset button is pressed -> empty/uncheck all and reload
+    $(document).off('click.crmReset', '#crm-filter-reset').on('click.crmReset', '#crm-filter-reset', function(e) {
+        e.preventDefault();
+
+        var \$form = $(formSelector);
+
+        // empty texts and datepickers
+        \$form.find('input[type="text"]').val('');
+
+        // unmark checkboxen
+        \$form.find('input[type="checkbox"]').prop('checked', false);
+
+        // reset all selections
+        // => .val(null) deletes value
+        // => .trigger('change') is necesarry to visually update the state
+        \$form.find('select').each(function() {
+             $(this).val(null).trigger('change');
+        });
+
+        reloadCrmList();
+    });
+})();
+JS;
+$this->registerJs($script);
+?>

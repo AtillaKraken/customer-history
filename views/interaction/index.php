@@ -12,6 +12,7 @@ use yii\helpers\Url;
  * @var $space Space
  * @var $viewMode string
  * @var $pagination yii\data\Pagination
+ * @var $filter
  */
 ?>
 
@@ -19,7 +20,8 @@ use yii\helpers\Url;
     'contentContainer' => $space,
     'activeTab' => 'interaction',
     'createButtonLabel' => 'Neue Interaktion',
-    'createUrl' => $space->createUrl('/crm/interaction/create')
+    'createUrl' => $space->createUrl('/crm/interaction/create'),
+    'filter' => $filter
 ]) ?>
 
 <div class="panel panel-default">
