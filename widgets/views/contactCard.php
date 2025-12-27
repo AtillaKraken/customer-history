@@ -137,13 +137,13 @@ foreach ($interactions as $interaction) {
                     <?php endif ?>
                     <strong><?= Html::encode($contact->name) ?></strong><br>
                     <?php switch ($contact->gender) {
-                        case 'male':
+                        case Contact::GENDER_MALE:
                             echo '<i class="fa fa-male"></i>';
                             break;
-                        case 'female':
+                        case Contact::GENDER_FEMALE:
                             echo '<i class="fa fa-female"></i>';
                             break;
-                        case 'diverse':
+                        case Contact::GENDER_DIVERSE:
                             echo '<i class="fa fa-genderless"></i>';
                             break;
                         case null:

@@ -20,7 +20,7 @@ class MyInteractions extends Widget
             ->contentContainer($this->contentContainer)
             ->joinWith('responsibleUsers')
             ->where(['user.id' => $user->id])
-            ->andWhere(['NOT IN', 'crm_interaction.status', ['DONE', 'CANCELLED']]) // hide where no action's needed to be taken
+            ->andWhere(['NOT IN', 'crm_interaction.status', [Interaction::STATUS_DONE, Interaction::STATUS_CANCELLED    ]]) // hide where no action's needed to be taken
             ->orderBy(['date' => SORT_ASC]); // => show overdue/pending ones first
         $totalCount = $query->count();
 

@@ -46,16 +46,28 @@ class Event extends ContentActiveRecord
     }
 
     // Type Constants
-    const TYPE_NETWORKING = 'networking';
-    const TYPE_WORKSHOP = 'workshop';
-    const TYPE_PRESENTATION = 'presentation';
-    const TYPE_CAREER = 'career';
-    const TYPE_CAMPUSTOUR = 'campustour';
-    const TYPE_PROJECT = 'project';
-    const TYPE_CONFERENCE = 'conference';
-    const TYPE_MEDIA = 'media';
-    const TYPE_MARKETING = 'marketing';
-    const TYPE_OTHER = 'other';
+    const TYPE_NETWORKING = 'Netzwerktreffen';
+    const TYPE_WORKSHOP = 'Workshop';
+    const TYPE_PRESENTATION = 'Präsentation';
+    const TYPE_CAREER = 'Karriere-Event';
+    const TYPE_CAMPUSTOUR = 'Campustour';
+    const TYPE_PROJECT = 'Projektmeeting';
+    const TYPE_CONFERENCE = 'Fachtagung / Messe';
+    const TYPE_MEDIA = 'Presse- & Medienformat';
+    const TYPE_MARKETING = 'Marketing- / PR-Aktion';
+    const TYPE_OTHER = 'Sonstiges';
+    private const TYPES = [
+        self::TYPE_NETWORKING,
+        self::TYPE_WORKSHOP,
+        self::TYPE_PRESENTATION,
+        self::TYPE_CAREER,
+        self::TYPE_CAMPUSTOUR,
+        self::TYPE_PROJECT,
+        self::TYPE_CONFERENCE,
+        self::TYPE_MEDIA,
+        self::TYPE_MARKETING,
+        self::TYPE_OTHER,
+    ];
 
     public $topics = []; // helper array for the form/modal
     public array $contactIds = []; // helper for contact assignment
@@ -80,6 +92,7 @@ class Event extends ContentActiveRecord
     {
         return 'CRM-Veranstaltung';
     }
+
     // necessary to display correct name of an entry in streams and activity widgets
     public function getContentDescription()
     {
@@ -94,6 +107,7 @@ class Event extends ContentActiveRecord
     {
         return 'fa-calendar-o';
     }
+
     // TODO: Icon-Konsistenz prüfne/durchsetzen
 
     public function attributeLabels()
@@ -116,18 +130,7 @@ class Event extends ContentActiveRecord
      */
     public static function getTypeOptions()
     {
-        return [
-            self::TYPE_NETWORKING => 'Netzwerktreffen',
-            self::TYPE_WORKSHOP => 'Workshop',
-            self::TYPE_PRESENTATION => 'Präsentation',
-            self::TYPE_CAREER => 'Karriere-Event',
-            self::TYPE_CAMPUSTOUR => 'Campustour',
-            self::TYPE_PROJECT => 'Projektmeeting',
-            self::TYPE_CONFERENCE => 'Fachtagung/Messe',
-            self::TYPE_MEDIA => 'Presse- & Medienformat',
-            self::TYPE_MARKETING => 'Marketing-/PR-Aktion',
-            self::TYPE_OTHER => 'Sonstige',
-        ];
+        return array_combine(self::TYPES, self::TYPES);
     }
 
     public function getContacts()

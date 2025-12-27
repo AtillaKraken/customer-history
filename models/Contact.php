@@ -30,6 +30,52 @@ class Contact extends ContentActiveRecord
 
     public $wallEntryClass = 'app\modules\crm\widgets\ContactWallEntry';
 
+    // Roles:
+    const ROLE_MANAGEMENT = 'Geschäftsführung / Vorstand';
+    const ROLE_HEAD_OF = 'Abteilungs- / Bereichsleitung';
+    const ROLE_PROJECT_LEAD = 'Projektleitung';
+    const ROLE_OPERATIONS = 'Operativ / Service / Support';
+    const ROLE_ASSISTANCE = 'Assistenz / Sekretariat';
+    const ROLE_SALES = 'Vertrieb / Sales';
+    const ROLE_PURCHASING = 'Einkauf';
+    const ROLE_FINANCE = 'Finanzen / Controlling';
+    const ROLE_LEGAL = 'Recht / Verträge';
+    const ROLE_HR = 'Personal / HR';
+    const ROLE_MARKETING = 'Marketing / Kommunikation / PR';
+    const ROLE_IT = 'IT / Administration';
+    const ROLE_R_AND_D = 'Forschung & Entwicklung / Produkt';
+    const ROLE_OTHER = 'Sonstiges';
+
+    private const ROLES = [
+        self::ROLE_MANAGEMENT,
+        self::ROLE_HEAD_OF,
+        self::ROLE_PROJECT_LEAD,
+        self::ROLE_OPERATIONS,
+        self::ROLE_ASSISTANCE,
+        self::ROLE_SALES,
+        self::ROLE_PURCHASING,
+        self::ROLE_FINANCE,
+        self::ROLE_LEGAL,
+        self::ROLE_HR,
+        self::ROLE_MARKETING,
+        self::ROLE_IT,
+        self::ROLE_R_AND_D,
+        self::ROLE_OTHER,
+    ];
+
+    // Gender:
+    const GENDER_FEMALE = 'Weiblich';
+    const GENDER_MALE = 'Männlich';
+    const GENDER_DIVERSE = 'Divers';
+    const GENDER_NOT_SPECIFIED = 'Keine Angabe';
+
+    private const GENDERS = [
+        self::GENDER_FEMALE,
+        self::GENDER_MALE,
+        self::GENDER_DIVERSE,
+        self::GENDER_NOT_SPECIFIED,
+    ];
+
     public function getUrl()
     {
         return $this->content->container->createUrl('/crm/contact/view', ['id' => $this->id]);
@@ -123,31 +169,12 @@ class Contact extends ContentActiveRecord
      */
     public static function getRoleOptions()
     {
-        return [
-            // Decision makers
-            'MANAGEMENT' => 'Geschäftsführung / Vorstand',
-            'HEAD_OF' => 'Abteilungs- / Bereichsleitung',
+        return array_combine(self::ROLES, self::ROLES);
+    }
 
-            // Key roles
-            'PROJECT_LEAD' => 'Projektleitung',
-            'OPERATIONS' => 'Operativ / Service / Support',
-            'ASSISTANCE' => 'Assistenz / Sekretariat',
-
-            // Commercial
-            'SALES' => 'Vertrieb / Sales',
-            'PURCHASING' => 'Einkauf',
-            'FINANCE' => 'Finanzen / Controlling',
-            'LEGAL' => 'Recht / Verträge',
-
-            // Departments
-            'HR' => 'Personal / HR',
-            'MARKETING' => 'Marketing / Kommunikation / PR',
-            'IT' => 'IT / Admin',
-            'R_AND_D' => 'Forschung & Entwicklung / Produkt', // Ergänzt: Falls IT zu eng gefasst ist
-
-            // Fallback
-            'OTHER' => 'Sonstiges',
-        ];
+    public static function getGenderOptions()
+    {
+        return array_combine(self::GENDERS, self::GENDERS);
     }
 
     // After finding from db: String -> Array

@@ -35,29 +35,61 @@ class Interaction extends ContentActiveRecord
     // define Widget for Stream
     public $wallEntryClass = 'app\modules\crm\widgets\InteractionWallEntry';
 
+    // Status:
+    const STATUS_PLANNED = 'Geplant';
+    const STATUS_OVERDUE = 'Überfällig';
+    const STATUS_CANCELLED = 'Abgesagt';
+    const STATUS_DONE = 'Erledigt';
+
+    private const STATUSES = [
+        self::STATUS_PLANNED,
+        self::STATUS_OVERDUE,
+        self::STATUS_CANCELLED,
+        self::STATUS_DONE,
+    ];
+
+    // Channels:
+    const CHANNEL_EMAIL = 'E-Mail';
+    const CHANNEL_PHONE = 'Telefon';
+    const CHANNEL_VIDEO = 'Videokonferenz';
+    const CHANNEL_IN_PERSON = 'Persönliches Treffen';
+    const CHANNEL_EVENT = 'Veranstaltung';
+    const CHANNEL_SOCIAL = 'Social Media';
+    const CHANNEL_MESSENGER = 'Messenger';
+    const CHANNEL_LETTER = 'Brief';
+    const CHANNEL_NEWSLETTER = 'Newsletter';
+    const CHANNEL_OTHER = 'Sonstiges';
+
+    private const CHANNELS = [
+        self::CHANNEL_EMAIL,
+        self::CHANNEL_PHONE,
+        self::CHANNEL_VIDEO,
+        self::CHANNEL_IN_PERSON,
+        self::CHANNEL_EVENT,
+        self::CHANNEL_SOCIAL,
+        self::CHANNEL_MESSENGER,
+        self::CHANNEL_LETTER,
+        self::CHANNEL_NEWSLETTER,
+        self::CHANNEL_OTHER,
+    ];
+
+    public static function getChannelOptions()
+    {
+        return array_combine(self::CHANNELS, self::CHANNELS);
+    }
+
+
+    public static function getStatusOptions()
+    {
+        return array_combine(self::STATUSES, self::STATUSES);
+    }
+
+
     // define target of Notification-Links
     public function getUrl()
     {
         return $this->content->container->createUrl('/crm/interaction/view', ['id' => $this->id]);
     }
-
-    // Statuses:
-    const STATUS_PLANNED = 'PLANNED';
-    const STATUS_OVERDUE = 'OVERDUE';
-    const STATUS_CANCELLED = 'CANCELLED';
-    const STATUS_DONE = 'DONE';
-
-    // Channels:
-    const CHANNEL_EMAIL = 'EMAIL';
-    const CHANNEL_PHONE = 'PHONE';
-    const CHANNEL_VIDEO = 'VIDEO_CONF';
-    const CHANNEL_IN_PERSON = 'IN_PERSON';
-    const CHANNEL_EVENT = 'EVENT';
-    const CHANNEL_SOCIAL = 'SOCIAL_MEDIA';
-    const CHANNEL_MESSENGER = 'MESSENGER';
-    const CHANNEL_LETTER = 'LETTER';
-    const CHANNEL_NEWSLETTER = 'NEWSLETTER';
-    const CHANNEL_OTHER = 'OTHER';
 
 
     public static function tableName()
@@ -102,38 +134,6 @@ class Interaction extends ContentActiveRecord
             'result' => 'Ergebnis',
             'links' => 'Links',
             'event_id' => 'EventID',
-        ];
-    }
-
-    /**
-     * @return string[] array of applicable statuses
-     */
-    public static function getStatusOptions()
-    {
-        return [
-            self::STATUS_PLANNED => 'Geplant',
-            self::STATUS_OVERDUE => 'Überfällig',
-            self::STATUS_CANCELLED => 'Abgesagt',
-            self::STATUS_DONE => 'Erledigt',
-        ];
-    }
-
-    /**
-     * @return string[] array of applicable channels
-     */
-    public static function getChannelOptions()
-    {
-        return [
-            self::CHANNEL_EMAIL => 'E-Mail',
-            self::CHANNEL_PHONE => 'Telefon',
-            self::CHANNEL_VIDEO => 'Videokonferenz',
-            self::CHANNEL_IN_PERSON => 'Persönliches Treffen',
-            self::CHANNEL_EVENT => 'Veranstaltung',
-            self::CHANNEL_SOCIAL => 'Social Media',
-            self::CHANNEL_MESSENGER => 'HumHub-Messenger',
-            self::CHANNEL_LETTER => 'Brief',
-            self::CHANNEL_NEWSLETTER => 'Newsletter',
-            self::CHANNEL_OTHER => 'Sonstiges',
         ];
     }
 

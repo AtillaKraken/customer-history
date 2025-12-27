@@ -18,11 +18,9 @@ use app\modules\crm\models\Contact;
         </div>
         <div class="col-md-4">
             <!-- Gender -->
-            <?= $form->field($model, 'gender')->dropDownList([
-                'male' => 'Männlich',
-                'female' => 'Weiblich',
-                'diverse' => 'Divers',
-            ], ['prompt' => 'Keine Angabe']) ?>
+            <?= $form->field($model, 'gender')->dropDownList(Contact::getGenderOptions(), [
+                'prompt' => 'Keine Angabe'
+            ]) ?>
         </div>
     </div>
 

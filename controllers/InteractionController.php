@@ -149,7 +149,7 @@ class InteractionController extends ContentContainerController
             ->contentContainer($this->contentContainer)
             ->joinWith('responsibleUsers')
             ->where(['user.id' => $user->id])
-            ->andWhere(['NOT IN', 'crm_interaction.status', ['DONE', 'CANCELLED']])
+            ->andWhere(['NOT IN', 'crm_interaction.status', [Interaction::STATUS_DONE, Interaction::STATUS_CANCELLED]])
             ->orderBy(['date' => SORT_ASC]);
 
         $interactions = $query->all();
