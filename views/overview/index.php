@@ -6,41 +6,61 @@ use app\modules\crm\widgets\CrmStatistics;
 use app\modules\crm\widgets\MyInteractions;
 use app\modules\crm\widgets\MyOrganizations;
 use app\modules\crm\widgets\UpcomingEvents;
+use humhub\modules\activity\widgets\ActivityStreamViewer;
+use humhub\widgets\LinkPager;
 
 /* @var $space humhub\modules\space\models\Space */
 /* @var $interactions array */
+/* @var $pagination yii\data\Pagination */
 ?>
 
 <!-- Insert Navigation Widget -->
 <?= CrmNavigation::widget([
     'contentContainer' => $space,
     'activeTab' => 'overview',
-    'createButtonLabel' => 'Schnellerfassung' // Default URL = Dispatcher
+    'createButtonLabel' => 'Schnellerfassung'
 ]) ?>
 
 
 <div class="row">
     <div class="col-md-8">
 
-        <h3 style="margin-top: 20px; margin-bottom: 15px;">Persönliche Agenda</h3>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <i class="fa fa-list-ol"></i> <strong>Persönliche Agenda</strong>
+            </div>
+            <div class="panel-body">
+                <div class="crm-agenda-list">
+                    <?php if (empty($interactions)): ?>
+                        <div class="text-muted text-center" style="padding: 20px;">
+                            <i class="fa fa-check-circle-o fa-2x"></i><br>
+                            Alles erledigt! Keine offenen Interaktionen in deiner Agenda.
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($interactions as $interaction): ?>
+                            <?= InteractionCard::widget(['interaction' => $interaction]) ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
 
-        <div class="crm-agenda-list">
-            <?php foreach ($interactions as $interaction): ?>
-                <!-- Nutzt das InteractionCard Widget für die große Darstellung -->
-                <?= InteractionCard::widget(['interaction' => $interaction]) ?>
-            <?php endforeach; ?>
+                <div class="text-center" style="margin-top: 15px;">
+                    <?= LinkPager::widget(['pagination' => $pagination]) ?>
+                </div>
+            </div>
         </div>
 
-        <br>
-        <h4>Kundenhistorien-Stream</h4>
-        <div class="well">
-            Hier kommt später der HumHub Stream hin (ActivityStreamWidget).
+        <div class="panel panel-default">
+                <?= ActivityStreamViewer::widget([
+                    'contentContainer' => $space,
+                    'streamAction' => '/crm/stream/stream',
+                    'messageStreamEmpty' => 'Keine Aktivitäten gefunden.',
+                ]) ?>
         </div>
 
     </div>
 
     <div class="col-md-4">
-        <div >
+        <div>
             <?php try {
                 echo MyInteractions::widget(['contentContainer' => $space]);
                 echo MyOrganizations::widget(['contentContainer' => $space]);
