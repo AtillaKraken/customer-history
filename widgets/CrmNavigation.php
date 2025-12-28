@@ -5,6 +5,7 @@ namespace app\modules\crm\widgets;
 use humhub\components\Widget;
 use app\modules\crm\models\forms\CrmFilter;
 use app\modules\crm\models\Organization;
+use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\modules\space\modules\manage\models\MembershipSearch;
 
 class CrmNavigation extends Widget
@@ -63,6 +64,13 @@ class CrmNavigation extends Widget
             if($member->user) {
                 $userOptions[$member->user->id] = $member->user->displayName;
             }
+        }
+
+        // check if users allowed to create, if not set url to null
+        if (!$this->contentContainer->permissionManager->can(new CreateCrmEntry())) {
+            $this->createUrl = null; // pass null for the view to NOT render a creation-button of opened entity
+        } elseif ($this->createUrl === null) {
+            $this->createUrl = $this->contentContainer->createUrl('/crm/create/index');
         }
 
         return $this->render('crmNavigation', [

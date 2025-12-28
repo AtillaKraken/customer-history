@@ -6,6 +6,10 @@ use humhub\modules\crm\models\traits\LinkableTrait;
 use humhub\modules\topic\models\Topic;
 use Yii;
 use humhub\modules\content\components\ContentActiveRecord;
+use humhub\modules\space\models\Space;
+use humhub\modules\space\models\Membership;
+use humhub\modules\crm\permissions\ManageCrmData;
+use yii\base\InvalidConfigException;
 
 /**
  * This is the model class for table "crm_event".
@@ -46,16 +50,16 @@ class Event extends ContentActiveRecord
     }
 
     // Type Constants
-    const TYPE_NETWORKING = 'Netzwerktreffen';
-    const TYPE_WORKSHOP = 'Workshop';
-    const TYPE_PRESENTATION = 'Präsentation';
-    const TYPE_CAREER = 'Karriere-Event';
-    const TYPE_CAMPUSTOUR = 'Campustour';
-    const TYPE_PROJECT = 'Projektmeeting';
-    const TYPE_CONFERENCE = 'Fachtagung / Messe';
-    const TYPE_MEDIA = 'Presse- & Medienformat';
-    const TYPE_MARKETING = 'Marketing- / PR-Aktion';
-    const TYPE_OTHER = 'Sonstiges';
+    public const TYPE_NETWORKING = 'Netzwerktreffen';
+    public const TYPE_WORKSHOP = 'Workshop';
+    public const TYPE_PRESENTATION = 'Präsentation';
+    public const TYPE_CAREER = 'Karriere-Event';
+    public const TYPE_CAMPUSTOUR = 'Campustour';
+    public const TYPE_PROJECT = 'Projektmeeting';
+    public const TYPE_CONFERENCE = 'Fachtagung / Messe';
+    public const TYPE_MEDIA = 'Presse- & Medienformat';
+    public const TYPE_MARKETING = 'Marketing- / PR-Aktion';
+    public const TYPE_OTHER = 'Sonstiges';
     private const TYPES = [
         self::TYPE_NETWORKING,
         self::TYPE_WORKSHOP,
@@ -164,7 +168,9 @@ class Event extends ContentActiveRecord
 
     public function beforeSave($insert)
     {
-        if (!parent::beforeSave($insert)) return false;
+        if (!parent::beforeSave($insert)) {
+            return false;
+        }
 
         // format date for database (dd.mm.YYYY -> YYYY-mm-dd)
         if ($this->date) {
@@ -210,4 +216,80 @@ class Event extends ContentActiveRecord
             }
         }
     }
+
+    /**
+     * @throws \Throwable
+     * @throws InvalidConfigException
+     */
+    public function canEdit()
+    {
+        $user = Yii::$app->user->getIdentity();
+        if (!$user) {
+            return false;
+        }
+
+        // space admins and owner
+        if ($this->content->container->permissionManager->can(new ManageCrmData())) {
+            return true;
+        }
+
+        // contnet creator
+        if ($this->content->created_by == $user->id) {
+            return true;
+        }
+
+        // responsibleUser for participating Organizations
+        // if users at least responsible for one organizaion of the participating contacts,
+        // he/she can edit the event
+        foreach ($this->organizations as $org) {
+            if ($org->isResponsible($user->id)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    public function canDelete()
+    {
+        $user = Yii::$app->user->getIdentity();
+        if (!$user) {
+            return false;
+        }
+
+        // admins/owner
+        if ($this->content->container->permissionManager->can(new ManageCrmData())) {
+            return true;
+        }
+
+        // moderators
+        if ($this->content->container instanceof Space) {
+            $membership = Membership::findOne(['space_id' => $this->content->container->id, 'user_id' => $user->id]);
+            if ($membership && $membership->group_id === Space::USERGROUP_MODERATOR) {
+                return true;
+            }
+        }
+
+        // content creator
+        if ($this->content->created_by == $user->id) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * override standard soft-deletion with hard delete - includes unlinking of pivots
+     */
+    public function delete()
+    {
+        foreach ($this->contacts as $contact) {
+            $this->unlink('contacts', $contact, true);
+        }
+        foreach ($this->organizations as $org) {
+            $this->unlink('organizations', $org, true);
+        }
+
+        return $this->hardDelete();
+    }
+
 }

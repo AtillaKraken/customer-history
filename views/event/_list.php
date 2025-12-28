@@ -53,11 +53,23 @@ use humhub\widgets\LinkPager;
                 </td>
 
                 <td class="text-right" style="vertical-align: middle;">
+                    <?php if ($event->canEdit()): ?>
                     <?= Button::primary()
                         ->icon('fa-pencil')
                         ->xs()
                         ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/event/edit', ['id' => $event->id]))
                     ?>
+                    <?php endif; ?>
+                    <?php if ($event->canDelete()): ?>
+                        <?= Button::danger()
+                            ->icon('fa-trash')
+                            ->xs()
+                            ->action('ui.modal.load', $event->content->container->createUrl('/crm/event/delete', ['id' => $event->id]))->confirm(
+                                'Veranstaltung löschen',
+                                'Möchtest du diese Veranstaltung wirklich unwiderruflich löschen? Alle Verknüpfungen zu ihr gehen verloren.',
+                                'Löschen',
+                                'Abbrechen' ) ?>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>

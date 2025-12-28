@@ -5,7 +5,6 @@ use humhub\modules\content\widgets\richtext\RichTextField;
 use app\modules\crm\models\Organization;
 use humhub\widgets\Link;
 
-
 /* @var $form humhub\modules\ui\form\widgets\ActiveForm */
 /* @var $model Organization */
 ?>
@@ -19,13 +18,13 @@ use humhub\widgets\Link;
         <div class="col-md-6">
             <!-- Category -->
             <?= $form->field($model, 'category')->dropDownList(Organization::getCategoryOptions(), [
-                'prompt' => 'Bitte auswählen...'
+                'prompt' => 'Bitte auswählen...',
             ]) ?>
         </div>
         <div class="col-md-6">
             <!-- Industry -->
             <?= $form->field($model, 'industry')->dropDownList(Organization::getIndustryOptions(), [
-                'prompt' => 'Bitte auswählen...'
+                'prompt' => 'Bitte auswählen...',
             ]) ?>
         </div>
     </div>
@@ -33,12 +32,12 @@ use humhub\widgets\Link;
         <div class="col-md-6">
             <!-- Size -->
             <?= $form->field($model, 'size')->dropDownList(Organization::getSizeOptions(), [
-                'prompt' => 'Bitte auswählen...'
+                'prompt' => 'Bitte auswählen...',
             ]) ?>
         </div>
         <div class="col-md-6">
             <!-- City -->
-            <?= $form->field($model, 'city')->textInput(['placeholder' => 'Ort']) ?>
+            <?= $form->field($model, 'city')->textInput(['placeholder' => 'Sitz der Organisation']) ?>
         </div>
     </div>
 
@@ -49,13 +48,17 @@ use humhub\widgets\Link;
     <?= $form->field($model, 'responsibleUserGuids')->widget(UserPickerField::class, [
         'id' => 'crm-responsible-user-picker',
         'selection' => $model->responsibleUsers,
-        'placeholder' => 'Benutzer zuweisen...'
-    ]) ?>
+        'placeholder' => 'Benutzer zuweisen...'])?>
 
     <!-- "Assign me" Button -->
     <div class="text-right">
         <?= Link::userPickerSelfSelect('#crm-responsible-user-picker', 'Mich zuweisen')
             ->icon('fa-check-circle')
             ->options(['class' => 'small']) ?>
+    </div>
+
+    <div class="alert alert-info" style="font-size: 12px; padding: 8px; margin-right: 115px">
+        <i class="fa fa-shield"></i> <strong>Berechtigungen:</strong>
+        Auswahl darf automatisch zugehörige <strong>Kontaktpersonen, Interaktionen und Veranstaltungen</strong> bearbeiten.
     </div>
 </div>

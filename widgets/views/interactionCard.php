@@ -1,6 +1,8 @@
 <?php
 
 use app\modules\crm\models\Interaction;
+use humhub\modules\content\widgets\richtext\RichText;
+use humhub\widgets\Button;
 use yii\helpers\Html;
 use humhub\modules\like\widgets\LikeLink;
 use humhub\modules\comment\widgets\CommentLink;
@@ -163,7 +165,11 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 <strong>Beschreibung</strong>
                 <div class="well well-sm" style="background: #fff; border: 1px solid #ddd; margin-top: 5px;">
                     <div class="crm-richtext-container" id="desc-container-<?= $interaction->id ?>">
-                        <?= \humhub\modules\content\widgets\richtext\RichText::output($interaction->description) ?>
+                        <?php if (!empty($interaction->description)): ?>
+                        <?= RichText::output($interaction->description) ?>
+                        <?php else: ?>
+                        <em class="text-muted">Keine Beschreibung hinterlegt.</em>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -204,8 +210,6 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 </div>
             <?php endif; ?>
 
-            <!-- TODO: <a>/Hover-Bereiche vereinheitlichen -->
-
             <div class="row" style="margin-top: 20px; border-top: 1px dashed #eee; padding-top: 15px;">
 
                 <div class="col-sm-4">
@@ -217,39 +221,19 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                             <?php foreach ($interaction->responsibleUsers as $user): ?>
                             <a href="<?= $user->getUrl() ?>">
                                 <li style="margin-bottom: 8px; display: flex; align-items: center;">
-                                    <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded"
-                                         style="width: 24px; height: 24px; margin-right: 8px;"
-                                         alt="<?= Html::encode($user->displayName) ?>"/>
+                                    <a href="<?= $user->getUrl() ?>">
+                                        <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded"
+                                             style="width: 24px; height: 24px; margin-right: 8px;"
+                                             alt="<?= Html::encode($user->displayName) ?>"/>
+                                    </a>
                                     <div style="line-height: 1.2;">
-                                        <strong><?= Html::encode($user->displayName) ?></strong>
+                                        <a href="<?= $user->getUrl() ?>">
+                                            <strong><?= Html::encode($user->displayName) ?></strong>
                                         <br>
                                         <span class="text-muted" style="font-size: 10px;">
                                             <?= Html::encode($user->profile->title ?? 'Mitglied') ?>
                                         </span>
-                                    </div>
-                                </li>
-                                <?php endforeach; ?>
-                        </ul>
-                    <?php endif; ?>
-                </div>
-
-                <div class="col-sm-4">
-                    <strong style="color: #17a2b8;"><i class="fa fa-users"></i> Kontaktpersonen</strong>
-                    <?php if (empty($interaction->contacts)): ?>
-                        <div class="text-muted small" style="margin-top:5px;">-</div>
-                    <?php else: ?>
-                        <ul class="crm-related-list" style="margin-top: 10px;">
-                            <?php foreach ($interaction->contacts as $contact): ?>
-                                <li>
-                                    <div class="icon-col"><i class="fa fa-user"></i></div>
-                                    <div class="content-col">
-                                        <strong>
-                                            <a href="#" data-action-click="ui.modal.load"
-                                               data-action-url="<?= $contact->content->container->createUrl('/crm/contact/view', ['id' => $contact->id]) ?>">
-                                                <?= Html::encode($contact->name) ?>
-                                            </a>
-                                        </strong>
-                                        <small><?= $contact->organization ? Html::encode($contact->organization->name) : '-' ?></small>
+                                        </a>
                                     </div>
                                 </li>
                             <?php endforeach; ?>
@@ -258,7 +242,55 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 </div>
 
                 <div class="col-sm-4">
-                    <strong style="color: #17a2b8;"><i class="fa fa-building-o"></i> Betroffene Organisationen</strong>
+                    <strong style="color: #17a2b8;"><i class="fa fa-users"></i> Kontakte</strong>
+
+                    <?php
+                    // get IDs of orgs that have still-existing contact-entries assigned to themselves
+                    // => necessary to determine and display the ones that have deleted contacts
+                    $activeOrgIds = [];
+                    foreach ($interaction->contacts as $contact) {
+                        if ($contact->organization_id) {
+                            $activeOrgIds[] = $contact->organization_id;
+                        }
+                    }
+                    ?>
+
+                    <ul class="crm-related-list" style="margin-top: 10px;">
+                        <?php foreach ($interaction->contacts as $contact): ?>
+                            <li>
+                                <div class="icon-col"><i class="fa fa-user"></i></div>
+                                <div class="content-col">
+                                    <strong>
+                                        <a href="#" data-action-click="ui.modal.load"
+                                           data-action-url="<?= $contact->content->container->createUrl('/crm/contact/view', ['id' => $contact->id]) ?>">
+                                            <?= Html::encode($contact->name) ?>
+                                        </a>
+                                    </strong>
+                                    <small><?= $contact->organization ? Html::encode($contact->organization->name) : '-' ?></small>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+
+                        <?php foreach ($interaction->organizations as $org): ?>
+                            <?php if (!in_array($org->id, $activeOrgIds)): ?>
+                                <li style="opacity: 0.6;">
+                                    <div class="icon-col text-muted"><i class="fa fa-user-times"></i></div>
+                                    <div class="content-col">
+                                        <strong class="text-muted" style="font-style: italic;">Gelöschter Kontakt</strong>
+                                        <small class="text-muted">Ehemals: <?= Html::encode($org->name) ?></small>
+                                    </div>
+                                </li>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+
+                        <?php if (empty($interaction->contacts) && empty($interaction->organizations)): ?>
+                            <li class="text-muted small">-</li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+
+                <div class="col-sm-4">
+                    <strong style="color: #17a2b8;"><i class="fa fa-building-o"></i> Organisationen</strong>
                     <?php if (empty($interaction->organizations)): ?>
                         <div class="text-muted small" style="margin-top:5px;">-</div>
                     <?php else: ?>
@@ -293,12 +325,24 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                     </span>
                 <?php endif; ?>
 
-                <?php
-                echo \humhub\widgets\Button::defaultType('Bearbeiten')
+                <?php if ($interaction->canEdit()):
+                echo Button::defaultType('Bearbeiten')
                     ->icon('fa-pencil')
                     ->xs()
                     ->action('ui.modal.load', $interaction->content->container->createUrl('/crm/interaction/edit', ['id' => $interaction->id]))
                 ?>
+                <?php endif; ?>
+                <?php if ($interaction->canDelete()): ?>
+                    <?= Button::danger()
+                        ->icon('fa-trash')
+                        ->xs()
+                        ->action('ui.modal.load', $interaction->content->container->createUrl('/crm/interaction/delete', ['id' => $interaction->id]))->confirm(
+                            'Interaktion löschen',
+                            'Möchtest du diese Interaktion wirklich unwiderruflich löschen? Alle Verknüpfungen zu ihr gehen verloren.',
+                            'Löschen',
+                            'Abbrechen' ) ?>
+                <?php endif; ?>
+
             </div>
 
             <?php if (!$isStream): ?>

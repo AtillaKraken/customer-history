@@ -4,8 +4,13 @@ namespace app\modules\crm\models;
 
 use humhub\modules\crm\models\traits\LinkableTrait;
 use humhub\modules\content\components\ContentActiveRecord;
+use humhub\modules\crm\permissions\ManageCrmData;
+use humhub\modules\space\models\Membership;
+use humhub\modules\space\models\Space;
 use humhub\modules\user\models\User;
 use humhub\modules\search\interfaces\Searchable;
+use Yii;
+use yii\base\InvalidConfigException;
 
 // required for  global search function
 
@@ -188,6 +193,22 @@ class Organization extends ContentActiveRecord implements Searchable
         ];
     }
 
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'title' => 'Name',
+            'category' => 'Kategorie',
+            'industry' => 'Branche',
+            'size' => 'Mitarbeitenden-Anzahl',
+            'city' => 'Ort',
+            'notes' => 'Notiz',
+            'links' => 'Links',
+            'topics' => 'Themen',
+            'responsibleUserGuids' => 'Verantwortliche Nutzer',
+        ];
+    }
+
     public function getContacts()
     {
         return $this->hasMany(Contact::class, ['organization_id' => 'id']);
@@ -278,5 +299,88 @@ class Organization extends ContentActiveRecord implements Searchable
         return array_combine(self::SIZES, self::SIZES);
     }
 
+    /**
+     * @throws \Throwable
+     * @throws InvalidConfigException
+     */
+    public function canEdit()
+    {
+        $user = Yii::$app->user->getIdentity();
+        if (!$user) {
+            return false;
+        }
+
+        // admins / owner
+        if ($this->content->container->permissionManager->can(new ManageCrmData())) {
+            return true;
+        }
+
+        // content creator
+        if ($this->content->created_by == $user->id) {
+            return true;
+        }
+
+        // responsibleUser
+        if ($this->isResponsible($user->id)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function canDelete()
+    {
+        $user = Yii::$app->user->getIdentity();
+        if (!$user) {
+            return false;
+        }
+
+        // admin / owner
+        if ($this->content->container->permissionManager->can(new ManageCrmData())) {
+            return true;
+        }
+
+        // moderators
+        if ($this->content->container instanceof Space) {
+            $membership = Membership::findOne(['space_id' => $this->content->container->id, 'user_id' => $user->id]);
+            if ($membership && $membership->group_id === Space::USERGROUP_MODERATOR) {
+                return true;
+            }
+        }
+
+        // content creator
+        if ($this->content->created_by == $user->id) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * override standard soft-deletion with hard delete - includes unlinking of pivots
+     */
+    public function delete()
+    {
+        foreach ($this->interactions as $interaction) {
+            $this->unlink('interactions', $interaction, true);
+        }
+        foreach ($this->events as $event) {
+            $this->unlink('events', $event, true);
+        }
+        foreach ($this->responsibleUsers as $user) {
+            $this->unlink('responsibleUsers', $user, true);
+        }
+
+        return $this->hardDelete();
+    }
+
+    /**
+     * helper: is a user responsible for this organization?
+     */
+    public function isResponsible($userId)
+    {
+        // get this organization's pivot table and check if given user's id is part of it
+        return $this->getResponsibleUsers()->where(['user.id' => $userId])->exists();
+    }
 
 }

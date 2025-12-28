@@ -5,6 +5,7 @@ namespace humhub\modules\crm;
 use app\modules\crm\models\Interaction;
 use humhub\modules\content\widgets\stream\WallStreamEntryWidget;
 use humhub\modules\content\widgets\WallCreateContentMenu;
+use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\modules\space\models\Space;
 use humhub\modules\space\widgets\Menu;
 use humhub\modules\ui\menu\MenuLink;
@@ -73,6 +74,11 @@ class Events
 
         // add CRM button in space index
         if (!$menu->contentContainer->isModuleEnabled('crm')) {
+            return;
+        }
+
+        // permissionCheck
+        if (!$menu->contentContainer->permissionManager->can(new CreateCrmEntry())) {
             return;
         }
 

@@ -2,6 +2,7 @@
 
 use app\modules\crm\models\Interaction;
 use app\modules\crm\widgets\CrmNavigation;
+use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\modules\space\models\Space;
 use yii\helpers\Html;
 use humhub\widgets\Button;
@@ -50,6 +51,7 @@ use yii\helpers\Url;
             <?= $this->render('_list', ['interactions' => $interactions, 'pagination' => $pagination]) ?>
         <?php endif; ?>
 
+        <?php if ($space->permissionManager->can(new CreateCrmEntry())): ?>
         <div class="clearfix" style="margin-bottom: 15px; margin-top: 15px">
 
             <?= Button::success('Neue Interaktion')
@@ -60,5 +62,6 @@ use yii\helpers\Url;
                 ->loader(false)
             ?>
         </div>
+        <?php endif; ?>
     </div>
 </div>

@@ -3,6 +3,8 @@
 namespace humhub\modules\crm;
 
 use humhub\modules\content\components\ContentContainerModule;
+use humhub\modules\crm\permissions\CreateCrmEntry;
+use humhub\modules\crm\permissions\ManageCrmData;
 use humhub\modules\space\models\Space;
 use Yii;
 
@@ -17,6 +19,12 @@ class Module extends ContentContainerModule
 
     public function getPermissions($contentContainer = null)
     {
+        if ($contentContainer instanceof Space) {
+            return [
+                new ManageCrmData(), // admin permission
+                new CreateCrmEntry(), // create permission
+            ];
+        }
         return [];
     }
 

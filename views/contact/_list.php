@@ -56,6 +56,8 @@ use app\modules\crm\models\Interaction;
                         <small class="text-muted"><?= Html::encode($cnt->gender) ?></small>
                 </td>
                 <td style="vertical-align: middle;">
+                    <a href="#" data-action-click="ui.modal.load"
+                       data-action-url="<?= $cnt->content->container->createUrl('/crm/organization/view', ['id' => $cnt->organization_id]) ?>">
                     <?php if ($cnt->organization): ?>
                         <i class="fa fa-building-o"></i> <?= Html::encode($cnt->organization->name) ?>
                     <?php else: ?>
@@ -88,11 +90,24 @@ use app\modules\crm\models\Interaction;
                 </td>
 
                 <td class="text-right" style="vertical-align: middle;">
+                    <?php if ($cnt->canEdit()): ?>
                     <?= Button::primary()
                         ->icon('fa-pencil')
                         ->xs()
                         ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/contact/edit', ['id' => $cnt->id]))
                     ?>
+                    <?php endif; ?>
+                    <?php if ($cnt->canDelete()): ?>
+                        <?= Button::danger()
+                            ->icon('fa-trash')
+                            ->xs()
+                            ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/contact/delete', ['id' => $cnt->id]))->confirm(
+                                'Kontaktperson löschen',
+                                'Möchtest du diesen Kontakt wirklich unwiderruflich löschen? Alle Direkt-Verweise auf ihn werden entfernt.',
+                                'Löschen',
+                                'Abbrechen' )
+                        ?>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>

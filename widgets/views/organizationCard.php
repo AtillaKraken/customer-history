@@ -4,6 +4,7 @@ use app\modules\crm\models\Organization;
 use app\modules\crm\models\Interaction;
 use app\modules\crm\models\Event;
 use humhub\modules\content\widgets\richtext\RichText;
+use humhub\widgets\Button;
 use yii\helpers\Html;
 use humhub\modules\like\widgets\LikeLink;
 use humhub\modules\comment\widgets\CommentLink;
@@ -267,9 +268,22 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                     </span>
                 <?php endif; ?>
 
-                <?= \humhub\widgets\Button::defaultType('Bearbeiten')
+                <?php if ($organization->canEdit()): ?>
+                <?= Button::defaultType('Bearbeiten')
                     ->icon('fa-pencil')->xs()
                     ->action('ui.modal.load', $organization->content->container->createUrl('/crm/organization/edit', ['id' => $organization->id])) ?>
+                <?php endif; ?>
+                <?php if ($organization->canDelete()): ?>
+                    <?= Button::danger()
+                        ->icon('fa-trash')
+                        ->xs()
+                        ->action('ui.modal.load', $organization->content->container->createUrl('/crm/organization/delete', ['id' => $organization->id]))->confirm(
+                            'Organisation löschen',
+                            'Möchtest du diese Organisation wirklich unwiderruflich löschen? Alle zugehörigen Kontakte sowie Verweise auf diese werden dadurch mitgelöscht!',
+                            'Löschen',
+                            'Abbrechen' )
+                    ?>
+                <?php endif; ?>
             </div>
 
             <?php if (!$isStream): ?>

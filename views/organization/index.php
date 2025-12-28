@@ -2,6 +2,7 @@
 
 use app\modules\crm\models\Organization;
 use app\modules\crm\widgets\CrmNavigation;
+use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\widgets\Button;
 use yii\helpers\Url;
 
@@ -45,11 +46,13 @@ use yii\helpers\Url;
             <?= $this->render('_list', ['organizations' => $organizations, 'pagination' => $pagination]) ?>
         <?php endif; ?>
 
+        <?php if ($space->permissionManager->can(new CreateCrmEntry())): ?>
         <div class="clearfix" style="margin-bottom: 15px; margin-top: 15px">
             <?= Button::success('Neue Organisation')
                 ->icon('fa-plus')
                 ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/organization/create'))
                 ->right()->sm()->loader(false) ?>
         </div>
+        <?php endif; ?>
     </div>
 </div>
