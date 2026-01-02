@@ -6,7 +6,7 @@ use app\modules\crm\models\Contact;
 use app\modules\crm\models\Organization;
 use app\modules\crm\models\forms\CrmFilter;
 use humhub\modules\content\components\ContentContainerController;
-use humhub\modules\content\permissions\CreatePrivateContent;
+use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\widgets\ModalClose;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -49,8 +49,12 @@ class ContactController extends ContentContainerController
             ->where(['crm_contact.id' => $id])
             ->one();
 
-        if (!$model) throw new HttpException(404, 'Kontaktperson nicht gefunden.');
-        if (!$model->content->canView()) throw new HttpException(403, 'Zugriff verweigert.');
+        if (!$model) {
+            throw new HttpException(404, 'Kontaktperson nicht gefunden.');
+        }
+        if (!$model->content->canView()) {
+            throw new HttpException(403, 'Zugriff verweigert.');
+        }
 
         if (Yii::$app->request->isAjax) {
             return $this->renderAjax('view', ['model' => $model]);
@@ -60,9 +64,8 @@ class ContactController extends ContentContainerController
 
     public function actionCreate()
     {
-        // CreatePrivateContent to only allow Space-Members contentCreation (=> space-membership is required)
-        if (!$this->contentContainer->permissionManager->can(new CreatePrivateContent())) {
-            throw new HttpException(401, 'Sie haben keine Berechtigung, Kontakte zu erstellen.');
+        if (!$this->contentContainer->permissionManager->can(new CreateCrmEntry())) {
+            throw new HttpException(401, 'Zugriff verweigert.');
         }
 
         $model = new Contact();
@@ -71,16 +74,15 @@ class ContactController extends ContentContainerController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'script' => 'humhub.modules.client.reload();'
+                'script' => 'humhub.modules.client.reload();',
             ]);
         }
 
         return $this->renderAjax('edit', [
             'model' => $model,
-            'organizations' => $this->getOrganizationList()
+            'organizations' => $this->getOrganizationList(),
         ]);
     }
-
     public function actionEdit($id)
     {
         $model = Contact::find()
@@ -100,14 +102,34 @@ class ContactController extends ContentContainerController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'script' => 'humhub.modules.client.reload();'
+                'script' => 'humhub.modules.client.reload();',
             ]);
         }
 
         return $this->renderAjax('edit', [
             'model' => $model,
-            'organizations' => $this->getOrganizationList()
+            'organizations' => $this->getOrganizationList(),
         ]);
+    }
+
+    public function actionDelete($id)
+    {
+        $model = Contact::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['crm_contact.id' => $id])
+            ->one();
+
+        if (!$model) {
+            throw new HttpException(404, 'Kontaktperson nicht gefunden.');
+        }
+
+        if (!$model->canDelete()) {
+            throw new HttpException(401, 'Zugriff verweigert.');
+        }
+
+        $model->delete();
+
+        return $this->redirect($this->contentContainer->createUrl('/crm/contact/index'));
     }
 
     /**

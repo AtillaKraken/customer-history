@@ -5,7 +5,7 @@ namespace humhub\modules\crm\controllers;
 use app\modules\crm\models\Event;
 use app\modules\crm\models\forms\CrmFilter;
 use HttpException;
-use humhub\modules\content\permissions\CreatePrivateContent;
+use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\widgets\ModalClose;
 use humhub\modules\content\components\ContentContainerController;
 use Yii;
@@ -33,7 +33,7 @@ class EventController extends ContentContainerController
         $pages = new Pagination([
             'totalCount' => $countQuery->count(),
             'pageSize' => $pageSize,
-            'params' => array_merge(Yii::$app->request->get(), ['view' => $view])
+            'params' => array_merge(Yii::$app->request->get(), ['view' => $view]),
         ]);
 
         $events = $query->offset($pages->offset)
@@ -45,7 +45,7 @@ class EventController extends ContentContainerController
             $viewFile = ($view === 'cards') ? '_accordionList' : '_list';
             return $this->renderAjax($viewFile, [
                 'events' => $events,
-                'pagination' => $pages
+                'pagination' => $pages,
             ]);
         }
 
@@ -54,13 +54,13 @@ class EventController extends ContentContainerController
             'space' => $this->contentContainer,
             'filter' => $filter,
             'viewMode' => $view,
-            'pagination' => $pages
+            'pagination' => $pages,
         ]);
     }
 
     public function actionCreate()
     {
-        if (!$this->contentContainer->permissionManager->can(new CreatePrivateContent())) {
+        if (!$this->contentContainer->permissionManager->can(new CreateCrmEntry())) {
             throw new HttpException(401, 'Zugriff verweigert.');
         }
 
@@ -70,15 +70,14 @@ class EventController extends ContentContainerController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'script' => 'humhub.modules.client.reload();'
+                'script' => 'humhub.modules.client.reload();',
             ]);
         }
 
         return $this->renderAjax('edit', [
-            'model' => $model
+            'model' => $model,
         ]);
     }
-
     public function actionEdit($id)
     {
         $model = Event::find()
@@ -88,11 +87,11 @@ class EventController extends ContentContainerController
 
         // check existence
         if (!$model) {
-            throw new HttpException(404, 'Veranstlatung nicht gefunden.');
+            throw new HttpException(404, 'Veranstaltung nicht gefunden.');
         }
 
-        // check permissions
-        if (!$model->content->canEdit()) {
+        // check custom permission embedded in Modle
+        if (!$model->canEdit()) {
             throw new HttpException(401, 'Zugriff verweigert.');
         }
 
@@ -100,14 +99,14 @@ class EventController extends ContentContainerController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'script' => 'humhub.modules.client.reload();'
+                'script' => 'humhub.modules.client.reload();',
             ]);
         }
 
         // render view
         return $this->renderAjax('edit', [
             'model' => $model,
-            'contentContainer' => $this->contentContainer
+            'contentContainer' => $this->contentContainer,
         ]);
     }
 
@@ -118,14 +117,38 @@ class EventController extends ContentContainerController
             ->where(['crm_event.id' => $id])
             ->one();
 
-        if (!$model) throw new HttpException(404, 'Veranstaltung nicht gefunden.');
-        if (!$model->content->canView()) throw new HttpException(403, 'Zugriff verweigert.');
+        if (!$model) {
+            throw new HttpException(404, 'Veranstaltung nicht gefunden.');
+        }
+        if (!$model->content->canView()) {
+            throw new HttpException(403, 'Zugriff verweigert.');
+        }
 
         if (Yii::$app->request->isAjax) {
             return $this->renderAjax('view', ['model' => $model]);
         }
 
         return $this->render('view', ['model' => $model]);
+    }
+
+    public function actionDelete($id)
+    {
+        $model = Event::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['crm_event.id' => $id])
+            ->one();
+
+        if (!$model) {
+            throw new HttpException(404, 'Veranstaltung nicht gefunden.');
+        }
+
+        if (!$model->canDelete()) {
+            throw new HttpException(401, 'Zugriff verweigert.');
+        }
+
+        $model->delete();
+
+        return $this->redirect($this->contentContainer->createUrl('/crm/event/index'));
     }
 
     public function actionLoadUpcoming()
@@ -139,7 +162,7 @@ class EventController extends ContentContainerController
 
         return $this->renderAjax('_modal_list', [
             'events' => $events,
-            'title' => 'Anstehende Veranstaltungen'
+            'title' => 'Anstehende Veranstaltungen',
         ]);
     }
 }

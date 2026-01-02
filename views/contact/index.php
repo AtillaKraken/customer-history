@@ -1,6 +1,7 @@
 <?php
 
 use app\modules\crm\widgets\CrmNavigation;
+use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\modules\space\models\Space;
 use yii\helpers\Url;
 use humhub\widgets\Button;
@@ -49,11 +50,13 @@ use humhub\widgets\Button;
         <?php else: ?>
             <?= $this->render('_list', ['contacts' => $contacts, 'pagination' => $pagination]) ?>
         <?php endif; ?>
+        <?php if ($space->permissionManager->can(new CreateCrmEntry())): ?>
         <div class="clearfix" style="margin-bottom: 15px; margin-top: 15px">
             <?= Button::success('Neue Kontaktperson')
                 ->icon('fa-plus')
                 ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/contact/create'))
                 ->right()->sm()->loader(false) ?>
         </div>
+        <?php endif; ?>
     </div>
 </div>

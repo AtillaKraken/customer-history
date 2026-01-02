@@ -3,6 +3,10 @@
 namespace app\modules\crm\models;
 
 use humhub\modules\content\components\ContentActiveRecord;
+use humhub\modules\space\models\Space;
+use humhub\modules\space\models\Membership;
+use humhub\modules\crm\permissions\ManageCrmData;
+use Yii;
 
 /**
  * This is the model class for table "crm_contact".
@@ -211,4 +215,85 @@ class Contact extends ContentActiveRecord
             ->viaTable('crm_event_contact', ['contact_id' => 'id'])
             ->orderBy(['date' => SORT_DESC]);
     }
+
+    public function canEdit()
+    {
+        $user = Yii::$app->user->getIdentity();
+        if (!$user) {
+            return false;
+        }
+
+        // admins / owner (via custom Permission)
+        if ($this->content->container->permissionManager->can(new ManageCrmData())) {
+            return true;
+        }
+
+        // content creator
+        if ($this->content->created_by == $user->id) {
+            return true;
+        }
+
+        // responsible Users
+        if ($this->isResponsible($user->id)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function canDelete()
+    {
+        $user = Yii::$app->user->getIdentity();
+        if (!$user) {
+            return false;
+        }
+
+        // admins / owner (via custom Permission)
+        if ($this->content->container->permissionManager->can(new \humhub\modules\crm\permissions\ManageCrmData())) {
+            return true;
+        }
+
+        // moderators
+        if ($this->content->container instanceof Space) {
+            $membership = Membership::findOne(['space_id' => $this->content->container->id, 'user_id' => $user->id]);
+            if ($membership && $membership->group_id === Space::USERGROUP_MODERATOR) {
+                return true;
+            }
+        }
+
+        // content creator
+        if ($this->content->created_by == $user->id) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * override standard soft-deletion with hard delete - includes unlinking of pivots
+     */
+    public function delete()
+    {
+        foreach ($this->interactions as $interaction) {
+            $this->unlink('interactions', $interaction, true);
+        }
+        foreach ($this->events as $event) {
+            $this->unlink('events', $event, true);
+        }
+
+        return $this->hardDelete();
+    }
+
+    /**
+     * helper: is the user responsible for this contact's organization?
+     */
+    public function isResponsible($userId)
+    {
+        if ($this->organization) {
+            return $this->organization->isResponsible($userId);
+        }
+
+        return false;
+    }
+
 }

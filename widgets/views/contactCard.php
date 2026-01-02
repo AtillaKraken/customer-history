@@ -155,8 +155,11 @@ foreach ($interactions as $interaction) {
                 <div class="col-sm-3">
                     <small class="text-muted text-uppercase">Mitglied von</small><br>
                     <?php if ($contact->organization): ?>
+                    <a href="#" data-action-click="ui.modal.load"
+                       data-action-url="<?= $contact->content->container->createUrl('/crm/organization/view', ['id' => $contact->organization_id]) ?>">
                         <i class="fa fa-building-o"></i>
                         <strong><?= Html::encode($contact->organization->name) ?></strong>
+                    </a>
                     <?php endif; ?>
                 </div>
                 <div class="col-sm-3">
@@ -285,9 +288,21 @@ foreach ($interactions as $interaction) {
                     </span>
                 <?php endif; ?>
 
+                <?php if ($contact->canEdit()): ?>
                 <?= \humhub\widgets\Button::defaultType('Bearbeiten')
                     ->icon('fa-pencil')->xs()
                     ->action('ui.modal.load', $contact->content->container->createUrl('/crm/contact/edit', ['id' => $contact->id])) ?>
+                        <?php endif; ?>
+                <?php if ($contact->canDelete()): ?>
+                    <?= \humhub\widgets\Button::danger('Löschen')
+                        ->icon('fa-trash')->xs()
+                        ->action('ui.modal.load', $contact->content->container->createUrl('/crm/contact/delete', ['id' => $contact->id]))->confirm(
+                            'Kontaktperson löschen',
+                            'Möchtest du diesen Kontakt wirklich unwiderruflich löschen? Alle Direkt-Verweise auf ihn werden entfernt.',
+                            'Löschen',
+                            'Abbrechen' ) ?>
+                    <?php endif; ?>
+
             </div>
 
             <?php if (!$isStream): ?>

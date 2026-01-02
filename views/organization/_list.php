@@ -56,8 +56,21 @@ use humhub\widgets\LinkPager;
                 </td>
 
                 <td class="text-right" style="vertical-align: middle;">
+                    <?php if ($org->canEdit()): ?>
                     <?= Button::primary()->icon('fa-pencil')->xs()
                         ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/organization/edit', ['id' => $org->id])) ?>
+                    <?php endif; ?>
+                    <?php if ($org->canDelete()): ?>
+                        <?= Button::danger()
+                            ->icon('fa-trash')
+                            ->xs()
+                            ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/organization/delete', ['id' => $org->id]))->confirm(
+                                'Organisation löschen',
+                                'Möchtest du diese Organisation wirklich unwiderruflich löschen? Alle zugehörigen Kontakte sowie Verweise auf diese werden dadurch mitgelöscht!',
+                                'Löschen',
+                                'Abbrechen' )
+                        ?>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>

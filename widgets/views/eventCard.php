@@ -1,6 +1,7 @@
 <?php
 
 use app\modules\crm\models\Event;
+use humhub\modules\content\widgets\richtext\RichText;
 use yii\helpers\Html;
 use humhub\modules\like\widgets\LikeLink;
 use humhub\modules\comment\widgets\CommentLink;
@@ -140,22 +141,33 @@ $typeLabel = $types[$event->type] ?? '-';
                 </div>
             </div>
 
-            <?php if (!empty($event->description)): ?>
-                <div style="margin-bottom: 15px;">
-                    <strong>Beschreibung</strong>
-                    <div class="well well-sm" style="background: #fff; border: 1px solid #ddd; margin-top: 5px;">
-                        <?= \humhub\modules\content\widgets\richtext\RichText::output($event->description) ?>
-                    </div>
+            <div style="margin-bottom: 15px;">
+                <strong>Beschreibung</strong>
+                <div class="well well-sm" style="background: #fff; border: 1px solid #ddd; margin-top: 5px;">
+                    <?php if (!empty($event->description)): ?>
+                        <?= RichText::output($event->description) ?>
+                    <?php else: ?>
+                        <em class="text-muted">Keine Beschreibung hinterlegt.</em>
+                    <?php endif; ?>
                 </div>
-            <?php endif; ?>
+            </div>
 
             <div class="row" style="margin-top: 20px; border-top: 1px dashed #eee; padding-top: 15px;">
 
                 <div class="col-sm-4">
                     <strong style="color: #17a2b8;"><i class="fa fa-users"></i> Teilnehmende Kontakte</strong>
-                    <?php if (empty($event->contacts)): ?>
-                        <div class="text-muted small" style="margin-top:5px;">-</div>
-                    <?php else: ?>
+
+                    <?php
+                    // get IDs of orgs that have still-existing contact-entries assigned to themselves
+                    // => necessary to determine and display the ones that have deleted contacts
+                    $activeOrgIds = [];
+                    foreach ($event->contacts as $contact) {
+                        if ($contact->organization_id) {
+                            $activeOrgIds[] = $contact->organization_id;
+                        }
+                    }
+                    ?>
+
                         <ul class="crm-related-list" style="margin-top: 10px;">
                             <?php foreach ($event->contacts as $contact): ?>
                                 <li>
@@ -171,8 +183,23 @@ $typeLabel = $types[$event->type] ?? '-';
                                     </div>
                                 </li>
                             <?php endforeach; ?>
+
+                            <?php foreach ($event->organizations as $org): ?>
+                                <?php if (!in_array($org->id, $activeOrgIds)): ?>
+                                    <li style="opacity: 0.6;">
+                                        <div class="icon-col text-muted"><i class="fa fa-user-times"></i></div>
+                                        <div class="content-col">
+                                            <strong class="text-muted" style="font-style: italic;">Gelöschter Kontakt</strong>
+                                            <small class="text-muted">Ehemals: <?= Html::encode($org->name) ?></small>
+                                        </div>
+                                    </li>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+
+                            <?php if (empty($event->contacts) && empty($event->organizations)): ?>
+                                <li class="text-muted small">-</li>
+                            <?php endif; ?>
                         </ul>
-                    <?php endif; ?>
                 </div>
 
                 <div class="col-sm-4">
@@ -232,11 +259,22 @@ $typeLabel = $types[$event->type] ?? '-';
                     </span>
                 <?php endif; ?>
 
+                <?php if ($event->canEdit()): ?>
                 <?= \humhub\widgets\Button::defaultType('Bearbeiten')
                     ->icon('fa-pencil')
                     ->xs()
                     ->action('ui.modal.load', $event->content->container->createUrl('/crm/event/edit', ['id' => $event->id]))
                 ?>
+                <?php endif; ?>
+                <?php if ($event->canDelete()): ?>
+                    <?= \humhub\widgets\Button::danger('Löschen')
+                        ->icon('fa-trash')->xs()
+                        ->action('ui.modal.load', $event->content->container->createUrl('/crm/event/delete', ['id' => $event->id]))->confirm(
+                            'Veranstaltung löschen',
+                            'Möchtest du diese Veranstaltung wirklich unwiderruflich löschen? Alle Verknüpfungen zu ihr gehen verloren.',
+                            'Löschen',
+                            'Abbrechen' ) ?>
+                <?php endif; ?>
             </div>
 
             <?php if (!$isStream): ?>

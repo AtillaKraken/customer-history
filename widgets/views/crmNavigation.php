@@ -1,5 +1,6 @@
 <?php
 
+use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\widgets\Button;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -60,7 +61,7 @@ $isOverview = ($activeTab === 'overview');
                     href="<?= $contentContainer->createUrl('/crm/interaction/index') ?>">Interaktionen</a></li>
             <li class="<?= $isActive('event') ?>"><a href="<?= $contentContainer->createUrl('/crm/event/index') ?>">Veranstaltungen</a>
             </li>
-            <?php if ($isOverview): ?>
+            <?php if ($isOverview && $createUrl): ?>
                 <li class="pull-right">
                     <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $createUrl ?>"
                        class="backgroundSuccess" style="color: #fff;  font-weight: bold;">
@@ -95,7 +96,15 @@ $isOverview = ($activeTab === 'overview');
                     </div>
                 </div>
                 <div class="col-md-4 text-right">
-                    <?= Button::success($createButtonLabel)->icon('fa-plus')->action('ui.modal.load', $createUrl)->right()->sm()->loader(false) ?>
+                    <?php if ($contentContainer->permissionManager->can(new CreateCrmEntry())): ?>
+                        <?= Button::success($createButtonLabel)
+                            ->icon('fa-plus')
+                            ->action('ui.modal.load', $createUrl)
+                            ->right()
+                            ->sm()
+                            ->loader(false)
+                        ?>
+                    <?php endif; ?>
                 </div>
             </div>
 

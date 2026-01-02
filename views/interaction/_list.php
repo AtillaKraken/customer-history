@@ -79,11 +79,23 @@ use humhub\modules\user\widgets\Image as UserImage;
                 </td>
 
                 <td class="text-right" style="vertical-align: middle;">
+                    <?php if ($interaction->canEdit()): ?>
                     <?= Button::primary()
                         ->icon('fa-pencil')
                         ->xs()
                         ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/interaction/edit', ['id' => $interaction->id]))
                     ?>
+                    <?php endif; ?>
+                    <?php if ($interaction->canDelete()): ?>
+                        <?= Button::danger()
+                            ->icon('fa-trash')
+                            ->xs()
+                            ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/interaction/delete', ['id' => $interaction->id]))->confirm(
+                                'Interaktion löschen',
+                                'Möchtest du diese Interaktion wirklich unwiderruflich löschen? Alle Verknüpfungen zu ihr gehen verloren.',
+                                'Löschen',
+                                'Abbrechen' ) ?>
+                    <?php endif; ?>
                 </td>
             </tr>
         <?php endforeach; ?>

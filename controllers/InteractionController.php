@@ -4,7 +4,7 @@ namespace humhub\modules\crm\controllers;
 
 use app\modules\crm\models\Interaction;
 use app\modules\crm\models\forms\CrmFilter;
-use humhub\modules\content\permissions\CreatePrivateContent;
+use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\widgets\ModalClose;
 use HttpException;
 use humhub\modules\content\components\ContentContainerController;
@@ -86,7 +86,7 @@ class InteractionController extends ContentContainerController
     public function actionCreate()
     {
         // permission check
-        if (!$this->contentContainer->permissionManager->can(new CreatePrivateContent())) {
+        if (!$this->contentContainer->permissionManager->can(new CreateCrmEntry())) {
             throw new HttpException(401, 'Zugriff verweigert.');
         }
 
@@ -136,6 +136,25 @@ class InteractionController extends ContentContainerController
             'model' => $model,
             'contentContainer' => $this->contentContainer
         ]);
+    }
+    public function actionDelete($id)
+    {
+        $model = Interaction::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['crm_interaction.id' => $id])
+            ->one();
+
+        if (!$model) {
+            throw new HttpException(404, 'Interaktion nicht gefunden.');
+        }
+
+        if (!$model->canDelete()) {
+            throw new HttpException(401, 'Zugriff verweigert.');
+        }
+
+        $model->delete();
+
+        return $this->redirect($this->contentContainer->createUrl('/crm/interaction/index'));
     }
 
     /**

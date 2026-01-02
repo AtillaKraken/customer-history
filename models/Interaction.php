@@ -4,9 +4,13 @@ namespace app\modules\crm\models;
 
 use HttpException;
 use humhub\modules\crm\models\traits\LinkableTrait;
+use humhub\modules\crm\permissions\ManageCrmData;
+use humhub\modules\space\models\Membership;
+use humhub\modules\space\models\Space;
 use humhub\modules\user\models\User;
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\topic\models\Topic;
+use Yii;
 use yii\db\Exception;
 
 /**
@@ -100,8 +104,8 @@ class Interaction extends ContentActiveRecord
     /**
      * @var array helper attribute for the form's UserPicker to save GUIDs.
      */
-    public array $responsibleUserGuids = [];
-    public array $contactIds = [];
+    public $responsibleUserGuids = [];
+    public $contactIds = [];
     public $topics = [];
 
     public function rules()
@@ -116,8 +120,10 @@ class Interaction extends ContentActiveRecord
             [['description', 'result', 'links'], 'string'],
             [['channel', 'status'], 'string', 'max' => 50],
             ['channel', 'in', 'range' => array_keys(self::getChannelOptions())],
-            [['topics', 'responsibleUserGuids', 'contactIds', 'newLinks', 'editLinks'], 'safe'],
-            [['event_id'], 'integer'],
+
+            // ensure fields are treated as arrays or safe even if empty
+            [['responsibleUserGuids', 'contactIds'], 'default', 'value' => []],
+            [['topics', 'responsibleUserGuids', 'contactIds', 'newLinks', 'editLinks'], 'safe'],            [['event_id'], 'integer'],
         ];
     }
 
@@ -134,6 +140,7 @@ class Interaction extends ContentActiveRecord
             'result' => 'Ergebnis',
             'links' => 'Links',
             'event_id' => 'EventID',
+            'responsibleUserGuids' => 'Verantwortliche Nutzer',
         ];
     }
 
@@ -234,24 +241,27 @@ class Interaction extends ContentActiveRecord
         Topic::attach($this->content, $this->topics);
 
         // save contacts
-        if (is_array($this->contactIds)) {
-            $this->unlinkAll('contacts', true);
-            foreach ($this->contactIds as $cId) {
-                $contact = Contact::findOne($cId);
+        // unlink first to handle removals
+        $this->unlinkAll('contacts', true);
+
+        // ensure handling of arrays and comma-separated strings
+        if (!empty($this->contactIds)) {
+            $cIds = is_array($this->contactIds) ? $this->contactIds : explode(',', $this->contactIds);
+            foreach ($cIds as $cId) {
+                $contact = Contact::findOne(trim($cId));
                 if ($contact) {
                     $this->link('contacts', $contact);
                 }
             }
         }
-        // TODO: Kontaktzuweisung fixen!
 
-        // save organizations of applied contacts in interaction
+        // save organizations
+        // (automatically derived from selected contacts)
         $this->unlinkAll('organizations', true);
         foreach ($this->contacts as $contact) {
             if ($contact->organization) {
                 // check if organizatonId/entry already exists to avoid duplicates:
                 $exists = $this->getOrganizations()->where(['id' => $contact->organization->id])->exists();
-
                 if (!$exists) {
                     $this->link('organizations', $contact->organization);
                 }
@@ -267,6 +277,86 @@ class Interaction extends ContentActiveRecord
                 if ($user) $this->link('responsibleUsers', $user);
             }
         }
+    }
+
+    public function canEdit()
+    {
+        $user = Yii::$app->user->getIdentity();
+        if (!$user) {
+            return false;
+        }
+
+        // space-admins / -owner
+        if ($this->content->container->permissionManager->can(new ManageCrmData())) {
+            return true;
+        }
+
+        // content creator
+        if ($this->content->created_by == $user->id) {
+            return true;
+        }
+
+        // respnsibleUser for this Interaction
+        if ($this->getResponsibleUsers()->where(['user.id' => $user->id])->exists()) {
+            return true;
+        }
+
+        // OR responsibleUser for affected organizations
+        // if users at least responsible for one organization of the addressed contacts,
+        // he/she can edit the interaction
+        foreach ($this->organizations as $org) {
+            if ($org->isResponsible($user->id)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function canDelete()
+    {
+        $user = Yii::$app->user->getIdentity();
+        if (!$user) {
+            return false;
+        }
+
+        // admin / owner
+        if ($this->content->container->permissionManager->can(new ManageCrmData())) {
+            return true;
+        }
+
+        // moderators
+        if ($this->content->container instanceof Space) {
+            $membership = Membership::findOne(['space_id' => $this->content->container->id, 'user_id' => $user->id]);
+            if ($membership && $membership->group_id === Space::USERGROUP_MODERATOR) {
+                return true;
+            }
+        }
+
+        // content creator
+        if ($this->content->created_by == $user->id) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * override standard soft-deletion with hard delete - includes unlinking of pivots
+     */
+    public function delete()
+    {
+        foreach ($this->contacts as $contact) {
+            $this->unlink('contacts', $contact, true);
+        }
+        foreach ($this->organizations as $org) {
+            $this->unlink('organizations', $org, true);
+        }
+        foreach ($this->responsibleUsers as $user) {
+            $this->unlink('responsibleUsers', $user, true);
+        }
+
+        return $this->hardDelete();
     }
 
     /**

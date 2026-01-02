@@ -6,6 +6,7 @@ use app\modules\crm\models\Organization;
 use app\modules\crm\models\forms\CrmFilter;
 use HttpException;
 use humhub\modules\content\permissions\CreatePrivateContent;
+use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\widgets\ModalClose;
 use humhub\modules\content\components\ContentContainerController;
 use Yii;
@@ -41,7 +42,7 @@ class OrganizationController extends ContentContainerController
         $pages = new Pagination([
             'totalCount' => $countQuery->count(),
             'pageSize' => $pageSize,
-            'params' => array_merge(Yii::$app->request->get(), ['view' => $view])
+            'params' => array_merge(Yii::$app->request->get(), ['view' => $view]),
         ]);
 
         $organizations = $query->offset($pages->offset)
@@ -53,7 +54,7 @@ class OrganizationController extends ContentContainerController
             $viewFile = ($view === 'cards') ? '_accordionList' : '_list';
             return $this->renderAjax($viewFile, [
                 'organizations' => $organizations,
-                'pagination' => $pages
+                'pagination' => $pages,
             ]);
         }
 
@@ -63,32 +64,30 @@ class OrganizationController extends ContentContainerController
             'space' => $this->contentContainer,
             'filter' => $filter,
             'viewMode' => $view,
-            'pagination' => $pages
+            'pagination' => $pages,
         ]);
     }
 
     public function actionCreate()
     {
-        if (!$this->contentContainer->permissionManager->can(new CreatePrivateContent())) {
+        if (!$this->contentContainer->permissionManager->can(new CreateCrmEntry())) {
             throw new HttpException(401, 'Zugriff verweigert.');
         }
 
         $model = new Organization();
-        $model->content->container = $this->contentContainer;
+        $model->content->setContainer($this->contentContainer);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'script' => 'humhub.modules.client.reload();'
+                'script' => 'humhub.modules.client.reload();',
             ]);
         }
 
         return $this->renderAjax('edit', [
             'model' => $model,
-            'contentContainer' => $this->contentContainer
         ]);
     }
-
     public function actionEdit($id)
     {
         $model = Organization::find()
@@ -110,15 +109,35 @@ class OrganizationController extends ContentContainerController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'script' => 'humhub.modules.client.reload();'
+                'script' => 'humhub.modules.client.reload();',
             ]);
         }
 
         // render view
         return $this->renderAjax('edit', [
             'model' => $model,
-            'contentContainer' => $this->contentContainer
+            'contentContainer' => $this->contentContainer,
         ]);
+    }
+
+    public function actionDelete($id)
+    {
+        $model = Organization::find()
+            ->contentContainer($this->contentContainer)
+            ->where(['crm_organization.id' => $id])
+            ->one();
+
+        if (!$model) {
+            throw new HttpException(404, 'Organisation nicht gefunden.');
+        }
+
+        if (!$model->canDelete()) {
+            throw new HttpException(401, 'Zugriff verweigert.');
+        }
+
+        $model->delete();
+
+        return $this->redirect($this->contentContainer->createUrl('/crm/organization/index'));
     }
 
     public function actionView($id)
@@ -128,8 +147,12 @@ class OrganizationController extends ContentContainerController
             ->where(['crm_organization.id' => $id])
             ->one();
 
-        if (!$model) throw new HttpException(404);
-        if (!$model->content->canView()) throw new HttpException(403);
+        if (!$model) {
+            throw new HttpException(404);
+        }
+        if (!$model->content->canView()) {
+            throw new HttpException(403);
+        }
 
         if (Yii::$app->request->isAjax) {
             return $this->renderAjax('view', ['model' => $model]);
@@ -152,7 +175,7 @@ class OrganizationController extends ContentContainerController
 
         return $this->renderAjax('_modal_list', [
             'organizations' => $organizations,
-            'title' => 'Meine Organisationen'
+            'title' => 'Meine Organisationen',
         ]);
     }
 
