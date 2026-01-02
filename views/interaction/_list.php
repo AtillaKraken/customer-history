@@ -30,6 +30,9 @@ use humhub\modules\user\widgets\Image as UserImage;
         <?php foreach ($interactions as $interaction): ?>
             <tr>
                 <td style="vertical-align: middle;">
+                    <span title="Qualität: <?= $interaction->getQualityScore() ?>%"
+                          style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; background-color: <?= $interaction->getQualityColor() ?>;">
+                    </span>
                     <a href="#" data-action-click="ui.modal.load"
                        data-action-url="<?= $interaction->content->container->createUrl('/crm/interaction/view', ['id' => $interaction->id]) ?>">
                         <strong><?= Html::encode($interaction->title) ?></strong>
@@ -80,11 +83,11 @@ use humhub\modules\user\widgets\Image as UserImage;
 
                 <td class="text-right" style="vertical-align: middle;">
                     <?php if ($interaction->canEdit()): ?>
-                    <?= Button::primary()
-                        ->icon('fa-pencil')
-                        ->xs()
-                        ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/interaction/edit', ['id' => $interaction->id]))
-                    ?>
+                        <?= Button::primary()
+                            ->icon('fa-pencil')
+                            ->xs()
+                            ->action('ui.modal.load', $this->context->contentContainer->createUrl('/crm/interaction/edit', ['id' => $interaction->id]))
+                        ?>
                     <?php endif; ?>
                     <?php if ($interaction->canDelete()): ?>
                         <?= Button::danger()
@@ -94,7 +97,7 @@ use humhub\modules\user\widgets\Image as UserImage;
                                 'Interaktion löschen',
                                 'Möchtest du diese Interaktion wirklich unwiderruflich löschen? Alle Verknüpfungen zu ihr gehen verloren.',
                                 'Löschen',
-                                'Abbrechen' ) ?>
+                                'Abbrechen') ?>
                     <?php endif; ?>
                 </td>
             </tr>

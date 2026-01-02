@@ -48,7 +48,7 @@ if ($model->content->container) {
             </div>
             <div class="col-md-6">
                 <!-- Time -->
-                <?= $form->field($model, 'time')->widget(TimePicker::class); ?>
+                <?= $form->field($model, 'time')->widget(TimePicker::class) ; ?>
             </div>
         </div>
 
@@ -161,7 +161,7 @@ $script = <<<JS
         var status = $('#interaction-status').val();
         var resultWrapper = $('#interaction-result-wrapper');
 
-        if (status === 'DONE') {
+        if (status === 'Erledigt') {
             resultWrapper.slideDown();
         } else {
             resultWrapper.slideUp();

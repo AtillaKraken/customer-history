@@ -5,11 +5,14 @@ namespace humhub\modules\crm;
 use app\modules\crm\models\Interaction;
 use humhub\modules\content\widgets\stream\WallStreamEntryWidget;
 use humhub\modules\content\widgets\WallCreateContentMenu;
+use humhub\modules\crm\notifications\LowQualityInteractionNotification;
 use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\modules\space\models\Space;
 use humhub\modules\space\widgets\Menu;
 use humhub\modules\ui\menu\MenuLink;
 use humhub\modules\ui\icon\widgets\Icon;
+use humhub\modules\user\components\ActiveQueryUser;
+use humhub\modules\user\models\User;
 use yii\base\Event;
 use Yii;
 
@@ -127,8 +130,96 @@ class Events
      *
      * @param Event $event
      */
+    /**
+     * Callback for daily cron job event.
+     * 1. Updates overdue statuses (Daily)
+     * 2. Sends LowQuality notifications (Monthly - last day of month)
+     */
     public static function onDailyCron($event)
     {
-        Interaction::updateOverdueStatuses();
+        // daily jobs:
+        if (Yii::$app->request->isConsoleRequest) {
+            echo "\n--- CRM Daily Cron Start ---\n";
+        }
+
+        // check interacitons-statusses daily
+        $updatedCount = Interaction::updateOverdueStatuses();
+
+        if (Yii::$app->request->isConsoleRequest) {
+            echo "Status-Update: $updatedCount Interaktionen auf 'Überfällig' gesetzt.\n";
+        }
+
+        // monthly jobs
+
+        // check: "is it the last of the month?"
+        // date('j') = day (1-31)
+        // date('t') = month's day-count (28-31)
+        if (date('j') != date('t')) {
+            if (Yii::$app->request->isConsoleRequest) {
+                echo "--- End CRM Daily Cron Job ---\n";
+            }
+            return;
+        }
+
+        if (Yii::$app->request->isConsoleRequest) {
+            echo "End of Month -> Iteraction-quality Check\n";
+        }
+
+        // check all spaces
+        $spaces = Space::find()->all();
+
+        foreach ($spaces as $space) {
+            if (!$space->isModuleEnabled('crm')) {
+                continue;
+            }
+
+            if (Yii::$app->request->isConsoleRequest) {
+                echo "Checking space: " . $space->name . "\n";
+            }
+
+            $interactions = Interaction::find()->contentContainer($space)->all();
+            $userCounts = [];
+
+            foreach ($interactions as $interaction) {
+                if ($interaction->getQualityScore() >= 40) {
+                    continue;
+                }
+
+                // get all respUsers of the interaction
+                foreach ($interaction->responsibleUsers as $user) {
+                    if (!isset($userCounts[$user->id])) {
+                        $userCounts[$user->id] = 0;
+                    }
+                    $userCounts[$user->id]++;
+                }
+            }
+
+            // send notifications
+            foreach ($userCounts as $userId => $count) {
+                if ($count > 0) {
+                    $recipient = User::findOne($userId);
+                    if ($recipient) {
+                        $notification = new LowQualityInteractionNotification();
+                        $notification->source = $space;
+
+                        // set Space Owner as sender, to display an avatar correctly
+                        $owner = $space->getOwnerUser()->one();
+                        if ($owner) {
+                            $notification->from($owner);
+                        }
+
+                        $notification->send($recipient);
+
+                        if (Yii::$app->request->isConsoleRequest) {
+                            echo "   -> Notifications sent to: " . $recipient->username . " (Anzahl: $count)\n";
+                        }
+                    }
+                }
+            }
+        }
+
+        if (Yii::$app->request->isConsoleRequest) {
+            echo "--- End CRM Daily Cron Job  ---\n";
+        }
     }
 }

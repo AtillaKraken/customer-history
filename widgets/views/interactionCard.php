@@ -109,6 +109,11 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
             <div class="media-body">
                 <h4 class="media-heading" style="font-size: 16px; font-weight: 600;">
                     <?= Html::encode($interaction->title) ?>
+
+                    <span title="Qualität: <?= $interaction->getQualityScore() ?>%"
+                          style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; vertical-align: middle; margin-left: 5px; margin-bottom: 2px; background-color: <?= $interaction->getQualityColor() ?>;">
+                    </span>
+
                     <i class="fa fa-angle-down pull-right text-muted interaction-toggle-icon"></i>
                 </h4>
                 <div class="text-muted" style="font-size: 12px;">
