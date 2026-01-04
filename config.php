@@ -25,6 +25,7 @@ return [
         ],
 
         // daily Cron Job to automatically update PLANNED, yet past interactions to OVERDUE
+        // & send LowQualityInteractionNotifications to respUsers for this month's interactions
         [
             'class' => CronController::class,
             'event' => CronController::EVENT_ON_DAILY_RUN,

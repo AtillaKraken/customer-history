@@ -384,4 +384,49 @@ class Interaction extends ContentActiveRecord
 
         return $count;
     }
+
+    /**
+     * calculates the quality score in percent
+     * Mandatory fields give fewer points to ensure initial state is red.
+     */
+    public function getQualityScore()
+    {
+        $points = 0;
+        $maxPoints = 7;
+
+        // mandatory fields give 0
+        //if (!empty($this->title)) $points += 0;
+        //if (!empty($this->date)) $points += 0;
+
+        // basic fields
+        // if (!empty($this->time)) $points += 0;
+        if (!empty($this->channel)) $points += 1;
+        if (!empty($this->status)) $points += 1;
+
+        // relations / arrays
+        // check both relation (for list view) and attribute (for form save)
+        if (!empty($this->contacts) || !empty($this->contactIds)) $points += 3;
+        if (!empty($this->responsibleUsers) || !empty($this->responsibleUserGuids)) $points += 1;
+
+        // content
+        if ($this->status === self::STATUS_DONE) {
+            if (!empty($this->result) && trim(strip_tags($this->result)) !== '') $points += 1;
+        } else {
+            if (!empty($this->description) && trim(strip_tags($this->description)) !== '') $points += 1;
+        }
+
+        $percent = round(($points / $maxPoints) * 100);
+        return min(100, $percent);
+    }
+
+    /**
+     * returns the hex color code based on the score
+     */
+    public function getQualityColor()
+    {
+        $score = $this->getQualityScore();
+        if ($score >= 80) return '#28a745';
+        if ($score >= 40) return '#ffc107';
+        return '#dc3545';
+    }
 }
