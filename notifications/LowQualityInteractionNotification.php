@@ -78,11 +78,11 @@ class LowQualityInteractionNotification extends BaseNotification
 
             // count > 0
             if ($count > 0) {
-                return 'Du hast diesen Monat <strong>' . $count . ' Interaktionen</strong> in "<strong>' . $spaceName . '</strong>" mit zu wenig Informationen versorgt. Bitte trage sie nach.';
+                return 'Du hast diesen Monat <strong>' . $count . ' Interaktion(en)</strong> in "<strong>' . $spaceName . '</strong>" mit zu wenig Informationen versorgt. Bitte trage sie nach.';
             }
 
             // Fallback: if count is 0 / Good work., Team!
-            return 'Keine deiner Interaktionen in "<strong>' . $spaceName . '</strong>" sind diesen Monat mti zu wenig Informationen versorgt worden. Gute Arbeit, weiter so!';
+            return 'Keine deiner Interaktionen in "<strong>' . $spaceName . '</strong>" sind diesen Monat mit zu wenig Informationen versorgt worden. Gute Arbeit, weiter so!';
 
         } catch (\Throwable $ex) {
             // throw error
