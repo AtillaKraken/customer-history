@@ -103,7 +103,8 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                         <?= Yii::$app->formatter->asRelativeTime($organization->content->created_at) ?> •
                     <?php endif; ?>
 
-                    <span title="Kontakte"><i class="fa fa-user"></i> <?= $countContacts ?></span> •
+                    <span title="Verantwortliche Nutzer"><i class="fa fa-user-circle"></i> <?= count($organization->responsibleUsers) ?></span> •
+                    <span title="Kontakte"><i class="fa fa-users"></i> <?= $countContacts ?></span> •
                     <span title="Interaktionen"><i class="fa fa-comments-o"></i> <?= $countInteractions ?></span> •
                     <span title="Veranstaltungen"><i class="fa fa-calendar"></i> <?= $countEvents ?></span>
 

@@ -103,7 +103,8 @@ $typeLabel = $types[$event->type] ?? '-';
                         <?= Yii::$app->formatter->asRelativeTime($event->content->created_at) ?> •
                     <?php endif; ?>
 
-                    <i class="fa fa-users" title="Teilnehmende Kontakte"></i> <?= count($event->contacts) ?>
+                    <span title="Teilnehmende Kontakte"><i class="fa fa-users"></i> <?= count($event->contacts) ?></span> •
+                    <span title="Betroffene Organisationen"><i class="fa fa-building-o"></i> <?= count($event->organizations) ?></span>
 
                     <?php if (!$isStream): ?>
                         • <i class="fa fa-comment-o" title="Kommentare"></i> <?= $commentCount ?>

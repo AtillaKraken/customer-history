@@ -126,13 +126,12 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                         <a href="<?= $interaction->content->createdBy->getUrl() ?>" class="text-muted">
                             <?= Html::encode($interaction->content->createdBy->displayName ?? 'System') ?>
                         </a> •
-
                         <?= Yii::$app->formatter->asRelativeTime($interaction->content->created_at) ?> •
                     <?php endif; ?>
 
-                    <i class="fa fa-users" title="Kontaktpersonen"></i> <?= count($interaction->contacts) ?> •
-                    <i class="fa fa-user"
-                       title="Verantwortliche Nutzer"></i> <?= count($interaction->responsibleUsers) ?>
+                    <span title="Verantwortliche Nutzer"><i class="fa fa-user-circle"></i> <?= count($interaction->responsibleUsers) ?></span> •
+                    <span title="Kontaktpersonen"><i class="fa fa-users"></i> <?= count($interaction->contacts) ?></span> •
+                    <span title="Organisationen"><i class="fa fa-building-o"></i> <?= count($interaction->organizations) ?></span>
 
                     <?php if (!$isStream): ?>
                         • <i class="fa fa-comment-o" title="Kommentare"></i> <?= $commentCount ?>

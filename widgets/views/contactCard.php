@@ -15,9 +15,6 @@ use humhub\modules\comment\models\Comment;
 
 $borderClass = 'border-left: 4px solid #ff8d00;'; // Orange für Kontakte
 $collapseId = 'contact-collapse-' . $contact->id;
-$commentCount = Comment::getCommentCount(Contact::class, $contact->id);
-$countEvents = $contact->getParticipations()->count();
-
 $collapseClass = $startCollapsed ? 'collapse' : 'collapse in';
 $ariaExpanded = $startCollapsed ? 'false' : 'true';
 
@@ -36,6 +33,12 @@ foreach ($interactions as $interaction) {
         $responsibleUsers[$user->id] = $user;
     }
 }
+
+$commentCount = Comment::getCommentCount(Contact::class, $contact->id);
+$countEvents = $contact->getParticipations()->count();
+$countInteractions = count($interactions);
+$countResponsible = count($responsibleUsers);
+
 ?>
 
 <style>
@@ -101,8 +104,8 @@ foreach ($interactions as $interaction) {
                 <h4 class="media-heading" style="font-size: 16px; font-weight: 600;">
                     <?php if (empty($contact->name)): ?>
                         <span class="text-danger">
-                <?= Html::encode($contact->getDisplayName()) ?>
-            </span>
+                            <?= Html::encode($contact->getDisplayName()) ?>
+                        </span>
                     <?php else: ?>
                         <?= Html::encode($contact->getDisplayName()) ?>
                     <?php endif; ?>
@@ -112,9 +115,13 @@ foreach ($interactions as $interaction) {
 
                 <div class="text-muted" style="font-size: 12px;">
                     <?php if ($contact->organization): ?>
-                        <i class="fa fa-building-o"></i>
-                        <strong><?= Html::encode($contact->organization->name) ?></strong>
+                        <i class="fa fa-building-o" title="Organisation"></i>
+                        <strong><?= Html::encode($contact->organization->name) ?></strong> •
                     <?php endif; ?>
+
+                    <span title="Interaktionen"><i class="fa fa-comments-o"></i> <?= $countInteractions ?></span> •
+                    <span title="Verantwortliche"><i class="fa fa-user-circle"></i> <?= $countResponsible ?></span> •
+                    <span title="Teilnahmen"><i class="fa fa-calendar"></i> <?= $countEvents ?></span>
 
                     <?php if (!$isStream): ?>
                         • <i class="fa fa-comment-o" title="Kommentare"></i> <?= $commentCount ?>
@@ -200,7 +207,7 @@ foreach ($interactions as $interaction) {
                 <div class="row" style="margin-top: 20px; border-top: 1px dashed #eee; padding-top: 15px;">
                     <div class="col-sm-4">
                         <strong style="color: #ff8d00; margin-bottom: 10px; display:block;">
-                            <i class="fa fa-history"></i> Letzte Interaktionen
+                            <i class="fa fa-comments-o"></i> Letzte Interaktionen
                         </strong>
                         <ul class="list-unstyled" style="font-size: 12px;">
                             <?php foreach ($interactions as $interaction): ?>
@@ -212,7 +219,7 @@ foreach ($interactions as $interaction) {
                                         </a>
                                     </div>
                                     <div class="text-muted">
-                                        <i class="fa fa-calendar-o"></i> <?= Yii::$app->formatter->asDate($interaction->date, 'php:d.m.y') ?>
+                                        <i class="fa fa-calendar"></i> <?= Yii::$app->formatter->asDate($interaction->date, 'php:d.m.y') ?>
                                         &middot;
                                         <span class="label label-default"
                                               style="font-size: 9px; padding: 1px 4px;"><?= Html::encode($interaction->status) ?></span>
