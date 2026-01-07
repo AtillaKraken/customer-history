@@ -42,6 +42,19 @@ $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
 // logic for inititial collapse state
 $collapseClass = $startCollapsed ? 'collapse' : 'collapse in';
 $ariaExpanded = $startCollapsed ? 'false' : 'true';
+
+$hasLinks = !empty($interaction->externalLinks);
+$hasTopics = !$isStream && !empty($interaction->content->getTags(humhub\modules\topic\models\Topic:: class)->count());
+
+// calc Columnwidth for 1st row (3 rows + optional topics)
+$row1Columns = 3; // Status, Zeitpunkt, Kanal
+if ($hasTopics) $row1Columns = 4;
+$row1ColClass = $row1Columns == 3 ? 'col-sm-4' : 'col-sm-3';
+
+// calc Columnwidth for 2nd row (3 rows + optional links)
+$row2Columns = 3; // Verantwortliche, Kontakte, Organisationen
+if ($hasLinks) $row2Columns = 4;
+$row2ColClass = $row2Columns == 3 ? 'col-sm-4' : 'col-sm-3';
 ?>
 
 <style>
@@ -129,9 +142,12 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                         <?= Yii::$app->formatter->asRelativeTime($interaction->content->created_at) ?> •
                     <?php endif; ?>
 
-                    <span title="Verantwortliche Nutzer"><i class="fa fa-user-circle"></i> <?= count($interaction->responsibleUsers) ?></span> •
-                    <span title="Kontaktpersonen"><i class="fa fa-users"></i> <?= count($interaction->contacts) ?></span> •
-                    <span title="Organisationen"><i class="fa fa-building-o"></i> <?= count($interaction->organizations) ?></span>
+                    <span title="Verantwortliche Nutzer"><i
+                            class="fa fa-user-circle"></i> <?= count($interaction->responsibleUsers) ?></span> •
+                    <span title="Kontaktpersonen"><i
+                            class="fa fa-users"></i> <?= count($interaction->contacts) ?></span> •
+                    <span title="Organisationen"><i
+                            class="fa fa-building-o"></i> <?= count($interaction->organizations) ?></span>
 
                     <?php if (!$isStream): ?>
                         • <i class="fa fa-comment-o" title="Kommentare"></i> <?= $commentCount ?>
@@ -147,21 +163,33 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
 
             <!-- info row -->
             <div class="row" style="margin-bottom: 15px;">
-                <div class="col-sm-4">
+                <div class="<?= $row1ColClass ?>">
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Status</small><br>
-                    <span class="label <?= $statusClass ?>"><i class="fa fa-flag"></i> <?= $interaction->status ?></span>
+                    <span class="label <?= $statusClass ?>"><i
+                            class="fa fa-flag"></i> <?= $interaction->status ?></span>
                 </div>
-                <div class="col-sm-4">
+                <div class="<?= $row1ColClass ?>">
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Zeitpunkt</small><br>
                     <strong><?= Yii::$app->formatter->asDate($interaction->date, 'php:d.m.Y') ?></strong>
                     <?php if ($interaction->time): ?>
                         <small>(<?= Html::encode($interaction->time) ?>)</small>
                     <?php endif; ?>
                 </div>
-                <div class="col-sm-4">
+                <div class="<?= $row1ColClass ?>">
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Kanal</small><br>
                     <strong><i class="fa fa-share-alt"></i> <?= Html::encode($interaction->channel ?? '-') ?></strong>
                 </div>
+                <?php if ($hasTopics): ?>
+                    <div class="<?= $row1ColClass ?>">
+                        <?php if (!$isStream && !empty($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->count())): ?>
+                            <small class="text-muted text-uppercase" style="font-size: 10px;">Themen</small><br>
+                            <?php foreach ($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->all() as $topic): ?>
+                                <span class="label label-default"
+                                      style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- description -->
@@ -170,9 +198,9 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 <div class="well well-sm" style="background: #fff; border: 1px solid #ddd; margin-top: 5px;">
                     <div class="crm-richtext-container" id="desc-container-<?= $interaction->id ?>">
                         <?php if (!empty($interaction->description)): ?>
-                        <?= RichText::output($interaction->description) ?>
+                            <?= RichText::output($interaction->description) ?>
                         <?php else: ?>
-                        <em class="text-muted">Keine Beschreibung hinterlegt.</em>
+                            <em class="text-muted">Keine Beschreibung hinterlegt.</em>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -189,34 +217,9 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 </div>
             <?php endif; ?>
 
-            <?php if (!$isStream && !empty($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->count())): ?>
-                <div style="margin-bottom: 15px;">
-                    <i class="fa fa-tags text-muted"></i>
-                    <?php foreach ($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->all() as $topic): ?>
-                        <span class="label label-default"
-                              style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if (!empty($interaction->externalLinks)): ?>
-                <div style="margin-bottom: 15px;">
-                    <strong><i class="fa fa-link"></i> Verknüpfte Links</strong>
-                    <ul class="list-unstyled" style="margin-top: 5px; padding-left: 10px; border-left: 2px solid #eee;">
-                        <?php foreach ($interaction->externalLinks as $link): ?>
-                            <li style="margin-bottom: 3px;">
-                                <a href="<?= Html::encode($link->url) ?>" target="_blank" rel="noopener noreferrer">
-                                    <i class="fa fa-external-link-square"></i> <?= Html::encode($link->url) ?>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
-
             <div class="row" style="margin-top: 20px; border-top: 1px dashed #eee; padding-top: 15px;">
 
-                <div class="col-sm-4">
+                <div class="<?= $row2ColClass ?>">
                     <strong style="color: #17a2b8;"><i class="fa fa-user-circle"></i> Verantwortliche Nutzer</strong>
                     <?php if (empty($interaction->responsibleUsers)): ?>
                         <div class="text-muted small" style="margin-top:5px;">-</div>
@@ -233,19 +236,19 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                                     <div style="line-height: 1.2;">
                                         <a href="<?= $user->getUrl() ?>">
                                             <strong><?= Html::encode($user->displayName) ?></strong>
-                                        <br>
-                                        <span class="text-muted" style="font-size: 10px;">
+                                            <br>
+                                            <span class="text-muted" style="font-size: 10px;">
                                             <?= Html::encode($user->profile->title ?? 'Mitglied') ?>
                                         </span>
                                         </a>
                                     </div>
                                 </li>
-                            <?php endforeach; ?>
+                                <?php endforeach; ?>
                         </ul>
                     <?php endif; ?>
                 </div>
 
-                <div class="col-sm-4">
+                <div class="<?= $row2ColClass ?>">
                     <strong style="color: #17a2b8;"><i class="fa fa-users"></i> Kontakte</strong>
 
                     <?php
@@ -280,7 +283,8 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                                 <li style="opacity: 0.6;">
                                     <div class="icon-col text-muted"><i class="fa fa-user-times"></i></div>
                                     <div class="content-col">
-                                        <strong class="text-muted" style="font-style: italic;">Gelöschter Kontakt</strong>
+                                        <strong class="text-muted" style="font-style: italic;">Gelöschter
+                                            Kontakt</strong>
                                         <small class="text-muted">Ehemals: <?= Html::encode($org->name) ?></small>
                                     </div>
                                 </li>
@@ -293,7 +297,7 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                     </ul>
                 </div>
 
-                <div class="col-sm-4">
+                <div class="<?= $row2ColClass ?>">
                     <strong style="color: #17a2b8;"><i class="fa fa-building-o"></i> Organisationen</strong>
                     <?php if (empty($interaction->organizations)): ?>
                         <div class="text-muted small" style="margin-top:5px;">-</div>
@@ -317,6 +321,32 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                     <?php endif; ?>
                 </div>
 
+                <?php if ($hasLinks): ?>
+                    <div class="<?= $row2ColClass ?>">
+                        <strong style="color: #17a2b8;"><i class="fa fa-link"></i> Links</strong>
+                        <?php if (empty($interaction->externalLinks)): ?>
+                            <div class="text-muted small" style="margin-top:5px;">-</div>
+                        <?php else: ?>
+                            <ul class="crm-related-list" style="margin-top: 10px;">
+                                <?php foreach ($interaction->externalLinks as $link): ?>
+                                    <li>
+                                        <div class="icon-col"><i class="fa fa-external-link-square"></i></div>
+                                        <div class="content-col">
+                                            <strong class="text-link">
+                                                <a href="<?= Html::encode($link->url) ?>" target="_blank"
+                                                   rel="noopener noreferrer">
+                                                    <?= Html::encode($link->url) ?>
+                                                </a>
+                                            </strong>
+                                        </div>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+
+
             </div>
 
             <div class="text-right" style="margin-top: 20px; padding-top: 10px; border-top: 1px dashed #eee;">
@@ -330,11 +360,11 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 <?php endif; ?>
 
                 <?php if ($interaction->canEdit()):
-                echo Button::defaultType('Bearbeiten')
-                    ->icon('fa-pencil')
-                    ->xs()
-                    ->action('ui.modal.load', $interaction->content->container->createUrl('/crm/interaction/edit', ['id' => $interaction->id]))
-                ?>
+                    echo Button::defaultType('Bearbeiten')
+                        ->icon('fa-pencil')
+                        ->xs()
+                        ->action('ui.modal.load', $interaction->content->container->createUrl('/crm/interaction/edit', ['id' => $interaction->id]))
+                    ?>
                 <?php endif; ?>
                 <?php if ($interaction->canDelete()): ?>
                     <?= Button::danger()
@@ -344,7 +374,7 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                             'Interaktion löschen',
                             'Möchtest du diese Interaktion wirklich unwiderruflich löschen? Alle Verknüpfungen zu ihr gehen verloren.',
                             'Löschen',
-                            'Abbrechen' ) ?>
+                            'Abbrechen') ?>
                 <?php endif; ?>
 
             </div>
