@@ -2,7 +2,7 @@
 use humhub\widgets\ModalDialog;
 use humhub\widgets\ModalButton;
 
-/* @var $interactions app\modules\crm\models\Interaction[] */
+/* @var $interactions humhub\modules\crm\models\Interaction[] */
 /* @var $title string */
 ?>
 

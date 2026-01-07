@@ -2,8 +2,8 @@
 
 namespace humhub\modules\crm\controllers;
 
-use app\modules\crm\models\Interaction;
-use app\modules\crm\models\forms\CrmFilter;
+use humhub\modules\crm\models\Interaction;
+use humhub\modules\crm\models\forms\CrmFilter;
 use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\widgets\ModalClose;
 use HttpException;

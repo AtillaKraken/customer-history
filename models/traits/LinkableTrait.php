@@ -2,7 +2,7 @@
 
 namespace humhub\modules\crm\models\traits;
 
-use app\modules\crm\models\EntityLink;
+use humhub\modules\crm\models\EntityLink;
 
 trait LinkableTrait
 {

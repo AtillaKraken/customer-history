@@ -1,6 +1,6 @@
 <?php
 
-use app\modules\crm\models\Organization;
+use humhub\modules\crm\models\Organization;
 use humhub\widgets\ModalDialog;
 use humhub\widgets\ModalButton;
 use humhub\modules\ui\form\widgets\ActiveForm;

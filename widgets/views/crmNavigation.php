@@ -6,16 +6,16 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use humhub\modules\ui\form\widgets\MultiSelect;
 use yii\jui\DatePicker;
-use app\modules\crm\models\Organization;
-use app\modules\crm\models\Interaction;
-use app\modules\crm\models\Contact;
-use app\modules\crm\models\Event;
+use humhub\modules\crm\models\Organization;
+use humhub\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Contact;
+use humhub\modules\crm\models\Event;
 
 /* @var $contentContainer humhub\modules\content\components\ContentContainerActiveRecord */
 /* @var $activeTab string */
 /* @var $createButtonLabel string */
 /* @var $createUrl string */
-/* @var $filter app\modules\crm\models\forms\CrmFilter */
+/* @var $filter humhub\modules\crm\models\forms\CrmFilter */
 /* @var $orgOptions array */
 /* @var $userOptions array */
 

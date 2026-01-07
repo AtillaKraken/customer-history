@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\crm\widgets;
+namespace humhub\modules\crm\widgets;
 
 use humhub\modules\content\widgets\stream\WallStreamEntryWidget;
 use humhub\modules\content\widgets\EditLink;

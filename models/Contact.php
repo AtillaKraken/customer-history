@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\crm\models;
+namespace humhub\modules\crm\models;
 
 use humhub\modules\content\components\ContentActiveRecord;
 use humhub\modules\space\models\Space;
@@ -32,7 +32,7 @@ use Yii;
 class Contact extends ContentActiveRecord
 {
 
-    public $wallEntryClass = 'app\modules\crm\widgets\ContactWallEntry';
+    public $wallEntryClass = 'humhub\modules\crm\widgets\ContactWallEntry';
 
     // Roles:
     const ROLE_MANAGEMENT = 'Geschäftsführung / Vorstand';

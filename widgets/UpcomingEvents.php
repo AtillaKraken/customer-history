@@ -1,9 +1,9 @@
 <?php
 
-namespace app\modules\crm\widgets;
+namespace humhub\modules\crm\widgets;
 
 use humhub\components\Widget;
-use app\modules\crm\models\Event;
+use humhub\modules\crm\models\Event;
 use yii\db\Expression;
 
 class UpcomingEvents extends Widget

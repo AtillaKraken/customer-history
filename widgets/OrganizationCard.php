@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\crm\widgets;
+namespace humhub\modules\crm\widgets;
 
 use humhub\components\Widget;
 

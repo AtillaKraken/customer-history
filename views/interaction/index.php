@@ -1,7 +1,7 @@
 <?php
 
-use app\modules\crm\models\Interaction;
-use app\modules\crm\widgets\CrmNavigation;
+use humhub\modules\crm\models\Interaction;
+use humhub\modules\crm\widgets\CrmNavigation;
 use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\modules\space\models\Space;
 use yii\helpers\Html;

@@ -2,7 +2,7 @@
 use humhub\widgets\ModalDialog;
 use humhub\widgets\ModalButton;
 
-/* @var $events app\modules\crm\models\Event[] */
+/* @var $events humhub\modules\crm\models\Event[] */
 /* @var $title string */
 ?>
 

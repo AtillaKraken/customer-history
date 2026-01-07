@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\crm\models;
+namespace humhub\modules\crm\models;
 
 use humhub\modules\crm\models\traits\LinkableTrait;
 use humhub\modules\topic\models\Topic;
@@ -36,7 +36,7 @@ class Event extends ContentActiveRecord
     use LinkableTrait;
 
     // define Widget for Stream
-    public $wallEntryClass = 'app\modules\crm\widgets\EventWallEntry';
+    public $wallEntryClass = 'humhub\modules\crm\widgets\EventWallEntry';
 
     // define target of Notification-Links
     public function getUrl()
@@ -109,7 +109,7 @@ class Event extends ContentActiveRecord
      */
     public function getIcon()
     {
-        return 'fa-calendar-o';
+        return 'fa-calendar';
     }
 
     // TODO: Icon-Konsistenz prüfne/durchsetzen

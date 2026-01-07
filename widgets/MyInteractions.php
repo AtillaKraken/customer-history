@@ -1,9 +1,9 @@
 <?php
 
-namespace app\modules\crm\widgets;
+namespace humhub\modules\crm\widgets;
 
 use humhub\components\Widget;
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 use Yii;
 
 class MyInteractions extends Widget

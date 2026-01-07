@@ -1,15 +1,16 @@
 <?php
 
-use app\modules\crm\widgets\CrmNavigation;
+use humhub\modules\crm\widgets\CrmNavigation;
+use humhub\modules\crm\models\Contact;
 use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\modules\space\models\Space;
 use yii\helpers\Url;
 use humhub\widgets\Button;
 
 /**
- * @var $contacts app\modules\crm\models\Contact[]
+ * @var $contacts humhub\modules\crm\models\Contact[]
  * @var $space Space
- * @var $filter app\modules\crm\models\forms\CrmFilter
+ * @var $filter humhub\modules\crm\models\forms\CrmFilter
  * @var $space humhub\modules\space\models\Space
  * @var $viewMode string
  * @var $pagination yii\data\Pagination
@@ -28,7 +29,7 @@ use humhub\widgets\Button;
 
 <div class="panel panel-default">
     <div class="panel-heading">
-        <i class="fa fa-address-card-o"></i> <strong>Kontaktpersonen</strong> im Space
+        <i class="fa fa-users"></i> <strong>Kontaktpersonen</strong>
         <div class="pull-right" style="margin-left: 10px;">
             <div class="btn-group btn-group-xs">
                 <a href="<?= Url::current(['view' => 'list']) ?>"

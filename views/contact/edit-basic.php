@@ -2,7 +2,7 @@
 
 use humhub\modules\content\widgets\richtext\RichTextField;
 use humhub\modules\ui\form\widgets\MultiSelect;
-use app\modules\crm\models\Contact;
+use humhub\modules\crm\models\Contact;
 
 /* @var $form humhub\modules\ui\form\widgets\ActiveForm */
 /* @var $model Contact */

@@ -1,9 +1,9 @@
 <?php
 
-use app\modules\crm\widgets\EventCard;
+use humhub\modules\crm\widgets\EventCard;
 use humhub\widgets\LinkPager;
 
-/* @var $events app\modules\crm\models\Event[] */
+/* @var $events humhub\modules\crm\models\Event[] */
 /* @var $pagination yii\data\Pagination */
 ?>
 

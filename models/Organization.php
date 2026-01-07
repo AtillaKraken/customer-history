@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\crm\models;
+namespace humhub\modules\crm\models;
 
 use humhub\modules\crm\models\traits\LinkableTrait;
 use humhub\modules\content\components\ContentActiveRecord;
@@ -43,7 +43,7 @@ class Organization extends ContentActiveRecord implements Searchable
     use LinkableTrait;
 
     // define Widget for Stream
-    public $wallEntryClass = 'app\modules\crm\widgets\OrganizationWallEntry';
+    public $wallEntryClass = 'humhub\modules\crm\widgets\OrganizationWallEntry';
 
 
     // Category:

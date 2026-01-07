@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\crm\widgets;
+namespace humhub\modules\crm\widgets;
 
 // humhubs class to display stream entries
 use humhub\modules\content\widgets\stream\WallStreamEntryWidget;

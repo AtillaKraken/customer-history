@@ -6,10 +6,10 @@ use humhub\modules\activity\actions\ActivityStreamAction;
 use humhub\modules\activity\models\Activity;
 use humhub\modules\comment\models\Comment;
 use humhub\modules\like\models\Like;
-use app\modules\crm\models\Interaction;
-use app\modules\crm\models\Event;
-use app\modules\crm\models\Contact;
-use app\modules\crm\models\Organization;
+use humhub\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Event;
+use humhub\modules\crm\models\Contact;
+use humhub\modules\crm\models\Organization;
 
 class CrmActivityStreamAction extends ActivityStreamAction
 {

@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 
-/* @var $events app\modules\crm\models\Event[] */
+/* @var $events humhub\modules\crm\models\Event[] */
 /* @var $totalCount int */
 /* @var $limit int */
 /* @var $contentContainer humhub\modules\content\components\ContentContainerActiveRecord */

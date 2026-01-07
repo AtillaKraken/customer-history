@@ -1,6 +1,6 @@
 <?php
 
-use app\modules\crm\models\EntityLink;
+use humhub\modules\crm\models\EntityLink;
 use yii\db\ActiveRecord;
 use yii\helpers\Html;
 

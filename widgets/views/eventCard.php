@@ -1,6 +1,6 @@
 <?php
 
-use app\modules\crm\models\Event;
+use humhub\modules\crm\models\Event;
 use humhub\modules\content\widgets\richtext\RichText;
 use yii\helpers\Html;
 use humhub\modules\like\widgets\LikeLink;
@@ -8,11 +8,11 @@ use humhub\modules\comment\widgets\CommentLink;
 use humhub\modules\comment\widgets\Comments;
 use humhub\modules\comment\models\Comment;
 
-/* @var $event app\modules\crm\models\Event */
+/* @var $event humhub\modules\crm\models\Event */
 /* @var $isStream bool */
 /* @var $startCollapsed bool */
 
-$borderClass = 'border-left: 4px solid #6fdbe8;'; // Light blue for events
+$borderClass = 'border-left: 4px solid #17a2b8;';
 $collapseId = 'event-collapse-' . $event->id;
 $commentCount = Comment::getCommentCount(Event::class, $event->id);
 

@@ -3,11 +3,11 @@
 use humhub\widgets\Button;
 use yii\helpers\Html;
 use humhub\widgets\Label;
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 use humhub\widgets\LinkPager;
 use humhub\modules\user\widgets\Image as UserImage;
 
-/* @var $interactions app\modules\crm\models\Interaction[] */
+/* @var $interactions humhub\modules\crm\models\Interaction[] */
 /* @var $pagination yii\data\Pagination */
 ?>
 

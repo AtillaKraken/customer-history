@@ -1,9 +1,9 @@
 <?php
 
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 use yii\helpers\Html;
 
-/* @var $interactions app\modules\crm\models\Interaction[] */
+/* @var $interactions humhub\modules\crm\models\Interaction[] */
 /* @var $totalCount int */
 /* @var $limit int */
 /* @var $contentContainer humhub\modules\content\components\ContentContainerActiveRecord */

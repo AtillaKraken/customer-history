@@ -1,6 +1,6 @@
 <?php
 
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 use humhub\modules\content\widgets\richtext\RichText;
 use humhub\widgets\Button;
 use yii\helpers\Html;
@@ -9,7 +9,7 @@ use humhub\modules\comment\widgets\CommentLink;
 use humhub\modules\comment\widgets\Comments;
 use humhub\modules\comment\models\Comment;
 
-/* @var $interaction app\modules\crm\models\Interaction */
+/* @var $interaction humhub\modules\crm\models\Interaction */
 /* @var $isStream bool "is this Card inside the global/space Stream or inside the Module/Interaction Dashboard?" */
 /* @var $startCollapsed bool "is this Card initially collapsed when opened rendered?" */
 

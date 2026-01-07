@@ -1,9 +1,9 @@
 <?php
 
-namespace app\modules\crm\widgets;
+namespace humhub\modules\crm\widgets;
 
 use yii\widgets\InputWidget;
-use app\modules\crm\models\Contact;
+use humhub\modules\crm\models\Contact;
 
 /**
  * Widget for selecting contacts with Organization data attributes.

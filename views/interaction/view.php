@@ -1,10 +1,10 @@
 <?php
 
-use app\modules\crm\widgets\InteractionCard;
+use humhub\modules\crm\widgets\InteractionCard;
 use humhub\widgets\ModalDialog;
 use humhub\widgets\ModalButton;
 
-/* @var $model app\modules\crm\models\Interaction */
+/* @var $model humhub\modules\crm\models\Interaction */
 
 // Check if loaded via AJAX (=> causing a modal to open)
 $isAjax = Yii::$app->request->isAjax;

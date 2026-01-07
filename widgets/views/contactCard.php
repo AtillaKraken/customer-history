@@ -1,7 +1,7 @@
 <?php
 
-use app\modules\crm\models\Contact;
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Contact;
+use humhub\modules\crm\models\Interaction;
 use humhub\modules\content\widgets\richtext\RichText;
 use yii\helpers\Html;
 use humhub\modules\like\widgets\LikeLink;
@@ -9,11 +9,11 @@ use humhub\modules\comment\widgets\CommentLink;
 use humhub\modules\comment\widgets\Comments;
 use humhub\modules\comment\models\Comment;
 
-/* @var $contact app\modules\crm\models\Contact */
+/* @var $contact humhub\modules\crm\models\Contact */
 /* @var $isStream bool */
 /* @var $startCollapsed bool */
 
-$borderClass = 'border-left: 4px solid #ff8d00;'; // Orange für Kontakte
+$borderClass = 'border-left: 4px solid #17a2b8;';
 $collapseId = 'contact-collapse-' . $contact->id;
 $collapseClass = $startCollapsed ? 'collapse' : 'collapse in';
 $ariaExpanded = $startCollapsed ? 'false' : 'true';
@@ -73,7 +73,7 @@ $countResponsible = count($responsibleUsers);
         width: 20px;
         text-align: center;
         margin-right: 8px;
-        color: #ff8d00;
+        color: #17a2b8;
         font-size: 14px;
         margin-top: 2px;
     }
@@ -98,7 +98,7 @@ $countResponsible = count($responsibleUsers);
          aria-expanded="<?= $ariaExpanded ?>" style="background-color: #fff; cursor: pointer;">
         <div class="media">
             <div class="media-left">
-                <i class="fa fa-user-circle-o fa-2x text-warning" style="margin-top: 5px; margin-right: 10px"></i>
+                <i class="fa fa-user-o fa-2x text-info" style="margin-top: 5px; margin-right: 10px"></i>
             </div>
             <div class="media-body">
                 <h4 class="media-heading" style="font-size: 16px; font-weight: 600;">
@@ -206,7 +206,7 @@ $countResponsible = count($responsibleUsers);
             <?php if (!empty($interactions)): ?>
                 <div class="row" style="margin-top: 20px; border-top: 1px dashed #eee; padding-top: 15px;">
                     <div class="col-sm-4">
-                        <strong style="color: #ff8d00; margin-bottom: 10px; display:block;">
+                        <strong style="color: #17a2b8; margin-bottom: 10px; display:block;">
                             <i class="fa fa-comments-o"></i> Letzte Interaktionen
                         </strong>
                         <ul class="list-unstyled" style="font-size: 12px;">
@@ -230,7 +230,7 @@ $countResponsible = count($responsibleUsers);
                     </div>
 
                     <div class="col-sm-4">
-                        <strong style="color: #ff8d00; margin-bottom: 10px; display:block;">
+                        <strong style="color: #17a2b8; margin-bottom: 10px; display:block;">
                             <i class="fa fa-user-circle"></i> Durchgeführt worden von:
                         </strong>
                         <?php if (empty($responsibleUsers)): ?>
@@ -259,7 +259,7 @@ $countResponsible = count($responsibleUsers);
                     </div>
 
                     <div class="col-sm-3">
-                        <strong style="color: #ff8d00;"><i class="fa fa-calendar"></i> Teilnahmen (<?= $countEvents ?>)</strong>
+                        <strong style="color: #17a2b8;"><i class="fa fa-calendar"></i> Teilnahmen (<?= $countEvents ?>)</strong>
                         <ul class="crm-related-list" style="margin-top: 10px;">
                             <?php foreach ($contact->participations as $event): ?>
                                 <li>

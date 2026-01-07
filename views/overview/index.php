@@ -1,11 +1,11 @@
 <?php
 
-use app\modules\crm\widgets\CrmNavigation;
-use app\modules\crm\widgets\InteractionCard;
-use app\modules\crm\widgets\CrmStatistics;
-use app\modules\crm\widgets\MyInteractions;
-use app\modules\crm\widgets\MyOrganizations;
-use app\modules\crm\widgets\UpcomingEvents;
+use humhub\modules\crm\widgets\CrmNavigation;
+use humhub\modules\crm\widgets\InteractionCard;
+use humhub\modules\crm\widgets\CrmStatistics;
+use humhub\modules\crm\widgets\MyInteractions;
+use humhub\modules\crm\widgets\MyOrganizations;
+use humhub\modules\crm\widgets\UpcomingEvents;
 use humhub\modules\activity\widgets\ActivityStreamViewer;
 use humhub\widgets\LinkPager;
 

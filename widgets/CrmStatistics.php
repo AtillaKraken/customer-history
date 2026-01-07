@@ -1,12 +1,12 @@
 <?php
 
-namespace app\modules\crm\widgets;
+namespace humhub\modules\crm\widgets;
 
 use humhub\components\Widget;
-use app\modules\crm\models\Organization;
-use app\modules\crm\models\Contact;
-use app\modules\crm\models\Event;
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Organization;
+use humhub\modules\crm\models\Contact;
+use humhub\modules\crm\models\Event;
+use humhub\modules\crm\models\Interaction;
 use yii\db\Expression;
 
 class CrmStatistics extends Widget

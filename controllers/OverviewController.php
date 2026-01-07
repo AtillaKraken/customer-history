@@ -3,7 +3,7 @@
 namespace humhub\modules\crm\controllers;
 
 use humhub\modules\content\components\ContentContainerController;
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 use Yii;
 use yii\data\Pagination;
 
