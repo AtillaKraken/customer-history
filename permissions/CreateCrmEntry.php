@@ -33,6 +33,7 @@ class CreateCrmEntry extends BasePermission
         Space::USERGROUP_ADMIN,
         Space::USERGROUP_MODERATOR,
         Space::USERGROUP_USER,
+        Space::USERGROUP_GUEST,
     ];
 
     protected $title = 'CRM Einträge erstellen';
