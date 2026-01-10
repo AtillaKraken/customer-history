@@ -10,7 +10,6 @@ use humhub\modules\crm\models\Contact;
  */
 class ContactMultiselectDropdown extends InputWidget
 
-// TODO: ggf. Styling ergänzen zum Anzeigen d. Kontaktperson icons
 {
     public $contentContainer;
     public $items = [];

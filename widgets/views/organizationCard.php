@@ -150,9 +150,6 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 </div>
             </div>
 
-
-            <!-- TODO: ALLE ICONS DURCHGEHEN UND KONSISTENZ CHECKEN-->
-
             <div class="row">
                 <div class="col-sm-3">
                     <strong style="color: #17a2b8"><i class="fa fa-user-circle"></i> Verantwortliche Nutzer</strong>

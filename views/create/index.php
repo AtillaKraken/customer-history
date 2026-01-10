@@ -10,6 +10,19 @@ use humhub\modules\ui\icon\widgets\Icon;
 <?php ModalDialog::begin(['header' => 'Zieleintrag für Schnellerfassung <strong>wählen</strong>', 'size' => 'large']) ?>
     <div class="modal-body" style="padding: 20px;">
         <div class="row">
+            <!-- Organization -->
+            <div class="col-md-6">
+                <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $contentContainer->createUrl('/crm/organization/create') ?>" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
+                    <div style="font-size: 40px; margin-bottom: 10px;">
+                        <?= Icon::get('building') ?>
+                    </div>
+                    <h4 style="font-weight:bold;">Organisation</h4>
+                    <p class="text-muted small">
+                        Erfasse Unternehmen, Institutionen oder Partner mit Stammdaten wie Branche und Standort.  Grundlage für alle Kontakte und Interaktionen.
+                    </p>
+                </a>
+            </div>
+
             <!-- Contact -->
             <div class="col-md-6">
                 <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $contentContainer->createUrl('/crm/contact/create') ?>" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
@@ -18,10 +31,12 @@ use humhub\modules\ui\icon\widgets\Icon;
                     </div>
                     <h4 style="font-weight:bold;">Kontaktperson</h4>
                     <p class="text-muted small">
-                        Neue Person zu einer bestehenden Organisation hinzufügen.
+                        Lege Ansprechpartner einer Organisation an und speichere deren Rollen und Kontaktdaten für gezielte Kommunikation.
                     </p>
                 </a>
             </div>
+        </div>
+        <div class="row" style="margin-top: 20px;">
 
             <!-- Interaction -->
             <div class="col-md-6">
@@ -31,25 +46,10 @@ use humhub\modules\ui\icon\widgets\Icon;
                     </div>
                     <h4 style="font-weight:bold;">Interaktion</h4>
                     <p class="text-muted small">
-                        Gespräch, E-Mail oder Meeting protokollieren oder planen.
+                        Dokumentiere Gespräche und E-Mails mit Kontaktpersonen. Plane Follow-ups und weise Verantwortlichkeiten zu, damit nichts verloren geht.
                     </p>
                 </a>
             </div>
-        </div>
-        <div class="row" style="margin-top: 20px;">
-            <!-- Organization -->
-            <div class="col-md-6">
-                    <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $contentContainer->createUrl('/crm/organization/create') ?>" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
-                    <div style="font-size: 40px; margin-bottom: 10px;">
-                        <?= Icon::get('building') ?>
-                    </div>
-                    <h4 style="font-weight:bold;">Organisation</h4>
-                    <p class="text-muted small">
-                        Neue Firma oder Institution anlegen.
-                    </p>
-                </a>
-            </div>
-
             <!-- Event -->
             <div class="col-md-6">
                 <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $contentContainer->createUrl('/crm/event/create') ?>" class="panel panel-default text-center" style="display:block; color:inherit; text-decoration:none; padding: 20px; background:#f7f7f7; border:none;">
@@ -58,7 +58,7 @@ use humhub\modules\ui\icon\widgets\Icon;
                     </div>
                     <h4 style="font-weight:bold;">Veranstaltung</h4>
                     <p class="text-muted small">
-                        Einen neuen Termin im Kalender eintragen.
+                        Erstelle Veranstaltungen wie Workshops oder Messen. Verknüpfe Teilnehmende, um später nachvollziehen zu können, wer dabei war.
                     </p>
                 </a>
             </div>

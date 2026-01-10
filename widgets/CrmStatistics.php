@@ -20,7 +20,7 @@ class CrmStatistics extends Widget
             ->contentContainer($this->contentContainer)
             ->where(['>=', 'content.created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
             ->count();
-        // TODO: Bei Datensätzen schauen, ob table 'content' hier korrekt selektiert oder doch nzu allgemein ist
+
 
         // get the recent interactions + total amount of the remaining 3 objects
         return $this->render('crmStatistics', [

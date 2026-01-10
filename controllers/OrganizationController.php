@@ -14,6 +14,14 @@ use yii\data\Pagination;
 
 class OrganizationController extends ContentContainerController
 {
+    public function init()
+    {
+        parent::init();
+
+        if (Yii::$app->user->isGuest) {
+            throw new \yii\web\HttpException(403, 'Sie müssen sich einloggen, um die internen CRM-Informationen einzusehen.');
+        }
+    }
     /**
      * Show List of all Organizations
      */

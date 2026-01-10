@@ -120,12 +120,17 @@ $row2ColClass = $row2Columns == 3 ? 'col-sm-4' : 'col-sm-3';
                 <i class="fa fa-comments-o fa-2x text-info" style="margin-top: 5px; margin-right: 10px"></i>
             </div>
             <div class="media-body">
-                <h4 class="media-heading" style="font-size: 16px; font-weight: 600;">
+                <h4 class="media-heading" style="font-size: 16px; font-weight: 600; position: relative;">
                     <?= Html::encode($interaction->title) ?>
 
-                    <span title="Qualität: <?= $interaction->getQualityScore() ?>%"
-                          style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; vertical-align: middle; margin-left: 5px; margin-bottom: 2px; background-color: <?= $interaction->getQualityColor() ?>;">
-                    </span>
+                    <!-- Quality Indicator with better explanation -->
+                    <span
+                        style="margin-left: 5px;"
+                        title="Data Quality:  <?= $interaction->getQualityScore() ?>% - Completeness of captured information"
+                        data-toggle="tooltip">
+            <i class="fa fa-tachometer" style="color: <?= $interaction->getQualityColor() ?>; font-size: 14px;"></i>
+            <span style="font-size: 11px; color: #999;"><?= $interaction->getQualityScore() ?>%</span>
+            </span>
 
                     <i class="fa fa-angle-down pull-right text-muted interaction-toggle-icon"></i>
                 </h4>
