@@ -3,7 +3,7 @@
 namespace humhub\modules\crm\notifications;
 
 use humhub\modules\notification\components\BaseNotification;
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 use humhub\modules\space\models\Space;
 use Yii;
 use yii\helpers\Html;

@@ -3,12 +3,22 @@
 namespace humhub\modules\crm\controllers;
 
 use humhub\modules\content\components\ContentContainerController;
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 use Yii;
 use yii\data\Pagination;
 
 class OverviewController extends ContentContainerController
 {
+
+    public function init()
+    {
+        parent::init();
+
+        if (Yii::$app->user->isGuest) {
+            throw new \yii\web\HttpException(403, 'Sie müssen sich einloggen, um die internen CRM-Informationen einzusehen.');
+        }
+    }
+
     /**
      * Renders the CRM Dashboard
      */

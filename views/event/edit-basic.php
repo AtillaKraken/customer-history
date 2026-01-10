@@ -1,10 +1,10 @@
 <?php
 
-use app\modules\crm\models\Event;
-use app\modules\crm\models\Contact;
+use humhub\modules\crm\models\Event;
+use humhub\modules\crm\models\Contact;
 use humhub\modules\ui\form\widgets\TimePicker;
 use humhub\modules\content\widgets\richtext\RichTextField;
-use app\modules\crm\widgets\ContactMultiselectDropdown;
+use humhub\modules\crm\widgets\ContactMultiselectDropdown;
 use yii\jui\DatePicker;
 use yii\helpers\Json;
 

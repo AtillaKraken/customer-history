@@ -1,8 +1,8 @@
 <?php
 
-namespace app\modules\crm\widgets;
+namespace humhub\modules\crm\widgets;
 
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 use humhub\components\Widget;
 
 /**

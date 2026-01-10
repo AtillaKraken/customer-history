@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\crm\models;
+namespace humhub\modules\crm\models;
 
 use humhub\components\ActiveRecord;
 

@@ -1,8 +1,8 @@
 <?php
 
-use app\modules\crm\models\Organization;
-use app\modules\crm\models\Interaction;
-use app\modules\crm\models\Event;
+use humhub\modules\crm\models\Organization;
+use humhub\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Event;
 use humhub\modules\content\widgets\richtext\RichText;
 use humhub\widgets\Button;
 use yii\helpers\Html;
@@ -11,12 +11,12 @@ use humhub\modules\comment\widgets\CommentLink;
 use humhub\modules\comment\widgets\Comments;
 use humhub\modules\comment\models\Comment;
 
-/* @var $organization app\modules\crm\models\Organization */
+/* @var $organization humhub\modules\crm\models\Organization */
 /* @var $isStream bool */
 /* @var $startCollapsed bool */
 
 // Design config
-$borderClass = 'border-left: 4px solid #008fa1;'; // Teal color for organizations
+$borderClass = 'border-left: 4px solid #17a2b8;';
 $collapseId = 'organization-collapse-' . $organization->id;
 $commentCount = Comment::getCommentCount(Organization::class, $organization->id);
 
@@ -87,7 +87,7 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
          aria-expanded="<?= $ariaExpanded ?>" style="background-color: #fff; cursor: pointer;">
         <div class="media">
             <div class="media-left">
-                <i class="fa fa-building-o fa-2x" style="margin-top: 5px; margin-right: 10px; color: #008fa1;"></i>
+                <i class="fa fa-building-o fa-2x text-info" style="margin-top: 5px; margin-right: 10px;"></i>
             </div>
             <div class="media-body">
                 <h4 class="media-heading" style="font-size: 16px; font-weight: 600;">
@@ -150,12 +150,9 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 </div>
             </div>
 
-
-            <!-- TODO: ALLE ICONS DURCHGEHEN UND KONSISTENZ CHECKEN-->
-
             <div class="row">
                 <div class="col-sm-3">
-                    <strong style="color: #008fa1"><i class="fa fa-user-circle"></i> Verantwortliche Nutzer</strong>
+                    <strong style="color: #17a2b8"><i class="fa fa-user-circle"></i> Verantwortliche Nutzer</strong>
                     <?php if (empty($organization->responsibleUsers)): ?>
                         <div class="text-muted small" style="margin-top:5px;">-</div>
                     <?php else: ?>
@@ -182,7 +179,7 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 </div>
 
                 <div class="col-sm-3">
-                    <strong style="color: #008fa1;"><i class="fa fa-users"></i> Kontaktpersonen (<?= $countContacts ?>)</strong>
+                    <strong style="color: #17a2b8;"><i class="fa fa-users"></i> Kontaktpersonen (<?= $countContacts ?>)</strong>
                     <ul class="crm-related-list" style="margin-top: 10px;">
                         <?php foreach ($organization->contacts as $contact): ?>
                             <li>
@@ -210,7 +207,7 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 </div>
 
                 <div class="col-sm-3">
-                    <strong style="color: #008fa1;"><i class="fa fa-comments-o"></i> Interaktionen
+                    <strong style="color: #17a2b8;"><i class="fa fa-comments-o"></i> Interaktionen
                         (<?= $countInteractions ?>)</strong>
                     <ul class="crm-related-list" style="margin-top: 10px;">
                         <?php foreach ($organization->interactions as $interaction): ?>
@@ -236,7 +233,7 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
                 </div>
 
                 <div class="col-sm-3">
-                    <strong style="color: #008fa1;"><i class="fa fa-calendar"></i> Teilnahmen (<?= $countEvents ?>)</strong>
+                    <strong style="color: #17a2b8;"><i class="fa fa-calendar"></i> Teilnahmen (<?= $countEvents ?>)</strong>
                     <ul class="crm-related-list" style="margin-top: 10px;">
                         <?php foreach ($organization->participations as $event): ?>
                             <li>

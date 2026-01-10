@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 
-/* @var $events app\modules\crm\models\Event[] */
+/* @var $events humhub\modules\crm\models\Event[] */
 /* @var $totalCount int */
 /* @var $limit int */
 /* @var $contentContainer humhub\modules\content\components\ContentContainerActiveRecord */
@@ -21,22 +21,26 @@ $showAllUrl = $contentContainer->createUrl('/crm/event/load-upcoming');
         <?php endif; ?>
     </div>
     <div class="panel-body" style="padding: 0;">
-        <?php foreach ($events as $evt): ?>
-            <?php
-            $viewUrl = $evt->content->container->createUrl('/crm/event/view', ['id' => $evt->id]);
-            ?>
-            <div style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;"
-                 onmouseover="this.style.backgroundColor='#f5f5f5';"
-                 onmouseout="this.style.backgroundColor='transparent';"
-                 data-action-click="ui.modal.load"
-                 data-action-url="<?= $viewUrl ?>">
+        <?php if (empty($events)): ?>
+            <div style="padding:10px;" class="text-muted text-center">Keine Veranstaltungen.</div>
+        <?php else: ?>
+            <?php foreach ($events as $evt): ?>
+                <?php
+                $viewUrl = $evt->content->container->createUrl('/crm/event/view', ['id' => $evt->id]);
+                ?>
+                <div style="padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;"
+                     onmouseover="this.style.backgroundColor='#f5f5f5';"
+                     onmouseout="this.style.backgroundColor='transparent';"
+                     data-action-click="ui.modal.load"
+                     data-action-url="<?= $viewUrl ?>">
 
-                <strong><?= Html::encode($evt->title) ?></strong><br>
-                <small class="text-muted">
-                    Datum: <?= Yii::$app->formatter->asDate($evt->date, 'php:d.m.y') ?> ·
-                    Format: <?= Html::encode($evt->type) ?>
-                </small>
-            </div>
-        <?php endforeach; ?>
+                    <strong><?= Html::encode($evt->title) ?></strong><br>
+                    <small class="text-muted">
+                        Datum: <?= Yii::$app->formatter->asDate($evt->date, 'php:d.m.y') ?> ·
+                        Format: <?= Html::encode($evt->type) ?>
+                    </small>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </div>

@@ -2,7 +2,7 @@
 
 use humhub\modules\user\widgets\UserPickerField;
 use humhub\modules\content\widgets\richtext\RichTextField;
-use app\modules\crm\models\Organization;
+use humhub\modules\crm\models\Organization;
 use humhub\widgets\Link;
 
 /* @var $form humhub\modules\ui\form\widgets\ActiveForm */

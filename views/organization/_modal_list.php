@@ -2,7 +2,7 @@
 use humhub\widgets\ModalDialog;
 use humhub\widgets\ModalButton;
 
-/* @var $organizations app\modules\crm\models\Organization[] */
+/* @var $organizations humhub\modules\crm\models\Organization[] */
 /* @var $title string */
 ?>
 

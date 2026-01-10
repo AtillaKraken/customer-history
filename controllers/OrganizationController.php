@@ -2,8 +2,8 @@
 
 namespace humhub\modules\crm\controllers;
 
-use app\modules\crm\models\Organization;
-use app\modules\crm\models\forms\CrmFilter;
+use humhub\modules\crm\models\Organization;
+use humhub\modules\crm\models\forms\CrmFilter;
 use HttpException;
 use humhub\modules\content\permissions\CreatePrivateContent;
 use humhub\modules\crm\permissions\CreateCrmEntry;
@@ -14,6 +14,14 @@ use yii\data\Pagination;
 
 class OrganizationController extends ContentContainerController
 {
+    public function init()
+    {
+        parent::init();
+
+        if (Yii::$app->user->isGuest) {
+            throw new \yii\web\HttpException(403, 'Sie müssen sich einloggen, um die internen CRM-Informationen einzusehen.');
+        }
+    }
     /**
      * Show List of all Organizations
      */
@@ -165,7 +173,7 @@ class OrganizationController extends ContentContainerController
     {
         $user = Yii::$app->user->getIdentity();
 
-        $query = \app\modules\crm\models\Organization::find()
+        $query = \humhub\modules\crm\models\Organization::find()
             ->contentContainer($this->contentContainer)
             ->joinWith('responsibleUsers')
             ->where(['user.id' => $user->id])

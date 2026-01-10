@@ -1,11 +1,11 @@
 <?php
 
-use app\modules\crm\models\Interaction;
-use app\modules\crm\models\Contact;
+use humhub\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Contact;
 use humhub\modules\ui\form\widgets\ActiveForm;
 use humhub\modules\user\widgets\UserPickerField;
 use humhub\modules\content\widgets\richtext\RichTextField;
-use app\modules\crm\widgets\ContactMultiselectDropdown;
+use humhub\modules\crm\widgets\ContactMultiselectDropdown;
 use humhub\modules\ui\form\widgets\TimePicker;
 use humhub\widgets\Link;
 use yii\jui\DatePicker;

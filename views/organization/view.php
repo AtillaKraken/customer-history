@@ -1,9 +1,9 @@
 <?php
-use app\modules\crm\widgets\OrganizationCard;
+use humhub\modules\crm\widgets\OrganizationCard;
 use humhub\widgets\ModalDialog;
 use humhub\widgets\ModalButton;
 
-/* @var $model app\modules\crm\models\Organization */
+/* @var $model humhub\modules\crm\models\Organization */
 $isAjax = Yii::$app->request->isAjax;
 ?>
 

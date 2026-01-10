@@ -2,7 +2,7 @@
 
 use yii\helpers\Html;
 
-/* @var $organizations app\modules\crm\models\Organization[] */
+/* @var $organizations humhub\modules\crm\models\Organization[] */
 /* @var $totalCount int */
 /* @var $limit int */
 /* @var $contentContainer humhub\modules\content\components\ContentContainerActiveRecord */

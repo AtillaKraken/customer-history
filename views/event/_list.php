@@ -4,7 +4,7 @@ use humhub\widgets\Button;
 use yii\helpers\Html;
 use humhub\widgets\LinkPager;
 
-/* @var $events app\modules\crm\models\Event[] */
+/* @var $events humhub\modules\crm\models\Event[] */
 /* @var $pagination yii\data\Pagination */
 ?>
 
@@ -37,7 +37,7 @@ use humhub\widgets\LinkPager;
                 </td>
                 <td style="vertical-align: middle;">
                     <?php
-                    $types = \app\modules\crm\models\Event::getTypeOptions();
+                    $types = \humhub\modules\crm\models\Event::getTypeOptions();
                     $label = $types[$event->type] ?? $event->type;
                     ?>
                     <span class="label label-default"><?= Html::encode($label) ?></span>

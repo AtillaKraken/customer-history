@@ -1,9 +1,9 @@
 <?php
 
-use app\modules\crm\widgets\OrganizationCard;
+use humhub\modules\crm\widgets\OrganizationCard;
 use humhub\widgets\LinkPager;
 
-/* @var $organizations app\modules\crm\models\Organization[] */
+/* @var $organizations humhub\modules\crm\models\Organization[] */
 /* @var $pagination yii\data\Pagination */
 ?>
 

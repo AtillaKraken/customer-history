@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\crm\models;
+namespace humhub\modules\crm\models;
 
 use humhub\modules\crm\models\traits\LinkableTrait;
 use humhub\modules\topic\models\Topic;
@@ -36,7 +36,7 @@ class Event extends ContentActiveRecord
     use LinkableTrait;
 
     // define Widget for Stream
-    public $wallEntryClass = 'app\modules\crm\widgets\EventWallEntry';
+    public $wallEntryClass = 'humhub\modules\crm\widgets\EventWallEntry';
 
     // define target of Notification-Links
     public function getUrl()
@@ -74,7 +74,7 @@ class Event extends ContentActiveRecord
     ];
 
     public $topics = []; // helper array for the form/modal
-    public array $contactIds = []; // helper for contact assignment
+    public $contactIds = []; // helper for contact assignment
 
     public function rules()
     {
@@ -87,6 +87,7 @@ class Event extends ContentActiveRecord
             [['title'], 'string', 'max' => 255],
             [['type'], 'string', 'max' => 100],
             ['type', 'in', 'range' => array_keys(self::getTypeOptions())],
+            [['contactIds'], 'default', 'value' => []],
             [['topics', 'contactIds', 'newLinks', 'editLinks'], 'safe'],
         ];
     }
@@ -109,10 +110,8 @@ class Event extends ContentActiveRecord
      */
     public function getIcon()
     {
-        return 'fa-calendar-o';
+        return 'fa-calendar';
     }
-
-    // TODO: Icon-Konsistenz prüfne/durchsetzen
 
     public function attributeLabels()
     {
@@ -164,6 +163,22 @@ class Event extends ContentActiveRecord
         if ($this->date) {
             $this->date = \Yii::$app->formatter->asDate($this->date, 'php:d.m.Y');
         }
+    }
+
+    public function beforeValidate()
+    {
+        // ensure contactIds is always an array (handle empty strings from form)
+        if (is_string($this->contactIds)) {
+            if (empty($this->contactIds)) {
+                $this->contactIds = [];
+            } else {
+                $this->contactIds = explode(',', $this->contactIds);
+            }
+        } elseif (!is_array($this->contactIds)) {
+            $this->contactIds = [];
+        }
+
+        return parent::beforeValidate();
     }
 
     public function beforeSave($insert)

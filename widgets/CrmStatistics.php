@@ -1,12 +1,12 @@
 <?php
 
-namespace app\modules\crm\widgets;
+namespace humhub\modules\crm\widgets;
 
 use humhub\components\Widget;
-use app\modules\crm\models\Organization;
-use app\modules\crm\models\Contact;
-use app\modules\crm\models\Event;
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Organization;
+use humhub\modules\crm\models\Contact;
+use humhub\modules\crm\models\Event;
+use humhub\modules\crm\models\Interaction;
 use yii\db\Expression;
 
 class CrmStatistics extends Widget
@@ -20,7 +20,7 @@ class CrmStatistics extends Widget
             ->contentContainer($this->contentContainer)
             ->where(['>=', 'content.created_at', new Expression('DATE_SUB(NOW(), INTERVAL 30 DAY)')])
             ->count();
-        // TODO: Bei Datensätzen schauen, ob table 'content' hier korrekt selektiert oder doch nzu allgemein ist
+
 
         // get the recent interactions + total amount of the remaining 3 objects
         return $this->render('crmStatistics', [

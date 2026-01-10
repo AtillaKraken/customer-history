@@ -2,8 +2,8 @@
 
 namespace humhub\modules\crm\controllers;
 
-use app\modules\crm\models\Interaction;
-use app\modules\crm\models\forms\CrmFilter;
+use humhub\modules\crm\models\Interaction;
+use humhub\modules\crm\models\forms\CrmFilter;
 use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\widgets\ModalClose;
 use HttpException;
@@ -14,6 +14,15 @@ use yii\data\Pagination;
 class InteractionController extends ContentContainerController
 {
     // URL: /index.php?r=crm/interaction/index&cguid=<space-guid>
+
+    public function init()
+    {
+        parent::init();
+
+        if (Yii::$app->user->isGuest) {
+            throw new \yii\web\HttpException(403, 'Sie müssen sich einloggen, um die internen CRM-Informationen einzusehen.');
+        }
+    }
 
     public function actionIndex($view = 'list')
     {

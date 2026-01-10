@@ -5,7 +5,7 @@ use humhub\modules\topic\widgets\TopicPicker;
 use humhub\modules\file\widgets\UploadButton;
 use humhub\modules\file\widgets\FilePreview;
 
-/* @var $model app\modules\crm\models\Event */
+/* @var $model humhub\modules\crm\models\Event */
 /* @var $form humhub\modules\ui\form\widgets\ActiveForm */
 
 // especially necessary here for the topic-implementation

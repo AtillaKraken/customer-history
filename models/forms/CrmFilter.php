@@ -1,11 +1,11 @@
 <?php
 
-namespace app\modules\crm\models\forms;
+namespace humhub\modules\crm\models\forms;
 
 use Yii;
 use yii\base\Model;
 use yii\db\ActiveQuery;
-use app\modules\crm\models\Organization;
+use humhub\modules\crm\models\Organization;
 
 class CrmFilter extends Model
 {

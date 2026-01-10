@@ -3,9 +3,9 @@
 use yii\helpers\Html;
 use humhub\widgets\Button;
 use humhub\widgets\LinkPager;
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 
-/* @var $contacts app\modules\crm\models\Contact[] */
+/* @var $contacts humhub\modules\crm\models\Contact[] */
 /* @var $pagination yii\data\Pagination */
 ?>
 

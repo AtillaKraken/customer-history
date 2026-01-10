@@ -1,10 +1,10 @@
 <?php
 
-namespace app\modules\crm\widgets;
+namespace humhub\modules\crm\widgets;
 
 use humhub\components\Widget;
-use app\modules\crm\models\forms\CrmFilter;
-use app\modules\crm\models\Organization;
+use humhub\modules\crm\models\forms\CrmFilter;
+use humhub\modules\crm\models\Organization;
 use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\modules\space\modules\manage\models\MembershipSearch;
 

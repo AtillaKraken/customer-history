@@ -14,7 +14,6 @@ echo MultiSelect::widget([
     'items' => $items,
     'options' => $options,
 ]);
-// TODO: Nicht existirerende Strings nciht abschickbar machen
 
 
 

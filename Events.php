@@ -2,7 +2,7 @@
 
 namespace humhub\modules\crm;
 
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 use humhub\modules\content\widgets\stream\WallStreamEntryWidget;
 use humhub\modules\content\widgets\WallCreateContentMenu;
 use humhub\modules\crm\notifications\LowQualityInteractionNotification;
@@ -90,7 +90,7 @@ class Events
         $menu->addEntry(new MenuLink([
             'label' => 'CRM Eintrag',
             'url' => $crmUrl,
-            'icon' => Icon::get('address-card'),
+            'icon' => Icon::get('address-card-o'),
             'sortOrder' => 350, // positioned between Post and Tasks
             'htmlOptions' => [
                 'data-action-click' => 'ui.modal.load', // opens the modal
@@ -118,7 +118,7 @@ class Events
         $menu->addEntry(new MenuLink([
             'label' => 'CRM',
             'url' => $menu->space->createUrl('/crm/overview/index'),
-            'icon' => Icon::get('users'),
+            'icon' => Icon::get('address-card-o'),
             'isActive' => (Yii::$app->controller->module && Yii::$app->controller->module->id == 'crm'),
             'sortOrder' => 400,
         ]));

@@ -6,13 +6,23 @@ use humhub\modules\activity\actions\ActivityStreamAction;
 use humhub\modules\activity\models\Activity;
 use humhub\modules\comment\models\Comment;
 use humhub\modules\like\models\Like;
-use app\modules\crm\models\Interaction;
-use app\modules\crm\models\Event;
-use app\modules\crm\models\Contact;
-use app\modules\crm\models\Organization;
+use humhub\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Event;
+use humhub\modules\crm\models\Contact;
+use humhub\modules\crm\models\Organization;
+use Yii;
 
 class CrmActivityStreamAction extends ActivityStreamAction
 {
+
+    public function init()
+    {
+        parent::init();
+
+        if (Yii::$app->user->isGuest) {
+            throw new \yii\web\HttpException(403, 'Sie müssen sich einloggen, um die internen CRM-Informationen einzusehen.');
+        }
+    }
     /**
      * @inheritdoc
      */

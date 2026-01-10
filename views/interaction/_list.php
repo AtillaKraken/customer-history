@@ -3,11 +3,11 @@
 use humhub\widgets\Button;
 use yii\helpers\Html;
 use humhub\widgets\Label;
-use app\modules\crm\models\Interaction;
+use humhub\modules\crm\models\Interaction;
 use humhub\widgets\LinkPager;
 use humhub\modules\user\widgets\Image as UserImage;
 
-/* @var $interactions app\modules\crm\models\Interaction[] */
+/* @var $interactions humhub\modules\crm\models\Interaction[] */
 /* @var $pagination yii\data\Pagination */
 ?>
 
@@ -17,6 +17,9 @@ use humhub\modules\user\widgets\Image as UserImage;
     <table class="table table-hover">
         <thead>
         <tr>
+            <th style="width: 40px; text-align: center;" title="Qualität der Erfassung">
+                <i class="fa fa-tachometer"></i>
+            </th>
             <th>Titel</th>
             <th>Datum</th>
             <th>Status</th>
@@ -29,10 +32,13 @@ use humhub\modules\user\widgets\Image as UserImage;
         <tbody>
         <?php foreach ($interactions as $interaction): ?>
             <tr>
+                <td style="vertical-align: middle; text-align: center;">
+                <span title="Qualität der Erfassung:  <?= $interaction->getQualityScore() ?>%"
+                      style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: <?= $interaction->getQualityColor() ?>;">
+                </span>
+                </td>
+
                 <td style="vertical-align: middle;">
-                    <span title="Qualität: <?= $interaction->getQualityScore() ?>%"
-                          style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; background-color: <?= $interaction->getQualityColor() ?>;">
-                    </span>
                     <a href="#" data-action-click="ui.modal.load"
                        data-action-url="<?= $interaction->content->container->createUrl('/crm/interaction/view', ['id' => $interaction->id]) ?>">
                         <strong><?= Html::encode($interaction->title) ?></strong>

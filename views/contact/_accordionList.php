@@ -1,10 +1,10 @@
 <?php
 
-use app\modules\crm\widgets\ContactCard;
+use humhub\modules\crm\widgets\ContactCard;
 use humhub\widgets\LinkPager;
 
 
-/* @var $contacts app\modules\crm\models\Contact[] */
+/* @var $contacts humhub\modules\crm\models\Contact[] */
 /* @var $pagination yii\data\Pagination */
 if (empty($contacts)): ?>
     <div class="alert alert-info">Keine Kontakte gefunden.</div>

@@ -4,7 +4,7 @@ use humhub\widgets\Button;
 use yii\helpers\Html;
 use humhub\widgets\LinkPager;
 
-/* @var $organizations app\modules\crm\models\Organization[] */
+/* @var $organizations humhub\modules\crm\models\Organization[] */
 /* @var $pagination yii\data\Pagination */
 ?>
 

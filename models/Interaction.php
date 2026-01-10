@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\crm\models;
+namespace humhub\modules\crm\models;
 
 use HttpException;
 use humhub\modules\crm\models\traits\LinkableTrait;
@@ -37,7 +37,7 @@ class Interaction extends ContentActiveRecord
     use LinkableTrait;
 
     // define Widget for Stream
-    public $wallEntryClass = 'app\modules\crm\widgets\InteractionWallEntry';
+    public $wallEntryClass = 'humhub\modules\crm\widgets\InteractionWallEntry';
 
     // Status:
     const STATUS_PLANNED = 'Geplant';

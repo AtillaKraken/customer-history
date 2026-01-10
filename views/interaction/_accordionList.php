@@ -1,8 +1,8 @@
 <?php
-use app\modules\crm\widgets\InteractionCard;
+use humhub\modules\crm\widgets\InteractionCard;
 use humhub\widgets\LinkPager;
 
-/* @var $interactions app\modules\crm\models\Interaction[] */
+/* @var $interactions humhub\modules\crm\models\Interaction[] */
 /* @var $pagination yii\data\Pagination */
 ?>
 

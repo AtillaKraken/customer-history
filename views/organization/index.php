@@ -1,7 +1,7 @@
 <?php
 
-use app\modules\crm\models\Organization;
-use app\modules\crm\widgets\CrmNavigation;
+use humhub\modules\crm\models\Organization;
+use humhub\modules\crm\widgets\CrmNavigation;
 use humhub\modules\crm\permissions\CreateCrmEntry;
 use humhub\widgets\Button;
 use yii\helpers\Url;

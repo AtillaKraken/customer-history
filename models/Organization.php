@@ -1,6 +1,6 @@
 <?php
 
-namespace app\modules\crm\models;
+namespace humhub\modules\crm\models;
 
 use humhub\modules\crm\models\traits\LinkableTrait;
 use humhub\modules\content\components\ContentActiveRecord;
@@ -43,7 +43,7 @@ class Organization extends ContentActiveRecord implements Searchable
     use LinkableTrait;
 
     // define Widget for Stream
-    public $wallEntryClass = 'app\modules\crm\widgets\OrganizationWallEntry';
+    public $wallEntryClass = 'humhub\modules\crm\widgets\OrganizationWallEntry';
 
 
     // Category:
@@ -131,9 +131,9 @@ class Organization extends ContentActiveRecord implements Searchable
     }
 
     /**
-     * @var array helper attribute for the form's UserPicker to save GUIDs.
+     * helper for the form's UserPicker to save GUIDs.
      */
-    public array $responsibleUserGuids = [];
+    public $responsibleUserGuids = [];
 
     public function rules()
     {
@@ -263,15 +263,30 @@ class Organization extends ContentActiveRecord implements Searchable
         // delete old links
         $this->unlinkAll('responsibleUsers', true);
 
-        // set new links
-        if (!empty($this->responsibleUserGuids)) {
-            $guids = is_array($this->responsibleUserGuids) ? $this->responsibleUserGuids : explode(',', $this->responsibleUserGuids);
+        // normalize to array
+        $guids = [];
+        if (is_string($this->responsibleUserGuids)) {
+            $guids = empty($this->responsibleUserGuids) ? [] : explode(',', $this->responsibleUserGuids);
+        } elseif (is_array($this->responsibleUserGuids)) {
+            $guids = $this->responsibleUserGuids;
+        }
 
-            foreach ($guids as $guid) {
-                $user = User::findOne(['guid' => trim($guid)]);
-                if ($user) {
-                    $this->link('responsibleUsers', $user);
-                }
+        // if new record and no users selected, assign creator automatically instead
+        if ($insert && empty($guids)) {
+            $creator = User::findOne($this->content->created_by);
+            if ($creator) {
+                $this->link('responsibleUsers', $creator);
+            }
+            return;
+        }
+
+        // set new links
+        foreach ($guids as $guid) {
+            $guid = trim($guid);
+            if (empty($guid)) continue;
+            $user = User:: findOne(['guid' => $guid]);
+            if ($user) {
+                $this->link('responsibleUsers', $user);
             }
         }
     }

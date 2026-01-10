@@ -1,9 +1,9 @@
 <?php
-use app\modules\crm\widgets\EventCard;
+use humhub\modules\crm\widgets\EventCard;
 use humhub\widgets\ModalDialog;
 use humhub\widgets\ModalButton;
 
-/* @var $model app\modules\crm\models\Event */
+/* @var $model humhub\modules\crm\models\Event */
 
 $isAjax = Yii::$app->request->isAjax;
 ?>
