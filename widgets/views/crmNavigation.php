@@ -38,33 +38,61 @@ $isOverview = ($activeTab === 'overview');
 
 <style>
     /* rotate animation to un-/collapse the filter dropdown*/
-    #crm-filter-toggle-btn .caret {
+    #crm-filter-toggle-btn .fa-caret-down {
         transition: transform 0.3s ease;
     }
 
-    #crm-filter-toggle-btn[aria-expanded="true"] .caret {
+    #crm-filter-toggle-btn[aria-expanded="true"] .fa-caret-down {
         transform: rotate(180deg);
     }
 </style>
 
 <!-- Navigation Tabs -->
-<div class="panel panel-default">
-    <div class="panel-body" style="padding: 10px;">
+<div class="card" style="margin-bottom: 15px; background-color: white">
+    <div class="card-body" style="padding: 10px">
         <ul class="nav nav-pills">
-            <li class="<?= $isActive('overview') ?>"><a
-                    href="<?= $contentContainer->createUrl('/crm/overview/index') ?>">Übersicht</a></li>
-            <li class="<?= $isActive('organization') ?>"><a
-                    href="<?= $contentContainer->createUrl('/crm/organization/index') ?>">Organisationen</a></li>
-            <li class="<?= $isActive('contact') ?>"><a href="<?= $contentContainer->createUrl('/crm/contact/index') ?>">Kontaktpersonen</a>
+
+            <li class="nav-item">
+                <a class="nav-link <?= $isActive('overview') ?>"
+                   href="<?= $contentContainer->createUrl('/crm/overview/index') ?>">
+                    Übersicht
+                </a>
             </li>
-            <li class="<?= $isActive('interaction') ?>"><a
-                    href="<?= $contentContainer->createUrl('/crm/interaction/index') ?>">Interaktionen</a></li>
-            <li class="<?= $isActive('event') ?>"><a href="<?= $contentContainer->createUrl('/crm/event/index') ?>">Veranstaltungen</a>
+
+            <li class="nav-item">
+                <a class="nav-link <?= $isActive('organization') ?>"
+                   href="<?= $contentContainer->createUrl('/crm/organization/index') ?>">
+                    Organisationen
+                </a>
             </li>
+
+            <li class="nav-item">
+                <a class="nav-link <?= $isActive('contact') ?>"
+                   href="<?= $contentContainer->createUrl('/crm/contact/index') ?>">
+                    Kontaktpersonen
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link <?= $isActive('interaction') ?>"
+                   href="<?= $contentContainer->createUrl('/crm/interaction/index') ?>">
+                    Interaktionen
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link <?= $isActive('event') ?>"
+                   href="<?= $contentContainer->createUrl('/crm/event/index') ?>">
+                    Veranstaltungen
+                </a>
+            </li>
+
             <?php if ($isOverview && $createUrl): ?>
-                <li class="pull-right">
-                    <a href="#" data-action-click="ui.modal.load" data-action-url="<?= $createUrl ?>"
-                       class="backgroundSuccess" style="color: #fff;  font-weight: bold;">
+                <li class="nav-item ms-auto">
+                    <a href="#"
+                       data-action-click="ui.modal.load"
+                       data-action-url="<?= $createUrl ?>"
+                       class="btn btn-success text-white fw-bold">
                         <i class="fa fa-plus"></i> <?= $createButtonLabel ?>
                     </a>
                 </li>
@@ -82,10 +110,10 @@ $isOverview = ($activeTab === 'overview');
 
             <div class="row">
                 <div class="col-md-2" style="padding-top: 6px;">
-                    <a href="#<?= $filterId ?>" data-toggle="collapse"
+                    <a href="#<?= $filterId ?>" data-bs-toggle="collapse"
                        aria-expanded="<?= $hasActiveFilters ? 'true' : 'false' ?>"
                        style="color: #333; text-decoration: none;" id="crm-filter-toggle-btn">
-                        <strong><i class="fa fa-filter"></i> Filter</strong> <span class="caret"></span>
+                        <strong><i class="fa fa-filter"></i> Filter</strong> <i class="fa fa-caret-down"></i>
                     </a>
                 </div>
                 <div class="col-md-6">

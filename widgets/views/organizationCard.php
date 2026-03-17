@@ -25,12 +25,12 @@ $countContacts = $organization->getContacts()->count();
 $countInteractions = $organization->getInteractions()->count();
 $countEvents = $organization->getParticipations()->count();
 
-$collapseClass = $startCollapsed ? 'collapse' : 'collapse in';
+$collapseClass = $startCollapsed ? 'collapse' : 'collapse show';
 $ariaExpanded = $startCollapsed ? 'false' : 'true';
 ?>
 
 <style>
-    .panel-heading[aria-expanded="true"] .org-toggle-icon {
+    .card-header[aria-expanded="true"] .org-toggle-icon {
         transform: rotate(180deg);
     }
 
@@ -82,17 +82,17 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
     }
 </style>
 
-<div class="panel panel-default" style="<?= $borderClass ?> margin-bottom: 10px;">
-    <div class="panel-heading" role="button" data-toggle="collapse" href="#<?= $collapseId ?>"
+<div class="card mb-2" style="<?= $borderClass ?>">
+    <div class="card-header" role="button" data-bs-toggle="collapse" href="#<?= $collapseId ?>"
          aria-expanded="<?= $ariaExpanded ?>" style="background-color: #fff; cursor: pointer;">
-        <div class="media">
-            <div class="media-left">
-                <i class="fa fa-building-o fa-2x text-info" style="margin-top: 5px; margin-right: 10px;"></i>
+        <div class="d-flex">
+            <div class="flex-shrink-0">
+                <i class="fa fa-building-o fa-3x text-info-emphasis" style="margin-top: 5px; margin-right: 10px;"></i>
             </div>
-            <div class="media-body">
+            <div class="flex-xxl-grow-1">
                 <h4 class="media-heading" style="font-size: 16px; font-weight: 600;">
                     <?= Html::encode($organization->name) ?>
-                    <i class="fa fa-angle-down pull-right text-muted org-toggle-icon"></i>
+                    <i class="fa fa-angle-down float-end text-muted org-toggle-icon"></i>
                 </h4>
 
                 <div class="text-muted" style="font-size: 12px;">
@@ -116,8 +116,9 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
         </div>
     </div>
 
-    <div id="<?= $collapseId ?>" class="panel-collapse <?= $collapseClass ?>">
-        <div class="panel-body" style="border-top: 1px solid #eee;">
+    <!-- body -->
+    <div id="<?= $collapseId ?>" class="<?= $collapseClass ?>">
+        <div class="card-body bg-white" style="border-top: 1px solid #eee;">
 
             <div class="row" style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
                 <div class="col-sm-3">
@@ -140,8 +141,7 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
 
             <div style="margin-bottom: 20px;">
                 <strong style="font-size: 14px;">Notiz</strong>
-                <div class="well well-sm"
-                     style="background: #fff; border: 1px solid #ddd; margin-top: 5px; font-size: 13px;">
+                <div class="bg-white border p-2 rounded" style="margin-top: 5px;">
                     <?php if (!empty($organization->notes)): ?>
                         <?= RichText::output($organization->notes) ?>
                     <?php else: ?>
@@ -258,7 +258,7 @@ $ariaExpanded = $startCollapsed ? 'false' : 'true';
 
             </div>
 
-            <div class="text-right" style="margin-top: 20px; padding-top: 10px; border-top: 1px dashed #eee;">
+            <div class="text-end" style="margin-top: 20px; padding-top: 10px; border-top: 1px dashed #eee;">
                 <?php if (!$isStream): ?>
                     <span style="margin-right: 15px;">
                         <?= LikeLink::widget(['object' => $organization]) ?> &middot;

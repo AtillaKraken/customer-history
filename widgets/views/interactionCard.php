@@ -13,24 +13,24 @@ use humhub\modules\comment\models\Comment;
 /* @var $isStream bool "is this Card inside the global/space Stream or inside the Module/Interaction Dashboard?" */
 /* @var $startCollapsed bool "is this Card initially collapsed when opened rendered?" */
 
-$statusClass = 'label-default';
+$statusClass = 'badge bg-secondary'; // default badge
 $borderClass = 'border-left: 4px solid #ccc;';
 
 switch ($interaction->status) {
     case Interaction::STATUS_PLANNED:
-        $statusClass = 'label-info';
+        $statusClass = 'badge backgroundInfo';
         $borderClass = 'border-left: 4px solid #17a2b8;';
         break;
     case Interaction::STATUS_OVERDUE:
-        $statusClass = 'label-danger';
+        $statusClass = 'badge bg-danger';
         $borderClass = 'border-left: 4px solid #d9534f;';
         break;
     case Interaction::STATUS_CANCELLED:
-        $statusClass = 'label-warning';
+        $statusClass = 'badge bg-warning';
         $borderClass = 'border-left: 4px solid #FFC107;';
         break;
     case Interaction::STATUS_DONE:
-        $statusClass = 'label-success';
+        $statusClass = 'badge bg-success';
         $borderClass = 'border-left: 4px solid #97d271;';
         break;
 }
@@ -40,7 +40,7 @@ $collapseId = 'interaction-collapse-' . $interaction->id;
 $commentCount = Comment::getCommentCount(Interaction::class, $interaction->id);
 
 // logic for inititial collapse state
-$collapseClass = $startCollapsed ? 'collapse' : 'collapse in';
+$collapseClass = $startCollapsed ? 'collapse' : 'collapse show';
 $ariaExpanded = $startCollapsed ? 'false' : 'true';
 
 $hasLinks = !empty($interaction->externalLinks);
@@ -59,7 +59,7 @@ $row2ColClass = $row2Columns == 3 ? 'col-sm-4' : 'col-sm-3';
 
 <style>
     /* rotate arrow animation when card is opened */
-    .panel-heading[aria-expanded="true"] .interaction-toggle-icon {
+    .card-header[aria-expanded="true"] .interaction-toggle-icon {
         transform: rotate(180deg);
     }
 
@@ -110,29 +110,29 @@ $row2ColClass = $row2Columns == 3 ? 'col-sm-4' : 'col-sm-3';
     }
 </style>
 
-<div class="panel panel-default" style="<?= $borderClass ?> margin-bottom: 10px;">
+<div class="card mb-2" style="<?= $borderClass ?>">
     <!-- Header -->
-    <div class="panel-heading" role="button" data-toggle="collapse" href="#<?= $collapseId ?>"
+    <div class="card-header" role="button" data-bs-toggle="collapse" href="#<?= $collapseId ?>"
          aria-expanded="<?= $ariaExpanded ?>"
          style="background-color: #fff; cursor: pointer;">
-        <div class="media">
-            <div class="media-left">
-                <i class="fa fa-comments-o fa-2x text-info" style="margin-top: 5px; margin-right: 10px"></i>
+        <div class="d-flex">
+            <div class="flex-shrink-0">
+                <i class="fa fa-comments-o fa-3x text-info-emphasis" style="margin-top: 5px; margin-right: 10px"></i>
             </div>
-            <div class="media-body">
+            <div class="flex-grow-1">
                 <h4 class="media-heading" style="font-size: 16px; font-weight: 600; position: relative;">
                     <?= Html::encode($interaction->title) ?>
 
                     <!-- Quality Indicator with better explanation -->
                     <span
                         style="margin-left: 5px;"
-                        title="Data Quality:  <?= $interaction->getQualityScore() ?>% - Completeness of captured information"
-                        data-toggle="tooltip">
+                        title="Data Quality:  <?= $interaction->getQualityScore() ?>% - Vollständigkeit erfasster Daten"
+                        data-bs-toggle="tooltip">
             <i class="fa fa-tachometer" style="color: <?= $interaction->getQualityColor() ?>; font-size: 14px;"></i>
             <span style="font-size: 11px; color: #999;"><?= $interaction->getQualityScore() ?>%</span>
             </span>
 
-                    <i class="fa fa-angle-down pull-right text-muted interaction-toggle-icon"></i>
+                    <i class="fa fa-angle-down float-end text-muted interaction-toggle-icon"></i>
                 </h4>
                 <div class="text-muted" style="font-size: 12px;">
 
@@ -163,14 +163,14 @@ $row2ColClass = $row2Columns == 3 ? 'col-sm-4' : 'col-sm-3';
     </div>
 
     <!-- body -->
-    <div id="<?= $collapseId ?>" class="panel-collapse <?= $collapseClass ?>">
-        <div class="panel-body" style="border-top: 1px solid #eee;">
+    <div id="<?= $collapseId ?>" class="<?= $collapseClass ?>">
+        <div class="card-body bg-white" style="border-top: 1px solid #eee;">
 
             <!-- info row -->
             <div class="row" style="margin-bottom: 15px;">
                 <div class="<?= $row1ColClass ?>">
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Status</small><br>
-                    <span class="label <?= $statusClass ?>"><i
+                    <span class="<?= $statusClass ?>"><i
                             class="fa fa-flag"></i> <?= $interaction->status ?></span>
                 </div>
                 <div class="<?= $row1ColClass ?>">
@@ -189,7 +189,7 @@ $row2ColClass = $row2Columns == 3 ? 'col-sm-4' : 'col-sm-3';
                         <?php if (!$isStream && !empty($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->count())): ?>
                             <small class="text-muted text-uppercase" style="font-size: 10px;">Themen</small><br>
                             <?php foreach ($interaction->content->getTags(humhub\modules\topic\models\Topic::class)->all() as $topic): ?>
-                                <span class="label label-default"
+                                <span class="badge bg-secondary"
                                       style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -200,7 +200,7 @@ $row2ColClass = $row2Columns == 3 ? 'col-sm-4' : 'col-sm-3';
             <!-- description -->
             <div style="margin-bottom: 15px;">
                 <strong>Beschreibung</strong>
-                <div class="well well-sm" style="background: #fff; border: 1px solid #ddd; margin-top: 5px;">
+                <div class="bg-white border p-2 rounded" style="margin-top: 5px;">
                     <div class="crm-richtext-container" id="desc-container-<?= $interaction->id ?>">
                         <?php if (!empty($interaction->description)): ?>
                             <?= RichText::output($interaction->description) ?>
@@ -214,7 +214,7 @@ $row2ColClass = $row2Columns == 3 ? 'col-sm-4' : 'col-sm-3';
             <?php if ($interaction->status === Interaction::STATUS_DONE && !empty($interaction->result)): ?>
                 <div style="margin-bottom: 15px;">
                     <strong>Ergebnis</strong>
-                    <div class="well well-sm" style="background: #eaffea; border: 1px solid #c3e6cb; margin-top: 5px;">
+                    <div class="bg-white border p-2 rounded" style="background: #eaffea !important; border-color: #c3e6cb !important; margin-top: 5px;">
                         <div class="crm-richtext-container" id="res-container-<?= $interaction->id ?>">
                             <?= \humhub\modules\content\widgets\richtext\RichText::output($interaction->result) ?>
                         </div>
@@ -234,7 +234,7 @@ $row2ColClass = $row2Columns == 3 ? 'col-sm-4' : 'col-sm-3';
                             <a href="<?= $user->getUrl() ?>">
                                 <li style="margin-bottom: 8px; display: flex; align-items: center;">
                                     <a href="<?= $user->getUrl() ?>">
-                                        <img src="<?= $user->getProfileImage()->getUrl() ?>" class="img-rounded"
+                                        <img src="<?= $user->getProfileImage()->getUrl() ?>" class="rounded"
                                              style="width: 24px; height: 24px; margin-right: 8px;"
                                              alt="<?= Html::encode($user->displayName) ?>"/>
                                     </a>
@@ -354,7 +354,7 @@ $row2ColClass = $row2Columns == 3 ? 'col-sm-4' : 'col-sm-3';
 
             </div>
 
-            <div class="text-right" style="margin-top: 20px; padding-top: 10px; border-top: 1px dashed #eee;">
+            <div class="text-end" style="margin-top: 20px; padding-top: 10px; border-top: 1px dashed #eee;">
 
                 <?php if (!$isStream): ?>
                     <span style="margin-right: 15px;">

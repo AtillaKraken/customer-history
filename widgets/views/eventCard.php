@@ -17,7 +17,7 @@ $collapseId = 'event-collapse-' . $event->id;
 $commentCount = Comment::getCommentCount(Event::class, $event->id);
 
 // Logic for start state
-$collapseClass = $startCollapsed ? 'collapse' : 'collapse in';
+$collapseClass = $startCollapsed ? 'collapse' : 'collapse show';
 $ariaExpanded = $startCollapsed ? 'false' : 'true';
 
 // Map type constant to readable label
@@ -27,7 +27,7 @@ $typeLabel = $types[$event->type] ?? '-';
 
 <style>
     /* Rotate arrow when panel is open */
-    .panel-heading[aria-expanded="true"] .event-toggle-icon {
+    .card-header[aria-expanded="true"] .event-toggle-icon {
         transform: rotate(180deg);
     }
     .event-toggle-icon {
@@ -77,18 +77,19 @@ $typeLabel = $types[$event->type] ?? '-';
     }
 </style>
 
-<div class="panel panel-default" style="<?= $borderClass ?> margin-bottom: 10px;">
-    <div class="panel-heading" role="button" data-toggle="collapse" href="#<?= $collapseId ?>"
+<div class="card mb-2" style="<?= $borderClass ?>">
+    <div class="card-header" role="button" data-bs-toggle="collapse" href="#<?= $collapseId ?>"
          aria-expanded="<?= $ariaExpanded ?>"
          style="background-color: #fff; cursor: pointer;">
-        <div class="media">
-            <div class="media-left">
-                <i class="fa fa-calendar fa-2x text-info" style="margin-top: 5px; margin-right: 10px"></i>
+
+        <div class="d-flex">
+            <div class="flex-shrink-0">
+                <i class="fa fa-calendar fa-3x text-info-emphasis" style="margin-top: 5px; margin-right: 10px"></i>
             </div>
-            <div class="media-body">
+            <div class="flex-grow-1">
                 <h4 class="media-heading" style="font-size: 16px; font-weight: 600;">
                     <?= Html::encode($event->title) ?>
-                    <i class="fa fa-angle-down pull-right text-muted event-toggle-icon"></i>
+                    <i class="fa fa-angle-down float-end text-muted event-toggle-icon"></i>
                 </h4>
 
                 <div class="text-muted" style="font-size: 12px;">
@@ -114,13 +115,13 @@ $typeLabel = $types[$event->type] ?? '-';
         </div>
     </div>
 
-    <div id="<?= $collapseId ?>" class="panel-collapse <?= $collapseClass ?>">
-        <div class="panel-body" style="border-top: 1px solid #eee;">
+    <div id="<?= $collapseId ?>" class="<?= $collapseClass ?>">
+        <div class="card-body bg-white" style="border-top: 1px solid #eee;">
 
             <div class="row" style="margin-bottom: 15px;">
                 <div class="col-sm-4">
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Format</small><br>
-                    <span class="label label-info"><?= Html::encode($typeLabel) ?></span>
+                    <span class="badge backgroundInfo"><?= Html::encode($typeLabel) ?></span>
                 </div>
                 <div class="col-sm-4">
                     <small class="text-muted text-uppercase" style="font-size: 10px;">Zeit</small><br>
@@ -136,7 +137,7 @@ $typeLabel = $types[$event->type] ?? '-';
                     <?php if (!$isStream && !empty($event->content->getTags(humhub\modules\topic\models\Topic::class)->count())): ?>
                         <small class="text-muted text-uppercase" style="font-size: 10px;">Themen</small><br>
                         <?php foreach ($event->content->getTags(humhub\modules\topic\models\Topic::class)->all() as $topic): ?>
-                            <span class="label label-default" style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
+                            <span class="badge bg-secondary" style="margin-right: 2px;"><?= \yii\helpers\Html::encode($topic->name) ?></span>
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </div>
@@ -144,7 +145,7 @@ $typeLabel = $types[$event->type] ?? '-';
 
             <div style="margin-bottom: 15px;">
                 <strong>Beschreibung</strong>
-                <div class="well well-sm" style="background: #fff; border: 1px solid #ddd; margin-top: 5px;">
+                <div class="bg-white border p-2 rounded" style="margin-top: 5px;">
                     <?php if (!empty($event->description)): ?>
                         <?= RichText::output($event->description) ?>
                     <?php else: ?>
@@ -169,38 +170,38 @@ $typeLabel = $types[$event->type] ?? '-';
                     }
                     ?>
 
-                        <ul class="crm-related-list" style="margin-top: 10px;">
-                            <?php foreach ($event->contacts as $contact): ?>
-                                <li>
-                                    <div class="icon-col"><i class="fa fa-user"></i></div>
+                    <ul class="crm-related-list" style="margin-top: 10px;">
+                        <?php foreach ($event->contacts as $contact): ?>
+                            <li>
+                                <div class="icon-col"><i class="fa fa-user"></i></div>
+                                <div class="content-col">
+                                    <strong>
+                                        <a href="#" data-action-click="ui.modal.load"
+                                           data-action-url="<?= $contact->content->container->createUrl('/crm/contact/view', ['id' => $contact->id]) ?>">
+                                            <?= Html::encode($contact->name) ?>
+                                        </a>
+                                    </strong>
+                                    <small><?= $contact->organization ? Html::encode($contact->organization->name) : '-' ?></small>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+
+                        <?php foreach ($event->organizations as $org): ?>
+                            <?php if (!in_array($org->id, $activeOrgIds)): ?>
+                                <li style="opacity: 0.6;">
+                                    <div class="icon-col text-muted"><i class="fa fa-user-times"></i></div>
                                     <div class="content-col">
-                                        <strong>
-                                            <a href="#" data-action-click="ui.modal.load"
-                                               data-action-url="<?= $contact->content->container->createUrl('/crm/contact/view', ['id' => $contact->id]) ?>">
-                                                <?= Html::encode($contact->name) ?>
-                                            </a>
-                                        </strong>
-                                        <small><?= $contact->organization ? Html::encode($contact->organization->name) : '-' ?></small>
+                                        <strong class="text-muted" style="font-style: italic;">Gelöschter Kontakt</strong>
+                                        <small class="text-muted">Ehemals: <?= Html::encode($org->name) ?></small>
                                     </div>
                                 </li>
-                            <?php endforeach; ?>
-
-                            <?php foreach ($event->organizations as $org): ?>
-                                <?php if (!in_array($org->id, $activeOrgIds)): ?>
-                                    <li style="opacity: 0.6;">
-                                        <div class="icon-col text-muted"><i class="fa fa-user-times"></i></div>
-                                        <div class="content-col">
-                                            <strong class="text-muted" style="font-style: italic;">Gelöschter Kontakt</strong>
-                                            <small class="text-muted">Ehemals: <?= Html::encode($org->name) ?></small>
-                                        </div>
-                                    </li>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-
-                            <?php if (empty($event->contacts) && empty($event->organizations)): ?>
-                                <li class="text-muted small">-</li>
                             <?php endif; ?>
-                        </ul>
+                        <?php endforeach; ?>
+
+                        <?php if (empty($event->contacts) && empty($event->organizations)): ?>
+                            <li class="text-muted small">-</li>
+                        <?php endif; ?>
+                    </ul>
                 </div>
 
                 <div class="col-sm-4">
@@ -250,7 +251,7 @@ $typeLabel = $types[$event->type] ?? '-';
 
             </div>
 
-            <div class="text-right" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
+            <div class="text-end" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
 
                 <?php if (!$isStream): ?>
                     <span style="margin-right: 15px;">
@@ -261,11 +262,11 @@ $typeLabel = $types[$event->type] ?? '-';
                 <?php endif; ?>
 
                 <?php if ($event->canEdit()): ?>
-                <?= \humhub\widgets\Button::defaultType('Bearbeiten')
-                    ->icon('fa-pencil')
-                    ->xs()
-                    ->action('ui.modal.load', $event->content->container->createUrl('/crm/event/edit', ['id' => $event->id]))
-                ?>
+                    <?= \humhub\widgets\Button::defaultType('Bearbeiten')
+                        ->icon('fa-pencil')
+                        ->xs()
+                        ->action('ui.modal.load', $event->content->container->createUrl('/crm/event/edit', ['id' => $event->id]))
+                    ?>
                 <?php endif; ?>
                 <?php if ($event->canDelete()): ?>
                     <?= \humhub\widgets\Button::danger('Löschen')

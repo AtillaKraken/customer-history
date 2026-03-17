@@ -33,12 +33,12 @@ use humhub\widgets\Button;
         <div class="pull-right" style="margin-left: 10px;">
             <div class="btn-group btn-group-xs">
                 <a href="<?= Url::current(['view' => 'list']) ?>"
-                   class="btn btn-default <?= ($viewMode === 'list') ? 'active' : '' ?>" title="Liste">
-                    <i class="fa fa-list"></i>
+                   class="btn btn-default d-flex align-items-center  <?= ($viewMode === 'list') ? 'active' : '' ?>" title="Liste">
+                    <i class="fa fa-list m-0"></i>
                 </a>
                 <a href="<?= Url::current(['view' => 'cards']) ?>"
-                   class="btn btn-default <?= ($viewMode === 'cards') ? 'active' : '' ?>" title="Details">
-                    <i class="fa fa-th-list"></i>
+                   class="btn btn-default d-flex align-items-center  <?= ($viewMode === 'cards') ? 'active' : '' ?>" title="Details">
+                    <i class="fa fa-th-list m-0"></i>
                 </a>
             </div>
         </div>

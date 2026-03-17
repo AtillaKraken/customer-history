@@ -15,7 +15,7 @@ use humhub\modules\comment\models\Comment;
 
 $borderClass = 'border-left: 4px solid #17a2b8;';
 $collapseId = 'contact-collapse-' . $contact->id;
-$collapseClass = $startCollapsed ? 'collapse' : 'collapse in';
+$collapseClass = $startCollapsed ? 'collapse' : 'collapse show';
 $ariaExpanded = $startCollapsed ? 'false' : 'true';
 
 // get interactions including this contact
@@ -42,7 +42,7 @@ $countResponsible = count($responsibleUsers);
 ?>
 
 <style>
-    .panel-heading[aria-expanded="true"] .contact-toggle-icon {
+    .card-header[aria-expanded="true"] .contact-toggle-icon {
         transform: rotate(180deg);
     }
 
@@ -93,14 +93,15 @@ $countResponsible = count($responsibleUsers);
     }
 </style>
 
-<div class="panel panel-default" style="<?= $borderClass ?> margin-bottom: 10px;">
-    <div class="panel-heading" role="button" data-toggle="collapse" href="#<?= $collapseId ?>"
+<div class="card mb-2" style="<?= $borderClass ?>">
+    <!-- Header -->
+    <div class="card-header" role="button" data-bs-toggle="collapse" href="#<?= $collapseId ?>"
          aria-expanded="<?= $ariaExpanded ?>" style="background-color: #fff; cursor: pointer;">
-        <div class="media">
-            <div class="media-left">
-                <i class="fa fa-user-o fa-2x text-info" style="margin-top: 5px; margin-right: 10px"></i>
+        <div class="d-flex">
+            <div class="flex-shrink-0">
+                <i class="fa fa-user-o fa-3x text-info-emphasis" style="margin-top: 5px; margin-right: 10px"></i>
             </div>
-            <div class="media-body">
+            <div class="flex-xxl-grow-1">
                 <h4 class="media-heading" style="font-size: 16px; font-weight: 600;">
                     <?php if (empty($contact->name)): ?>
                         <span class="text-danger">
@@ -109,8 +110,7 @@ $countResponsible = count($responsibleUsers);
                     <?php else: ?>
                         <?= Html::encode($contact->getDisplayName()) ?>
                     <?php endif; ?>
-
-                    <i class="fa fa-angle-down pull-right text-muted contact-toggle-icon"></i>
+                    <i class="fa fa-angle-down float-end text-muted contact-toggle-icon"></i>
                 </h4>
 
                 <div class="text-muted" style="font-size: 12px;">
@@ -131,8 +131,9 @@ $countResponsible = count($responsibleUsers);
         </div>
     </div>
 
-    <div id="<?= $collapseId ?>" class="panel-collapse <?= $collapseClass ?>">
-        <div class="panel-body" style="border-top: 1px solid #eee;">
+    <!-- body -->
+    <div id="<?= $collapseId ?>" class="<?= $collapseClass ?>">
+        <div class="card-body bg-white" style="border-top: 1px solid #eee;">
 
             <div class="row" style="margin-bottom: 15px;">
                 <div class="col-sm-3">
@@ -172,7 +173,7 @@ $countResponsible = count($responsibleUsers);
                 <div class="col-sm-3">
                     <small class="text-muted text-uppercase">Rollen / Funktionen</small><br>
                     <?php foreach ($contact->roleList as $role): ?>
-                        <span class="label label-default">
+                        <span class="badge bg-secondary">
                         <?= Html::encode($role) ?>
                     </span>
                     <?php endforeach; ?>
@@ -193,8 +194,7 @@ $countResponsible = count($responsibleUsers);
 
             <div style="margin-bottom: 20px;">
                 <strong style="font-size: 14px;">Notiz</strong>
-                <div class="well well-sm"
-                     style="background: #fff; border: 1px solid #ddd; margin-top: 5px; font-size: 13px;">
+                <div class="bg-white border p-2 rounded" style="margin-top: 5px;">
                     <?php if (!empty($contact->note)): ?>
                         <?= RichText::output($contact->note) ?>
                     <?php else: ?>
@@ -287,7 +287,7 @@ $countResponsible = count($responsibleUsers);
             <?php endif; ?>
 
 
-            <div class="text-right" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
+            <div class="text-end" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee;">
                 <?php if (!$isStream): ?>
                     <span style="margin-right: 15px;">
                         <?= LikeLink::widget(['object' => $contact]) ?> &middot;
