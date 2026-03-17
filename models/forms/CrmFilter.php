@@ -78,7 +78,7 @@ class CrmFilter extends Model
             if (!empty($this->orgIndustries)) $query->andWhere(['in', 'crm_organization.industry', $this->orgIndustries]);
             if (!empty($this->orgSize)) $query->andWhere(['crm_organization.size' => $this->orgSize]);
             if (!empty($this->orgRespUsers)) {
-                $query->innerJoin('crm_organization_responsible_user org_ru', 'crm_organization.id = org_ru.organization_id')
+                $query->innerJoin('crm_organization_user org_ru', 'crm_organization.id = org_ru.organization_id')
                     ->andWhere(['in', 'org_ru.user_id', $this->orgRespUsers]);
             }
         }
