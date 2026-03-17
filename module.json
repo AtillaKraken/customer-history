@@ -3,9 +3,9 @@
     "name": "Kundenhistorie",
     "description": "Verwalten von Interaktionen, Kontakten, Organisationen und Veranstaltungen innerhalb von Spaces.",
     "keywords": ["crm", "customer", "contacts", "interaction", "event"],
-    "version": "1.0.0",
+    "version": "1.1.0",
     "humhub": {
-        "minVersion": "1.15.0"
+        "minVersion": "1.18.0"
     },
     "namespace": "humhub\\modules\\crm",
     "authors": [
