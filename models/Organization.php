@@ -39,6 +39,7 @@ use yii\base\InvalidConfigException;
  */
 class Organization extends ContentActiveRecord implements Searchable
 {
+    public $moduleId = 'crm';
 
     use LinkableTrait;
 
