@@ -33,6 +33,8 @@ use yii\base\InvalidConfigException;
  */
 class Event extends ContentActiveRecord
 {
+    public $moduleId = 'crm';
+
     use LinkableTrait;
 
     // define Widget for Stream

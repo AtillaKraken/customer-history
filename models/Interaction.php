@@ -34,6 +34,8 @@ use yii\db\Exception;
  */
 class Interaction extends ContentActiveRecord
 {
+    public $moduleId = 'crm';
+
     use LinkableTrait;
 
     // define Widget for Stream

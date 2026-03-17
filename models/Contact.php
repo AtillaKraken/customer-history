@@ -31,6 +31,7 @@ use Yii;
  */
 class Contact extends ContentActiveRecord
 {
+    public $moduleId = 'crm';
 
     public $wallEntryClass = 'humhub\modules\crm\widgets\ContactWallEntry';
 
