@@ -6,7 +6,7 @@ use humhub\modules\crm\models\Event;
 use humhub\modules\crm\models\forms\CrmFilter;
 use HttpException;
 use humhub\modules\crm\permissions\CreateCrmEntry;
-use humhub\widgets\ModalClose;
+use humhub\widgets\modal\ModalClose;
 use humhub\modules\content\components\ContentContainerController;
 use Yii;
 use yii\data\Pagination;
@@ -79,7 +79,7 @@ class EventController extends ContentContainerController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'script' => 'humhub.modules.client.reload();',
+                'reload' => true,
             ]);
         }
 
@@ -108,7 +108,7 @@ class EventController extends ContentContainerController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'script' => 'humhub.modules.client.reload();',
+                'reload' => true,
             ]);
         }
 

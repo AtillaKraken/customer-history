@@ -7,7 +7,7 @@ use humhub\modules\crm\models\Organization;
 use humhub\modules\crm\models\forms\CrmFilter;
 use humhub\modules\content\components\ContentContainerController;
 use humhub\modules\crm\permissions\CreateCrmEntry;
-use humhub\widgets\ModalClose;
+use humhub\widgets\modal\ModalClose;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
@@ -83,7 +83,7 @@ class ContactController extends ContentContainerController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'script' => 'humhub.modules.client.reload();',
+                'reload' => true,
             ]);
         }
 
@@ -111,7 +111,7 @@ class ContactController extends ContentContainerController
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return ModalClose::widget([
                 'saved' => true,
-                'script' => 'humhub.modules.client.reload();',
+                'reload' => true,
             ]);
         }
 
